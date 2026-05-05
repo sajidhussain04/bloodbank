@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login | JharJeevan</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Google Fonts & Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --primary: #d32f2f;
+        --radius: 14px;
+        --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #ff8a80, #d32f2f);
+        animation: fadeIn 1s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .login-box {
+        background: #fff;
+        padding: 50px 40px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        text-align: center;
+        width: 360px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+        gap: 10px;
+        color: var(--primary);
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      .logo i {
+        font-size: 26px;
+        color: var(--primary);
+      }
+
+      h2 {
+        margin-bottom: 25px;
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      .input-group {
+        position: relative;
+        margin-bottom: 20px;
+      }
+
+      
+
+      input {
+        width: 100%;
+        padding: 12px 45px 12px 38px;
+        border: 1px solid #ddd;
+        border-radius: var(--radius);
+        outline: none;
+        transition: 0.3s;
+        font-size: 15px;
+      }
+
+      input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.15);
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius);
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #b71c1c;
+        transform: scale(1.02);
+      }
+
+      .forgot {
+        color: #555;
+        font-size: 14px;
+        margin-top: 10px;
+        cursor: pointer;
+        display: block;
+        transition: 0.3s;
+      }
+
+      .forgot:hover {
+        color: var(--primary);
+        text-decoration: underline;
+      }
+
+      .footer {
+        margin-top: 25px;
+        font-size: 13px;
+        color: #555;
+      }
+
+      /* Modal */
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal.active {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal-content {
+        background: #fff;
+        padding: 30px 25px;
+        border-radius: var(--radius);
+        width: 320px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        position: relative;
+      }
+
+      .modal-content h3 {
+        color: var(--primary);
+        margin-bottom: 10px;
+      }
+
+      .modal-content input {
+        padding-left: 15px;
+        margin-top: 10px;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: var(--radius);
+        outline: none;
+      }
+
+      .modal-content input:focus {
+        border-color: var(--primary);
+      }
+
+      .modal-content button {
+        margin-top: 15px;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 20px;
+        color: #555;
+        cursor: pointer;
+      }
+
+      .close-btn:hover {
+        color: var(--primary);
+      }
+
+      /* Toast message */
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #333;
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 8px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.4s;
+        z-index: 1000;
+      }
+
+      #toast.show {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(-10px);
+      }
+
+      @media (max-width: 480px) {
+        .login-box {
+          width: 90%;
+          padding: 40px 25px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-box">
+      <div class="logo"><i class="fas fa-tint"></i> JharJeevan</div>
+
+      <h2>Admin Login</h2>
+
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input
+          type="email"
+          id="email"
+          placeholder="Admin Email Address"
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter Admin Password"
+          autocomplete="current-password"
+        />
+        <i class="fas fa-eye toggle-password"></i>
+      </div>
+
+      <button id="loginBtn">Login</button>
+
+      <span class="forgot" id="forgotBtn">Forgot Password?</span>
+
+      <div class="footer">© 2025 JharJeevan Blood Bank</div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal" id="resetModal">
+      <div class="modal-content">
+        <span class="close-btn" id="closeBtn">×</span>
+        <h3>Forgot Password</h3>
+        <p style="font-size: 14px; color: #555">
+          Enter your registered email to receive reset link.
+        </p>
+        <input type="email" id="resetEmail" placeholder="Enter your email" />
+        <button id="resetBtn">Send Link</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <script>
+      function showToast(msg, color = "#333") {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.style.background = color;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3000);
+      }
+
+      async function login() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email) {
+          showToast("Please enter your admin email.", "#d32f2f");
+          return;
+        }
+        if (!password) {
+          showToast("Please enter your admin password.", "#d32f2f");
+          return;
+        }
+
+        try {
+          const res = await fetch("http://localhost:5000/api/admin/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            localStorage.setItem("adminToken", data.token);
+            if (data.admin && data.admin.email) {
+              localStorage.setItem("adminEmail", data.admin.email);
+            }
+            showToast("Login successful!", "#4caf50");
+            setTimeout(() => (window.location.href = "admin.html"), 1000);
+          } else {
+            showToast(data.message || "Invalid credentials", "#d32f2f");
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          showToast("Server error. Please try again.", "#d32f2f");
+        }
+      }
+
+      function openModal() {
+        document.getElementById("resetModal").classList.add("active");
+      }
+
+      function closeModal() {
+        document.getElementById("resetModal").classList.remove("active");
+      }
+
+      async function sendResetLink() {
+        const email = document.getElementById("resetEmail").value.trim();
+        if (!email) {
+          showToast("Enter your email first.", "#d32f2f");
+          return;
+        }
+
+        try {
+          const res = await fetch("http://localhost:5000/api/admin/forgot", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+
+          const data = await res.json();
+          if (res.ok && data.success) {
+            showToast(
+              data.message || "Reset link sent to your email!",
+              "#4caf50",
+            );
+            closeModal();
+            document.getElementById("resetEmail").value = "";
+          } else {
+            showToast(data.message || "Failed to send reset link.", "#d32f2f");
+          }
+        } catch (error) {
+          console.error("Reset link error:", error);
+          showToast("Server error. Please try again.", "#d32f2f");
+        }
+      }
+
+      // Allow Enter key to submit login
+      document
+        .getElementById("password")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            login();
+          }
+        });
+      document
+        .getElementById("email")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            login();
+          }
+        });
+
+      function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const icon = document.querySelector(".toggle-password");
+
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          icon.classList.remove("fa-eye");
+          icon.classList.add("fa-eye-slash");
+        } else {
+          passwordInput.type = "password";
+          icon.classList.remove("fa-eye-slash");
+          icon.classList.add("fa-eye");
+        }
+      }
+
+      document.getElementById("loginBtn").addEventListener("click", login);
+
+      document
+        .querySelector(".toggle-password")
+        .addEventListener("click", togglePassword);
+
+      document.getElementById("forgotBtn").addEventListener("click", openModal);
+
+      document
+        .getElementById("resetBtn")
+        .addEventListener("click", sendResetLink);
+
+      document.getElementById("closeBtn").addEventListener("click", closeModal);
+    </script>
+  </body>
+</html>

@@ -1200,7 +1200,7 @@ app.get("/api/health", (req, res) => {
 /* -------------------- AI ROUTES -------------------- */
 
 // Import AI routes
-const { initAIRoutes } = require("./server/routes/aiRoutes");
+const { initAIRoutes } = require("./routes/aiRoutes");
 
 // Initialize AI routes with models
 const aiRoutes = initAIRoutes(Donor, BloodRequest);

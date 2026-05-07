@@ -203,9 +203,14 @@ const adminSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-const Donor = mongoose.model("Donor", donorSchema);
-const BloodRequest = mongoose.model("BloodRequest", requestSchema);
-const Admin = mongoose.model("Admin", adminSchema);
+const Donor = mongoose.models.Donor || mongoose.model("Donor", donorSchema);
+
+const BloodRequest =
+  mongoose.models.BloodRequest ||
+  mongoose.model("BloodRequest", requestSchema);
+
+const Admin =
+  mongoose.models.Admin || mongoose.model("Admin", adminSchema);
 
 /* -------------------- INITIALIZE ADMIN -------------------- */
 

@@ -135,45 +135,24 @@ if (transporter) {
 }
 
 /* -------------------- DATABASE CONNECTION -------------------- */
-
-/* -------------------- DATABASE CONNECTION -------------------- */
-
-let isConnected = false;
-
 async function connectDB() {
-  if (isConnected) {
-    console.log("✅ MongoDB already connected");
-    return;
-  }
-
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10,
-    });
+    console.log("⏳ Connecting to MongoDB...");
 
-    isConnected = true;
+    const conn = await mongoose.connect(process.env.MONGO_URI);
 
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log("✅ MongoDB Connected");
+    console.log("HOST:", conn.connection.host);
+    console.log("DB:", conn.connection.name);
   } catch (err) {
-    console.error("❌ MongoDB connection error:", err.message);
+    console.error("❌ FULL MONGODB ERROR:");
+    console.error(err);
+
+    process.exit(1);
   }
 }
 
-connectDB();
 
-mongoose.connection.on("connected", () => {
-  console.log("🟢 Mongoose connected");
-});
-
-mongoose.connection.on("error", (err) => {
-  console.log("🔴 Mongoose error:", err.message);
-});
-
-mongoose.connection.on("disconnected", () => {
-  console.log("🟠 Mongoose disconnected");
-});
 
 /* -------------------- SCHEMAS -------------------- */
 
@@ -1263,10 +1242,11 @@ app.get("/api/health", async (req, res) => {
 
 // Import AI routes
 const { initAIRoutes } = require("./server/routes/aiRoutes");
+const { clear } = require("console");
 
 // Initialize AI routes with models
-const aiRoutes = initAIRoutes(Donor, BloodRequest);
-app.use("/api/ai", aiRoutes);
+// clear
+
 
 console.log(
   "🤖 AI Routes Initialized: Donor Recommender, Chatbot, Demand Predictor",
@@ -1296,51 +1276,60 @@ app.use((req, res) => {
 module.exports = app;
 
 /* -------------------- SERVER INITIALIZATION -------------------- */
-
 const PORT = process.env.PORT || 5000;
 
-// Only start the HTTP server when running locally (not on Vercel)
+async function startServer() {
+  try {
+    await connectDB();
+
+    const server = app.listen(PORT, () => {
+      console.log("\n" + "=".repeat(50));
+      console.log(`🚀 Jhar Jeevan Blood Bank Server`);
+      console.log("=".repeat(50));
+      console.log(`📡 Server running on: http://localhost:${PORT}`);
+      console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
+      console.log(
+        `🔒 Admin login: POST http://localhost:${PORT}/api/admin/login`,
+      );
+      console.log("-".repeat(50));
+      console.log(
+        `📧 Email: ${transporter ? "✅ Configured" : "❌ Not configured"}`,
+      );
+      console.log(`🔐 Admin Email: ${process.env.ADMIN_EMAIL}`);
+
+      if (process.env.ADMIN_PHONE) {
+        console.log(`📱 Admin Phone: ${process.env.ADMIN_PHONE}`);
+      }
+
+      console.log("=".repeat(50));
+      console.log("✨ System Ready! ✨\n");
+    });
+
+    process.on("SIGTERM", () => {
+      console.log("SIGTERM received");
+
+      server.close(() => {
+        mongoose.connection.close(false, () => {
+          process.exit(0);
+        });
+      });
+    });
+
+    process.on("SIGINT", () => {
+      console.log("SIGINT received");
+
+      server.close(() => {
+        mongoose.connection.close(false, () => {
+          process.exit(0);
+        });
+      });
+    });
+
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+  }
+}
+
 if (!process.env.VERCEL) {
-  const server = app.listen(PORT, () => {
-    console.log("\n" + "=".repeat(50));
-    console.log(`🚀 Jhar Jeevan Blood Bank Server`);
-    console.log("=".repeat(50));
-    console.log(`📡 Server running on: http://localhost:${PORT}`);
-    console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
-    console.log(
-      `🔒 Admin login: POST http://localhost:${PORT}/api/admin/login`,
-    );
-    console.log("-".repeat(50));
-    console.log(
-      `📧 Email: ${transporter ? "✅ Configured" : "❌ Not configured"}`,
-    );
-    console.log(`🔐 Admin Email: ${process.env.ADMIN_EMAIL}`);
-    if (process.env.ADMIN_PHONE)
-      console.log(`📱 Admin Phone: ${process.env.ADMIN_PHONE}`);
-    console.log("=".repeat(50));
-    console.log("✨ System Ready! ✨\n");
-  });
-
-  // Graceful shutdown
-  process.on("SIGTERM", () => {
-    console.log("SIGTERM signal received: closing HTTP server");
-    server.close(() => {
-      console.log("HTTP server closed");
-      mongoose.connection.close(false, () => {
-        console.log("MongoDB connection closed");
-        process.exit(0);
-      });
-    });
-  });
-
-  process.on("SIGINT", () => {
-    console.log("\nSIGINT signal received: closing HTTP server");
-    server.close(() => {
-      console.log("HTTP server closed");
-      mongoose.connection.close(false, () => {
-        console.log("MongoDB connection closed");
-        process.exit(0);
-      });
-    });
-  });
+  startServer();
 }

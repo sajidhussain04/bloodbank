@@ -132,12 +132,29 @@ if (transporter) {
 /* -------------------- DATABASE CONNECTION -------------------- */
 
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("✅ MongoDB connected");
+  })
   .catch((err) => {
-    console.error("❌ MongoDB error:", err);
-    process.exit(1);
+    console.error("❌ MongoDB error:", err.message);
   });
+
+
+  mongoose.connection.on("connected", () => {
+  console.log("🟢 Mongoose connected");
+});
+
+mongoose.connection.on("error", (err) => {
+  console.log("🔴 Mongoose error:", err);
+});
+
+mongoose.connection.on("disconnected", () => {
+  console.log("🟡 Mongoose disconnected");
+});
 
 /* -------------------- SCHEMAS -------------------- */
 

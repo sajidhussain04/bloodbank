@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
   // API Configuration - FIXED: Use absolute URL instead of window.location.origin
-  const API_URL = 'http://localhost:5000';
+  const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "https://YOUR-BACKEND-URL.onrender.com";
   
   // DOM Elements
   const donorForm = document.getElementById('donorRegistration');

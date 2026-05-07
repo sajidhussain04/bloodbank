@@ -101,11 +101,9 @@ app.use(
   }),
 );
 
-// Use static files from current directory (frontend is NOT moved into /client)
+// Use static files from current directory
 app.use(express.static(__dirname));
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+
 // 🔥 Fix favicon 404
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 
@@ -149,12 +147,9 @@ async function connectDB() {
   } catch (err) {
     console.error("❌ FULL MONGODB ERROR:");
     console.error(err);
-
     process.exit(1);
   }
 }
-
-
 
 /* -------------------- SCHEMAS -------------------- */
 
@@ -772,7 +767,7 @@ app.get("/api/requests", verifyAdmin, async (req, res) => {
   }
 });
 
-// PATCH - Approve request (for compatibility with admin.js)
+// PATCH - Approve request
 app.patch("/api/requests/:id/approve", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -973,7 +968,7 @@ app.post("/api/requests", async (req, res) => {
   }
 });
 
-// UPDATE request status (Approve/Reject/Complete)
+// UPDATE request status
 app.put("/api/requests/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -1239,20 +1234,31 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
-// ============ AI ROUTES (NEW FEATURE) ============
-/* -------------------- AI ROUTES -------------------- */
+/* ============ AI ROUTES INTEGRATION ============ */
 
-// Import AI routes
-const { initAIRoutes } = require("./server/routes/aiRoutes");
-const { clear } = require("console");
+/* ============ AI ROUTES INTEGRATION ============ */
 
-// Initialize AI routes with models
-// clear
+// Import AI routes - Make sure the path is correct
+try {
+ const { initAIRoutes } = require("./server/routes/aiRoutes");
+  
+  // Initialize AI routes with models
+  const aiRouter = initAIRoutes(Donor, BloodRequest);
+  
+  // Mount the AI routes at /api/ai
+  app.use("/api/ai", aiRouter);
+  
+  console.log("✅ AI Routes Initialized Successfully");
+  console.log("   📍 Base URL: /api/ai");
+  console.log("   💬 Chat POST /api/ai/chat");
+  console.log("   📊 Stats GET /api/ai/ai-stats");
+  console.log("   🩸 Demand GET /api/ai/demand-prediction");
+  console.log("   💚 Health GET /api/ai/health");
+} catch (error) {
+  console.error("❌ Failed to load AI routes:", error.message);
+  console.log("⚠️ AI features will be unavailable");
+}
 
-
-console.log(
-  "🤖 AI Routes Initialized: Donor Recommender, Chatbot, Demand Predictor",
-);
 /* -------------------- ERROR HANDLING MIDDLEWARE -------------------- */
 
 // Global error handler
@@ -1294,22 +1300,21 @@ async function startServer() {
         `🔒 Admin login: POST http://localhost:${PORT}/api/admin/login`,
       );
       console.log("-".repeat(50));
+      console.log(`🤖 AI Endpoints:`);
+      console.log(`   💬 Chat: POST http://localhost:${PORT}/api/ai/chat`);
+      console.log(`   📊 AI Stats: GET http://localhost:${PORT}/api/ai/ai-stats`);
+      console.log(`   🩸 Demand Prediction: GET http://localhost:${PORT}/api/ai/demand-prediction`);
+      console.log("-".repeat(50));
       console.log(
         `📧 Email: ${transporter ? "✅ Configured" : "❌ Not configured"}`,
       );
       console.log(`🔐 Admin Email: ${process.env.ADMIN_EMAIL}`);
-
-      if (process.env.ADMIN_PHONE) {
-        console.log(`📱 Admin Phone: ${process.env.ADMIN_PHONE}`);
-      }
-
       console.log("=".repeat(50));
       console.log("✨ System Ready! ✨\n");
     });
 
     process.on("SIGTERM", () => {
       console.log("SIGTERM received");
-
       server.close(() => {
         mongoose.connection.close(false, () => {
           process.exit(0);
@@ -1319,7 +1324,6 @@ async function startServer() {
 
     process.on("SIGINT", () => {
       console.log("SIGINT received");
-
       server.close(() => {
         mongoose.connection.close(false, () => {
           process.exit(0);

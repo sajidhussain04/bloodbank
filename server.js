@@ -133,8 +133,7 @@ if (transporter) {
 
 mongoose
   .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  
   })
   .then(() => {
     console.log("✅ MongoDB connected");
@@ -1205,17 +1204,35 @@ app.get("/api/search/donors", verifyAdmin, async (req, res) => {
 
 /* -------------------- HEALTH CHECK -------------------- */
 
-app.get("/api/health", (req, res) => {
-  res.json({
-    success: true,
-    status: "OK",
-    timestamp: new Date().toISOString(),
-    mongodb:
-      mongoose.connection.readyState === 1 ? "Connected" : "Disconnected",
-    email: transporter ? "Configured" : "Not configured",
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || "development",
-  });
+app.get("/api/health", async (req, res) => {
+  try {
+    const mongoState = mongoose.connection.readyState;
+
+    const mongoStatus =
+      mongoState === 1
+        ? "Connected"
+        : mongoState === 2
+          ? "Connecting"
+          : mongoState === 3
+            ? "Disconnecting"
+            : "Disconnected";
+
+    res.json({
+      success: true,
+      status: "OK",
+      timestamp: new Date().toISOString(),
+      mongodb: mongoStatus,
+      mongoReadyState: mongoState,
+      email: transporter ? "Configured" : "Not configured",
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV || "production",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 });
 
 // ============ AI ROUTES (NEW FEATURE) ============

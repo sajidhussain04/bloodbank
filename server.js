@@ -10,6 +10,7 @@ const helmet = require("helmet");
 const path = require("path");
 
 dotenv.config();
+mongoose.set("strictQuery", false);
 
 // Validate required environment variables
 if (!process.env.JWT_SECRET) {
@@ -85,7 +86,11 @@ app.use(
     origin: function (origin, callback) {
       // Allow requests with no origin (mobile apps, curl, etc.)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin) || origin.endsWith(".onrender.com")) {
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".onrender.com") ||
+        origin.endsWith(".vercel.app")
+      ) {
         return callback(null, true);
       }
       return callback(null, false);
@@ -132,10 +137,7 @@ if (transporter) {
 /* -------------------- DATABASE CONNECTION -------------------- */
 
 mongoose
-  .connect(process.env.MONGO_URI, {
-    serverSelectionTimeoutMS: 30000,
-    socketTimeoutMS: 45000,
-  })
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("✅ MongoDB connected");
   })

@@ -1261,7 +1261,7 @@ process.on("SIGINT", () => {
   });
 });
 
-=======
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -2527,5 +2527,5 @@ process.on("SIGINT", () => {
   });
 });
 
->>>>>>> d4b67de8baf5475278e14641bd8165e78b95f9b3
+
 module.exports = app;

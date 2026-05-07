@@ -136,25 +136,43 @@ if (transporter) {
 
 /* -------------------- DATABASE CONNECTION -------------------- */
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB connected");
-  })
-  .catch((err) => {
+/* -------------------- DATABASE CONNECTION -------------------- */
+
+let isConnected = false;
+
+async function connectDB() {
+  if (isConnected) {
+    console.log("✅ MongoDB already connected");
+    return;
+  }
+
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+    });
+
+    isConnected = true;
+
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+  } catch (err) {
     console.error("❌ MongoDB connection error:", err.message);
-  });
+  }
+}
+
+connectDB();
 
 mongoose.connection.on("connected", () => {
   console.log("🟢 Mongoose connected");
 });
 
 mongoose.connection.on("error", (err) => {
-  console.log("🔴 Mongoose error:", err);
+  console.log("🔴 Mongoose error:", err.message);
 });
 
 mongoose.connection.on("disconnected", () => {
-  console.log("🟡 Mongoose disconnected");
+  console.log("🟠 Mongoose disconnected");
 });
 
 /* -------------------- SCHEMAS -------------------- */
@@ -257,7 +275,7 @@ async function initAdmin() {
 }
 
 // Initialize admin after database connection
-mongoose.connection.once("open", () => {
+mongoose.connection.once("connected", () => {
   initAdmin();
 });
 

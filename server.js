@@ -133,17 +133,17 @@ if (transporter) {
 
 mongoose
   .connect(process.env.MONGO_URI, {
-  
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
   })
   .then(() => {
     console.log("✅ MongoDB connected");
   })
   .catch((err) => {
-    console.error("❌ MongoDB error:", err.message);
+    console.error("❌ MongoDB connection error:", err.message);
   });
 
-
-  mongoose.connection.on("connected", () => {
+mongoose.connection.on("connected", () => {
   console.log("🟢 Mongoose connected");
 });
 
@@ -222,11 +222,9 @@ const adminSchema = new mongoose.Schema({
 const Donor = mongoose.models.Donor || mongoose.model("Donor", donorSchema);
 
 const BloodRequest =
-  mongoose.models.BloodRequest ||
-  mongoose.model("BloodRequest", requestSchema);
+  mongoose.models.BloodRequest || mongoose.model("BloodRequest", requestSchema);
 
-const Admin =
-  mongoose.models.Admin || mongoose.model("Admin", adminSchema);
+const Admin = mongoose.models.Admin || mongoose.model("Admin", adminSchema);
 
 /* -------------------- INITIALIZE ADMIN -------------------- */
 
@@ -1221,7 +1219,12 @@ app.get("/api/health", async (req, res) => {
       success: true,
       status: "OK",
       timestamp: new Date().toISOString(),
-      mongodb: mongoStatus,
+      mongodb:
+        mongoose.connection.readyState === 1
+          ? "Connected"
+          : mongoose.connection.readyState === 2
+            ? "Connecting"
+            : "Disconnected",
       mongoReadyState: mongoState,
       email: transporter ? "Configured" : "Not configured",
       uptime: process.uptime(),
@@ -1284,7 +1287,9 @@ if (!process.env.VERCEL) {
     console.log("=".repeat(50));
     console.log(`📡 Server running on: http://localhost:${PORT}`);
     console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
-    console.log(`🔒 Admin login: POST http://localhost:${PORT}/api/admin/login`);
+    console.log(
+      `🔒 Admin login: POST http://localhost:${PORT}/api/admin/login`,
+    );
     console.log("-".repeat(50));
     console.log(
       `📧 Email: ${transporter ? "✅ Configured" : "❌ Not configured"}`,

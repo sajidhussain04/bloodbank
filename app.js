@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const API_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : "https://YOUR-BACKEND-URL.onrender.com";
+    : window.location.origin;
   
   // DOM Elements
   const donorForm = document.getElementById('donorRegistration');

@@ -58,7 +58,7 @@ app.use(
           "https://ka-f.fontawesome.com",
         ],
         imgSrc: ["'self'", "data:", "https:"],
-        connectSrc: ["'self'", "http://localhost:5000"],
+        connectSrc: ["'self'", "http://localhost:5000", "https:"],
         frameSrc: [
           "'self'",
           "https://www.google.com",
@@ -69,9 +69,27 @@ app.use(
   }),
 );
 
+const allowedOrigins = [
+  "http://127.0.0.1:5500",
+  "http://localhost:5500",
+  "http://localhost:5000",
+];
+
+// Add production URL from environment if set
+if (process.env.RENDER_EXTERNAL_URL) {
+  allowedOrigins.push(process.env.RENDER_EXTERNAL_URL);
+}
+
 app.use(
   cors({
-    origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin) || origin.endsWith(".onrender.com")) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -1211,47 +1229,54 @@ app.use((req, res) => {
   });
 });
 
+/* -------------------- EXPORT FOR VERCEL -------------------- */
+
+module.exports = app;
+
 /* -------------------- SERVER INITIALIZATION -------------------- */
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
-  console.log("\n" + "=".repeat(50));
-  console.log(`🚀 Jhar Jeevan Blood Bank Server`);
-  console.log("=".repeat(50));
-  console.log(`📡 Server running on: http://localhost:${PORT}`);
-  console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🔒 Admin login: POST http://localhost:${PORT}/api/admin/login`);
-  console.log("-".repeat(50));
-  console.log(
-    `📧 Email: ${transporter ? "✅ Configured" : "❌ Not configured"}`,
-  );
-  console.log(`🔐 Admin Email: ${process.env.ADMIN_EMAIL}`);
-  if (process.env.ADMIN_PHONE)
-    console.log(`📱 Admin Phone: ${process.env.ADMIN_PHONE}`);
-  console.log("=".repeat(50));
-  console.log("✨ System Ready! ✨\n");
-});
+// Only start the HTTP server when running locally (not on Vercel)
+if (!process.env.VERCEL) {
+  const server = app.listen(PORT, () => {
+    console.log("\n" + "=".repeat(50));
+    console.log(`🚀 Jhar Jeevan Blood Bank Server`);
+    console.log("=".repeat(50));
+    console.log(`📡 Server running on: http://localhost:${PORT}`);
+    console.log(`💚 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🔒 Admin login: POST http://localhost:${PORT}/api/admin/login`);
+    console.log("-".repeat(50));
+    console.log(
+      `📧 Email: ${transporter ? "✅ Configured" : "❌ Not configured"}`,
+    );
+    console.log(`🔐 Admin Email: ${process.env.ADMIN_EMAIL}`);
+    if (process.env.ADMIN_PHONE)
+      console.log(`📱 Admin Phone: ${process.env.ADMIN_PHONE}`);
+    console.log("=".repeat(50));
+    console.log("✨ System Ready! ✨\n");
+  });
 
-// Graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("SIGTERM signal received: closing HTTP server");
-  server.close(() => {
-    console.log("HTTP server closed");
-    mongoose.connection.close(false, () => {
-      console.log("MongoDB connection closed");
-      process.exit(0);
+  // Graceful shutdown
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM signal received: closing HTTP server");
+    server.close(() => {
+      console.log("HTTP server closed");
+      mongoose.connection.close(false, () => {
+        console.log("MongoDB connection closed");
+        process.exit(0);
+      });
     });
   });
-});
 
-process.on("SIGINT", () => {
-  console.log("\nSIGINT signal received: closing HTTP server");
-  server.close(() => {
-    console.log("HTTP server closed");
-    mongoose.connection.close(false, () => {
-      console.log("MongoDB connection closed");
-      process.exit(0);
+  process.on("SIGINT", () => {
+    console.log("\nSIGINT signal received: closing HTTP server");
+    server.close(() => {
+      console.log("HTTP server closed");
+      mongoose.connection.close(false, () => {
+        console.log("MongoDB connection closed");
+        process.exit(0);
+      });
     });
   });
-});
+}

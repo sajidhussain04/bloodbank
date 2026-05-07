@@ -103,7 +103,9 @@ app.use(
 
 // Use static files from current directory (frontend is NOT moved into /client)
 app.use(express.static(__dirname));
-
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 // 🔥 Fix favicon 404
 app.get("/favicon.ico", (req, res) => res.status(204).end());
 

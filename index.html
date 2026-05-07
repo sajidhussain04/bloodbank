@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JharJeevan Blood Bank - Saving Lives Through Donation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header role="banner">
+        <div class="container header-inner">
+            <div class="logo">
+                <h1>JharJeevan</h1>
+                <p class="tagline">Blood Bank & Donation Center</p>
+            </div>
+            <nav role="navigation" aria-label="Main Navigation">
+                <button class="mobile-menu" id="mobileMenuBtn" aria-expanded="false" aria-controls="mainNav">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                    <span class="sr-only">Toggle navigation</span>
+                </button>
+                <ul id="mainNav">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#donate">Donate Blood</a></li>
+                    <li><a href="#request">Request Blood</a></li>
+                    <li><a href="#inventory">Blood Inventory</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="admin-login.html" class="admin-login-btn">Login</a></li>
+
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero" aria-labelledby="hero-heading">
+        <div class="container hero-content">
+            <h2 id="hero-heading">Donate Blood, Save Lives</h2>
+            <p>Every drop counts. Join us in our mission to ensure no one dies due to lack of blood.</p>
+            <div class="cta-buttons" role="group" aria-label="Primary actions">
+                <a href="#donate" class="btn primary">Become a Donor</a>
+                <a href="#request" class="btn secondary">Request Blood</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section" aria-labelledby="about-heading">
+        <div class="container">
+            <h2 id="about-heading">About JharJeevan</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>JharJeevan Blood Bank was established in 2023 with the mission to create a robust blood donation ecosystem in Jharkhand. We are a non-profit organization dedicated to ensuring safe and adequate blood supply to all hospitals and patients in need.</p>
+                    <p>Our network includes over 10,000 registered donors and we serve more than 20 hospitals across the state. We follow strict quality and safety protocols in blood collection, testing, storage and distribution.</p>
+                    <ul class="achievements" aria-label="Our Achievements">
+                        <li><i class="fas fa-tint" aria-hidden="true"></i> 50,000+ Lives Saved</li>
+                        <li><i class="fas fa-users" aria-hidden="true"></i> 10,000+ Donors</li>
+                        <li><i class="fas fa-hospital" aria-hidden="true"></i> 50+ Partner Hospitals</li>
+                    </ul>
+                </div>
+                <div class="about-image">
+                    <img src="image4.jpg" alt="JharJeevan team and donors at blood donation camp" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="donate" class="donate-section" aria-labelledby="donate-heading">
+        <div class="container">
+            <h2 id="donate-heading">Become a Blood Donor</h2>
+            <div class="donate-content">
+                <div class="donate-info">
+                    <h3>Why Donate Blood?</h3>
+                    <p>Blood donation is a noble act that saves lives. One donation can save up to three lives. Regular blood donation also has health benefits for donors including reduced risk of heart disease and stimulation of blood cell production.</p>
+                    
+                    <h3>Eligibility Criteria</h3>
+                    <ul>
+                        <li>Age: 18-65 years</li>
+                        <li>Weight: Minimum 50 kg</li>
+                        <li>Hemoglobin: Minimum 12.5 g/dL</li>
+                        <li>No major illnesses or infections</li>
+                        <li>Not pregnant or breastfeeding</li>
+                        <li>Last donation should be at least 3 months ago</li>
+                    </ul>
+
+                    <div class="benefits">
+                        <h3>Donor Benefits</h3>
+                        <ul>
+                            <li>Free health checkup</li>
+                            <li>Blood group testing</li>
+                            <li>Refreshments after donation</li>
+                            <li>Donor certificate</li>
+                            <li>Priority during emergency</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="donate-form">
+                    <h3>Register as a Donor</h3>
+                    <form id="donorRegistration" novalidate>
+                        <div class="form-group">
+                            <input type="text" id="donorName" name="donorName" placeholder="Full Name" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="donorAge" name="donorAge" placeholder="Age" min="18" max="65" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <select id="donorBloodGroup" name="donorBloodGroup" required>
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="donorPhone" name="donorPhone" placeholder="Phone Number" pattern="[0-9]{10}" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="donorEmail" name="donorEmail" placeholder="Email (optional)">
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="donorLocation" name="donorLocation" placeholder="City/District" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <button type="submit" class="btn primary" id="donorSubmit">
+                            <span class="btn-text">Register as Donor</span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Registering...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="request" class="request-section" aria-labelledby="request-heading">
+        <div class="container">
+            <h2 id="request-heading">Request Blood</h2>
+            <div class="request-content">
+                <div class="request-form">
+                    <h3>Emergency Blood Request</h3>
+                    <form id="bloodRequest" novalidate>
+                        <div class="form-group">
+                            <input type="text" id="patientName" name="patientName" placeholder="Patient Name" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <select id="bloodGroup" name="bloodGroup" required>
+                                <option value="">Required Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" id="unitsRequired" name="unitsRequired" placeholder="Units Required" min="1" max="10" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="hospitalName" name="hospitalName" placeholder="Hospital Name" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="hospitalAddress" name="hospitalAddress" placeholder="Hospital Address" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="city" name="city" placeholder="City/District" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" id="requiredDate" name="requiredDate" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="requesterPhone" name="requesterPhone" placeholder="Your Contact Number" pattern="[0-9]{10}" required>
+                            <div class="field-error"></div>
+                        </div>
+                        <button type="submit" class="btn primary" id="requestSubmit">
+                            <span class="btn-text">Submit Request</span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Submitting...
+                            </span>
+                        </button>
+                    </form>
+                </div>
+                <div class="request-info">
+                    <h3>Blood Request Process</h3>
+                    <ol>
+                        <li>Fill out the request form with all required details</li>
+                        <li>Our team will verify the request within 30 minutes</li>
+                        <li>We'll match you with available donors or blood units</li>
+                        <li>You'll receive confirmation with donor/collection center details</li>
+                        <li>Collect the blood from the designated location</li>
+                    </ol>
+                    <div class="emergency-contact" role="region" aria-label="Emergency Contact">
+                        <h4>24x7 Emergency Helpline</h4>
+                        <p><i class="fas fa-phone" aria-hidden="true"></i> 9523627889</p>
+                        <p><i class="fas fa-mobile-alt" aria-hidden="true"></i> 9523627889</p>
+                        <p><i class="fas fa-envelope" aria-hidden="true"></i> emergency@jharjeevan.org</p>
+                    </div>
+                    <div class="response-time">
+                        <h4>Average Response Time</h4>
+                        <p><i class="fas fa-clock" aria-hidden="true"></i> 15-30 minutes</p>
+                        <p><i class="fas fa-check-circle" aria-hidden="true"></i> 95% success rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="inventory" class="inventory-section" aria-labelledby="inventory-heading">
+        <div class="container">
+            <h2 id="inventory-heading">Blood Inventory</h2>
+            <p class="inventory-description">Real-time availability of blood groups in our storage</p>
+            <div class="inventory-status" role="list">
+                <div class="blood-group" role="listitem">
+                    <h3>A+</h3>
+                    <div class="blood-level high">Available</div>
+                    <div class="blood-units">25 units</div>
+                </div>
+                <div class="blood-group">
+                    <h3>A-</h3>
+                    <div class="blood-level medium">Limited</div>
+                    <div class="blood-units">8 units</div>
+                </div>
+                <div class="blood-group">
+                    <h3>B+</h3>
+                    <div class="blood-level high">Available</div>
+                    <div class="blood-units">32 units</div>
+                </div>
+                <div class="blood-group">
+                    <h3>B-</h3>
+                    <div class="blood-level low">Critical</div>
+                    <div class="blood-units">2 units</div>
+                </div>
+                <div class="blood-group">
+                    <h3>AB+</h3>
+                    <div class="blood-level medium">Limited</div>
+                    <div class="blood-units">12 units</div>
+                </div>
+                <div class="blood-group">
+                    <h3>AB-</h3>
+                    <div class="blood-level low">Critical</div>
+                    <div class="blood-units">1 unit</div>
+                </div>
+                <div class="blood-group">
+                    <h3>O+</h3>
+                    <div class="blood-level high">Available</div>
+                    <div class="blood-units">45 units</div>
+                </div>
+                <div class="blood-group">
+                    <h3>O-</h3>
+                    <div class="blood-level low">Critical</div>
+                    <div class="blood-units">3 units</div>
+                </div>
+            </div>
+
+            <div class="inventory-legend">
+                <div class="legend-item">
+                    <span class="legend-color high"></span>
+                    <span>Available (10+ units)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color medium"></span>
+                    <span>Limited (5-9 units)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color low"></span>
+                    <span>Critical (<5 units)</span>
+                </div>
+            </div>
+
+            <p class="inventory-update">Last updated: <span id="updateTime"></span></p>
+            
+            <div class="inventory-actions">
+                <button class="btn secondary" id="refreshInventory">
+                    <i class="fas fa-sync-alt"></i> Refresh Inventory
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section" aria-labelledby="contact-heading">
+        <div class="container">
+            <h2 id="contact-heading">Contact Us</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>JharJeevan Blood Bank</h3>
+                    <p><i class="fas fa-map-marker-alt" aria-hidden="true"></i> 123 Health Street, Giridih, Jharkhand - 834001</p>
+                    <p><i class="fas fa-phone" aria-hidden="true"></i> 9523627889</p>
+                    <p><i class="fas fa-envelope" aria-hidden="true"></i> contact@jharjeevan.org</p>
+                    
+                    <h3>Working Hours</h3>
+                    <p>Monday to Saturday: 8:00 AM - 8:00 PM</p>
+                    <p>Sunday: 9:00 AM - 3:00 PM</p>
+                    <p>Emergency services available 24x7</p>
+
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="contact-map">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58231.731621533516!2d86.28945!3d24.18985!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f155d71e2ff95d%3A0xa5bea10ff8ed8188!2sGiridih%2C%20Jharkhand!5e0!3m2!1sen!2sin!4v1753338475367!5m2!1sen!2sin" 
+                            width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" 
+                            title="JharJeevan Blood Bank Location in Giridih, Jharkhand"
+                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <h3>JharJeevan</h3>
+                    <p>Committed to ensuring safe and adequate blood supply to all hospitals and patients in Jharkhand since 2023.</p>
+                    <div class="social-links" aria-label="Social media links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#donate">Donate Blood</a></li>
+                        <li><a href="#request">Request Blood</a></li>
+                        <li><a href="#inventory">Blood Inventory</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-newsletter">
+                    <h3>Stay Updated</h3>
+                    <p>Subscribe to our newsletter for blood donation camps and urgent requests.</p>
+                    <form id="newsletterForm">
+                        <input type="email" placeholder="Your Email" required>
+                        <button type="submit" class="btn primary">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 JharJeevan Blood Bank. All Rights Reserved.</p>
+                <p>Developed with <i class="fas fa-heart" style="color: #ff0000;"></i> for Jharkhand</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification container -->
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

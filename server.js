@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -19,7 +19,7 @@ const PUBLIC_DIR = __dirname;
 
 function requireEnv(name) {
   if (!process.env[name]) {
-    console.error(`âŒ Missing required environment variable: ${name}`);
+    console.error(`Ã¢ÂÅ’ Missing required environment variable: ${name}`);
     process.exit(1);
   }
 }
@@ -124,31 +124,31 @@ const transporter =
 
 if (transporter) {
   transporter.verify((error) => {
-    if (error) console.log("âŒ Email config error:", error.message);
-    else console.log("âœ… Email server ready");
+    if (error) console.log("Ã¢ÂÅ’ Email config error:", error.message);
+    else console.log("Ã¢Å“â€¦ Email server ready");
   });
 } else {
-  console.log("âš ï¸ Email notifications disabled");
+  console.log("Ã¢Å¡Â Ã¯Â¸Â Email notifications disabled");
 }
 
 /* -------------------- EMAIL HELPERS -------------------- */
 
 async function sendEmail(options) {
   if (!transporter) {
-    console.log("⚠️ Email skipped: SMTP is not configured");
+    console.log("âš ï¸ Email skipped: SMTP is not configured");
     return { success: false, skipped: true };
   }
 
   try {
     const info = await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"JharJeevan Blood Bank" <${JHARJEEVAN_EMAIL_FROM}>`, 
       ...options,
     });
 
-    console.log(`✅ Email sent: ${options.subject || "(no subject)"}`);
+    console.log(`Email sent: ${options.subject || "(no subject)"}`);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error(`❌ Email failed: ${options.subject || "(no subject)"} - ${error.message}`);
+    console.error(`âŒ Email failed: ${options.subject || "(no subject)"} - ${error.message}`);
     return { success: false, error: error.message };
   }
 }
@@ -157,7 +157,7 @@ async function sendAdminNotification(subject, html) {
   const adminEmail = normalizeEmail(process.env.ADMIN_EMAIL);
 
   if (!adminEmail) {
-    console.log("⚠️ Admin notification skipped: ADMIN_EMAIL is not configured");
+    console.log("âš ï¸ Admin notification skipped: ADMIN_EMAIL is not configured");
     return;
   }
 
@@ -222,7 +222,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
         subject: "Welcome Back to JharJeevan Newsletter",
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
-            <h2 style="color:#c0392b">Welcome back to JharJeevan ❤️</h2>
+            <h2 style="color:#c0392b">Welcome back to JharJeevan â¤ï¸</h2>
             <p>Hello ${name || existing.name || "there"},</p>
             <p>Your newsletter subscription is active again.</p>
             <p>Thank you for staying connected with JharJeevan Blood Bank.</p>
@@ -250,11 +250,11 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
 
     await sendEmail({
       to: email,
-      subject: "Welcome to JharJeevan Newsletter ❤️",
+      subject: "Welcome to JharJeevan Newsletter â¤ï¸",
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
           <div style="text-align:center">
-            <h2 style="color:#c0392b">Welcome to JharJeevan ❤️</h2>
+            <h2 style="color:#c0392b">Welcome to JharJeevan â¤ï¸</h2>
           </div>
           <p>Hello ${name || "there"},</p>
           <p>Thank you for subscribing to the JharJeevan newsletter.</p>
@@ -270,7 +270,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
     });
 
     await sendAdminNotification(
-      "📰 New Newsletter Subscriber - JharJeevan",
+      "ðŸ“° New Newsletter Subscriber - JharJeevan",
       `
         <h3>New newsletter subscription</h3>
         <p><strong>Email:</strong> ${email}</p>
@@ -386,7 +386,7 @@ async function initAdmin() {
   if (findError) throw findError;
 
   if (existing) {
-    console.log(`âœ… Admin account ready: ${email}`);
+    console.log(`Ã¢Å“â€¦ Admin account ready: ${email}`);
     return;
   }
 
@@ -399,7 +399,7 @@ async function initAdmin() {
   });
 
   if (error) throw error;
-  console.log(`âœ… Admin account created: ${email}`);
+  console.log(`Ã¢Å“â€¦ Admin account created: ${email}`);
 }
 
 /* -------------------- AUTH -------------------- */
@@ -496,7 +496,7 @@ app.post("/api/admin/forgot", async (req, res) => {
 
     if (transporter) {
       await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+        from: `"JharJeevan Blood Bank" <${JHARJEEVAN_EMAIL_FROM}>`, 
         to: admin.email,
         subject: "Password Reset Request - JharJeevan Admin Panel",
         html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px"><h2 style="color:#d32f2f">Password Reset Request</h2><p>Hello ${admin.name || "Administrator"},</p><p>Click the link below to reset your password. It is valid for 1 hour.</p><p><a href="${resetUrl}" style="background:#d32f2f;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block">Reset Password</a></p><p>If you didn't request this, ignore this email.</p></div>`,
@@ -504,7 +504,7 @@ app.post("/api/admin/forgot", async (req, res) => {
       return res.json({ success: true, message: "Password reset link has been sent to your email" });
     }
 
-    console.log(`âš ï¸ Email not configured. Reset URL for ${email}: ${resetUrl}`);
+    console.log(`Ã¢Å¡Â Ã¯Â¸Â Email not configured. Reset URL for ${email}: ${resetUrl}`);
     return res.json({ success: true, message: "Email is not configured. Check the server console for the reset link." });
   } catch (error) {
     console.error("Forgot password error:", error);
@@ -599,6 +599,1212 @@ function publicClient(client) {
   };
 }
 
+/* -------------------- JHARJEEVAN CLIENT NOTIFICATIONS -------------------- */
+
+async function createClientNotification({
+  recipientId,
+  type,
+  title,
+  message,
+  data = {},
+}) {
+  if (!recipientId) return null;
+
+  const { data: notification, error } = await supabase
+    .from("notifications")
+    .insert({
+      recipient_type: "client",
+      recipient_id: recipientId,
+      type,
+      title,
+      message,
+      data,
+    })
+    .select("*")
+    .single();
+
+  if (error) {
+    console.error("Client notification error:", error);
+    return null;
+  }
+
+  return notification;
+}
+
+async function createAdminNotification({
+  type,
+  title,
+  message,
+  data = {},
+}) {
+  try {
+    const adminEmail =
+      normalizeEmail(process.env.ADMIN_EMAIL);
+
+    if (!adminEmail) return null;
+
+    const { data: admin, error: adminError } =
+      await supabase
+        .from("admins")
+        .select("id,email,name")
+        .eq("email", adminEmail)
+        .maybeSingle();
+
+    if (adminError) {
+      console.error(
+        "Admin lookup notification error:",
+        adminError
+      );
+      return null;
+    }
+
+    if (!admin?.id) {
+      console.warn(
+        "Admin notification skipped: admin account not found."
+      );
+      return null;
+    }
+
+    const { data: notification, error } =
+      await supabase
+        .from("notifications")
+        .insert({
+          recipient_type: "admin",
+          recipient_id: admin.id,
+          type,
+          title,
+          message,
+          data,
+        })
+        .select("*")
+        .single();
+
+    if (error) {
+      console.error(
+        "Admin notification error:",
+        error
+      );
+      return null;
+    }
+
+    return notification;
+
+  } catch (error) {
+    console.error(
+      "Admin notification exception:",
+      error
+    );
+
+    return null;
+  }
+}
+
+async function sendClientWelcomeEmail(client) {
+
+  const safeName =
+    escapeEmailHtml(client.name || "there");
+
+  const loginUrl =
+    `${getJharJeevanEmailBaseUrl()}/client-login.html`;
+
+  const content = `
+
+    <p
+      style="
+        margin:0 0 16px;
+        color:#667085;
+        font-size:14px;
+        line-height:1.7;
+      "
+    >
+      Hello <strong style="color:#172238;">${safeName}</strong>,
+    </p>
+
+    <p
+      style="
+        margin:0;
+        color:#667085;
+        font-size:14px;
+        line-height:1.7;
+      "
+    >
+      Your JharJeevan client account has been created
+      successfully. You can now access your client portal
+      and manage your blood-support requests.
+    </p>
+
+    ${getEmailButton({
+      href: loginUrl,
+      label: "Open Client Portal",
+    })}
+
+    <div
+      style="
+        margin-top:24px;
+        padding:15px;
+        border-radius:13px;
+        background:#fff5f6;
+        border:1px solid #ffe1e4;
+      "
+    >
+      <strong
+        style="
+          color:#be123c;
+          font-size:12px;
+          font-family:Arial,Helvetica,sans-serif;
+        "
+      >
+        ❤️ Welcome to the JharJeevan network
+      </strong>
+
+      <p
+        style="
+          margin:6px 0 0;
+          color:#667085;
+          font-size:12px;
+          line-height:1.6;
+          font-family:Arial,Helvetica,sans-serif;
+        "
+      >
+        Thank you for joining a community built to
+        connect people with blood-support services.
+      </p>
+    </div>
+
+  `;
+
+  return sendEmail({
+    to: client.email,
+    subject: "Welcome to JharJeevan Blood Bank",
+    from: JHARJEEVAN_EMAIL_FROM,
+    html: getJharJeevanEmailShell({
+      eyebrow: "CLIENT ACCOUNT",
+      title: "Welcome to JharJeevan",
+      intro: "Your account is ready.",
+      content,
+    }),
+  });
+}
+
+async function sendNewClientAdminEmail(client) {
+
+  const adminEmail =
+    normalizeEmail(process.env.ADMIN_EMAIL);
+
+  if (!adminEmail) {
+    return {
+      success: false,
+      skipped: true,
+      reason: "missing_admin_email",
+    };
+  }
+
+  const safeEmail =
+    escapeEmailHtml(client.email || "—");
+
+  const safePhone =
+    escapeEmailHtml(client.phone || "—");
+
+  const safeBloodGroup =
+    escapeEmailHtml(client.blood_group || "—");
+
+  const safeLocation =
+    escapeEmailHtml(client.location || "—");
+
+  const safeName =
+    escapeEmailHtml(client.name || "—");
+
+  const registeredAt =
+    new Date().toLocaleString(
+      "en-IN",
+      {
+        timeZone: "Asia/Kolkata",
+        dateStyle: "medium",
+        timeStyle: "short",
+      }
+    );
+
+  const dashboardUrl =
+    `${getJharJeevanEmailBaseUrl()}/admin.html`;
+
+  const content = `
+
+    <p
+      style="
+        margin:0 0 20px;
+        color:#667085;
+        font-size:14px;
+        line-height:1.7;
+      "
+    >
+      A new client has successfully registered
+      on JharJeevan.
+    </p>
+
+    ${getEmailInfoCard([
+      {
+        label: "Name",
+        value: safeName,
+      },
+      {
+        label: "Email",
+        value: `
+          <a
+            href="mailto:${safeEmail}"
+            style="
+              color:#d92337;
+              text-decoration:none;
+            "
+          >
+            ${safeEmail}
+          </a>
+        `,
+      },
+      {
+        label: "Phone",
+        value: `
+          <a
+            href="tel:${safePhone}"
+            style="
+              color:#d92337;
+              text-decoration:none;
+            "
+          >
+            ${safePhone}
+          </a>
+        `,
+      },
+      {
+        label: "Blood Group",
+        value: safeBloodGroup,
+      },
+      {
+        label: "Location",
+        value: safeLocation,
+      },
+      {
+        label: "Registered",
+        value: escapeEmailHtml(registeredAt),
+      },
+    ])}
+
+    ${getEmailButton({
+      href: dashboardUrl,
+      label: "Review in Admin Dashboard",
+    })}
+
+    <p
+      style="
+        margin:0;
+        color:#98a2b3;
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:11px;
+        line-height:1.6;
+        text-align:center;
+      "
+    >
+      Please review the account from the admin
+      dashboard when convenient.
+    </p>
+
+  `;
+
+  return sendEmail({
+    to: adminEmail,
+    subject: "New Client Registration — JharJeevan Blood Bank",
+    from: JHARJEEVAN_EMAIL_FROM,
+    html: getJharJeevanEmailShell({
+      eyebrow: "ADMIN NOTIFICATION",
+      title: "New Client Registration",
+      intro: "A new client account requires your attention.",
+      content,
+    }),
+  });
+}
+/* -------------------- CLIENT PASSWORD RESET SYSTEM -------------------- */
+
+const CLIENT_PASSWORD_RESET_EXPIRY_MINUTES = 30;
+
+function generateClientResetToken() {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function hashClientResetToken(token) {
+  return crypto
+    .createHash("sha256")
+    .update(String(token))
+    .digest("hex");
+}
+
+function getClientPortalBaseUrl() {
+  const configured =
+    process.env.CLIENT_APP_URL ||
+    process.env.FRONTEND_URL ||
+    process.env.APP_URL;
+
+  if (!configured) {
+    return "http://localhost:5000";
+  }
+
+  return configured.replace(/\/+$/, "");
+}
+
+function isStrongClientPassword(password) {
+  return (
+    password.length >= 8 &&
+    password.length <= 128 &&
+    /[A-Z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  );
+}
+
+function escapeClientResetHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+async function sendClientPasswordResetEmail(client, resetUrl) {
+
+  if (!client?.email) {
+    return {
+      success: false,
+      skipped: true,
+      reason: "missing_client_email",
+    };
+  }
+
+  const safeName =
+    escapeEmailHtml(client.name || "there");
+
+  const safeUrl =
+    escapeEmailHtml(resetUrl);
+
+  const content = `
+
+    <p
+      style="
+        margin:0 0 16px;
+        color:#667085;
+        font-size:14px;
+        line-height:1.7;
+      "
+    >
+      Hello <strong style="color:#172238;">${safeName}</strong>,
+    </p>
+
+    <p
+      style="
+        margin:0;
+        color:#667085;
+        font-size:14px;
+        line-height:1.7;
+      "
+    >
+      We received a request to reset the password
+      for your JharJeevan client account.
+    </p>
+
+    ${getEmailButton({
+      href: safeUrl,
+      label: "Reset My Password",
+    })}
+
+    <div
+      style="
+        margin:24px 0;
+        padding:16px;
+        border-radius:13px;
+        background:#fff5f6;
+        border:1px solid #ffe1e4;
+      "
+    >
+
+      <strong
+        style="
+          color:#be123c;
+          font-family:Arial,Helvetica,sans-serif;
+          font-size:12px;
+        "
+      >
+        🔒 Secure password reset
+      </strong>
+
+      <p
+        style="
+          margin:7px 0 0;
+          color:#667085;
+          font-family:Arial,Helvetica,sans-serif;
+          font-size:12px;
+          line-height:1.6;
+        "
+      >
+        This link expires in
+        <strong>${CLIENT_PASSWORD_RESET_EXPIRY_MINUTES} minutes</strong>
+        and can only be used once.
+      </p>
+
+    </div>
+
+    <p
+      style="
+        color:#667085;
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:12px;
+        line-height:1.6;
+      "
+    >
+      If you did not request this password reset,
+      you can safely ignore this email.
+    </p>
+
+    <div
+      style="
+        margin-top:22px;
+        padding-top:18px;
+        border-top:1px solid #edf0f4;
+      "
+    >
+
+      <p
+        style="
+          margin:0 0 7px;
+          color:#667085;
+          font-family:Arial,Helvetica,sans-serif;
+          font-size:11px;
+          font-weight:700;
+        "
+      >
+        Button not working?
+      </p>
+
+      <a
+        href="${safeUrl}"
+        style="
+          color:#d92337;
+          font-family:Arial,Helvetica,sans-serif;
+          font-size:10px;
+          line-height:1.5;
+          word-break:break-all;
+        "
+      >
+        ${safeUrl}
+      </a>
+
+    </div>
+
+  `;
+
+  return sendEmail({
+    to: client.email,
+    subject: "Reset Your JharJeevan Password",
+    from: JHARJEEVAN_EMAIL_FROM,
+    html: getJharJeevanEmailShell({
+      eyebrow: "ACCOUNT SECURITY",
+      title: "Reset your password",
+      intro: "Use the secure link below to choose a new password.",
+      content,
+    }),
+  });
+}
+
+async function sendClientPasswordChangedEmail(client) {
+  if (!transporter) {
+    return { success: false, skipped: true };
+  }
+
+  const safeName = escapeClientResetHtml(client.name || "there");
+
+  return sendEmail({
+    to: client.email,
+    subject: "Your JharJeevan Password Was Changed",
+    html: `
+      <div style="
+        font-family:Arial,sans-serif;
+        max-width:620px;
+        margin:auto;
+        padding:30px;
+        color:#172238;
+      ">
+        <h2 style="color:#dc2626;">Password Changed Successfully</h2>
+
+        <p>Hello ${safeName},</p>
+
+        <p>
+          Your JharJeevan client account password has been changed
+          successfully.
+        </p>
+
+        <p>
+          If you did not make this change, please contact the
+          JharJeevan administration immediately.
+        </p>
+
+        <p style="color:#667085;font-size:14px;">
+          This is an automatic security notification.
+        </p>
+      </div>
+    `,
+  });
+}
+
+/*
+ * CLIENT FORGOT PASSWORD
+ *
+ * Security properties:
+ * - Does not reveal whether an email exists.
+ * - Generates 32 random bytes.
+ * - Stores only SHA-256 token hash.
+ * - Invalidates previous unused tokens.
+ * - Token expires after 30 minutes.
+ */
+app.post("/api/client/forgot-password", async (req, res) => {
+  const genericMessage =
+    "If that email address is registered, we will send a password reset link shortly.";
+
+  try {
+    const email = normalizeEmail(req.body.email);
+
+    if (!email) {
+      return res.json({
+        success: true,
+        message: genericMessage,
+      });
+    }
+
+    const { data: client, error: clientError } = await supabase
+      .from("client_users")
+      .select("id,name,email,is_active")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (clientError) throw clientError;
+
+    /*
+     * Never reveal whether the account exists.
+     */
+    if (!client || client.is_active === false) {
+      return res.json({
+        success: true,
+        message: genericMessage,
+      });
+    }
+
+    /*
+     * Invalidate all previous unused reset tokens.
+     */
+    const { error: invalidateError } = await supabase
+      .from("client_password_resets")
+      .update({ used_at: new Date().toISOString() })
+      .eq("client_id", client.id)
+      .is("used_at", null);
+
+    if (invalidateError) throw invalidateError;
+
+    const rawToken = generateClientResetToken();
+    const tokenHash = hashClientResetToken(rawToken);
+
+    const expiresAt = new Date(
+      Date.now() + CLIENT_PASSWORD_RESET_EXPIRY_MINUTES * 60 * 1000
+    ).toISOString();
+
+    const { error: insertError } = await supabase
+      .from("client_password_resets")
+      .insert({
+        client_id: client.id,
+        token_hash: tokenHash,
+        expires_at: expiresAt,
+      });
+
+    if (insertError) throw insertError;
+
+    const resetUrl =
+      `${getClientPortalBaseUrl()}/client-reset-password.html?token=` +
+      encodeURIComponent(rawToken);
+
+    const emailResult = await sendClientPasswordResetEmail(
+      client,
+      resetUrl
+    );
+
+    /*
+     * Do not leave a usable token behind if the email could not be sent.
+     */
+    if (!emailResult.success && !emailResult.skipped) {
+      await supabase
+        .from("client_password_resets")
+        .update({ used_at: new Date().toISOString() })
+        .eq("token_hash", tokenHash);
+
+      console.error(
+        "Client password reset email failed:",
+        emailResult.error || "Unknown email error"
+      );
+    }
+
+    if (emailResult.skipped) {
+      console.warn(
+        `SMTP not configured. Client reset email was not sent for ${email}.`
+      );
+    }
+
+    return res.json({
+      success: true,
+      message: genericMessage,
+    });
+  } catch (error) {
+    console.error("Client forgot password error:", error);
+
+    /*
+     * Keep the public response generic even when something fails.
+     */
+    return res.json({
+      success: true,
+      message: genericMessage,
+    });
+  }
+});
+
+/*
+ * CLIENT RESET PASSWORD
+ */
+app.post("/api/client/reset-password", async (req, res) => {
+  try {
+    const token = String(req.body.token || "").trim();
+    const newPassword = String(req.body.newPassword || "");
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: "Reset token is required.",
+      });
+    }
+
+    if (!isStrongClientPassword(newPassword)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Password must be 8-128 characters and include an uppercase letter, a number, and a special character.",
+      });
+    }
+
+    const tokenHash = hashClientResetToken(token);
+
+    const { data: resetRecord, error: resetError } = await supabase
+      .from("client_password_resets")
+      .select("id,client_id,expires_at,used_at")
+      .eq("token_hash", tokenHash)
+      .maybeSingle();
+
+    if (resetError) throw resetError;
+
+    if (!resetRecord) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token. Please request a new link.",
+      });
+    }
+
+    if (resetRecord.used_at) {
+      return res.status(400).json({
+        success: false,
+        message: "This reset link has already been used.",
+      });
+    }
+
+    if (new Date(resetRecord.expires_at).getTime() <= Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: "This reset link has expired. Please request a new one.",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+
+    const { data: client, error: clientError } = await supabase
+      .from("client_users")
+      .select("id,name,email,is_active")
+      .eq("id", resetRecord.client_id)
+      .maybeSingle();
+
+    if (clientError) throw clientError;
+
+    if (!client || client.is_active === false) {
+      return res.status(400).json({
+        success: false,
+        message: "Client account is unavailable.",
+      });
+    }
+
+    const { error: updateError } = await supabase
+      .from("client_users")
+      .update({
+        password_hash: passwordHash,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", client.id);
+
+    if (updateError) throw updateError;
+
+    /*
+     * Single-use token: invalidate immediately after successful reset.
+     */
+    const { error: consumeError } = await supabase
+      .from("client_password_resets")
+      .update({
+        used_at: new Date().toISOString(),
+      })
+      .eq("id", resetRecord.id)
+      .is("used_at", null);
+
+    if (consumeError) throw consumeError;
+
+    await Promise.allSettled([
+      createClientNotification({
+        recipientId: client.id,
+        type: "password_changed",
+        title: "Password changed successfully",
+        message:
+          "Your JharJeevan account password was changed successfully.",
+        data: {
+          clientId: client.id,
+        },
+      }),
+
+      sendClientPasswordChangedEmail(client),
+    ]);
+
+    return res.json({
+      success: true,
+      message:
+        "Your password has been changed successfully. You can now log in.",
+    });
+  } catch (error) {
+    console.error("Client reset password error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to reset password right now. Please try again.",
+    });
+  }
+});
+
+
+/* ============================================================
+   JHARJEEVAN PREMIUM EMAIL SYSTEM
+   Consistent transactional email design
+   ============================================================ */
+
+const JHARJEEVAN_EMAIL_FROM =
+  process.env.EMAIL_FROM ||
+  process.env.EMAIL_USER;
+
+function escapeEmailHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+function getJharJeevanEmailBaseUrl() {
+
+  const configured =
+    process.env.CLIENT_APP_URL ||
+    process.env.APP_URL;
+
+  return (
+    configured ||
+    "http://localhost:5000"
+  ).replace(/\/+$/, "");
+}
+function getJharJeevanEmailYear() {
+  return new Date().getFullYear();
+}
+
+function getJharJeevanEmailFooter() {
+  return `
+    <tr>
+      <td
+        style="
+          padding:26px 32px 30px;
+          text-align:center;
+          border-top:1px solid #edf0f4;
+          background:#fbfcfe;
+        "
+      >
+        <div
+          style="
+            font-family:Arial,Helvetica,sans-serif;
+            font-size:13px;
+            font-weight:700;
+            color:#344054;
+          "
+        >
+          JharJeevan Blood Bank
+        </div>
+
+        <div
+          style="
+            margin-top:6px;
+            font-family:Arial,Helvetica,sans-serif;
+            font-size:11px;
+            line-height:1.6;
+            color:#98a2b3;
+          "
+        >
+          Safe. Secure. Connected.
+          <br>
+          This is an automated email. Please do not reply.
+        </div>
+
+        <div
+          style="
+            margin-top:12px;
+            font-family:Arial,Helvetica,sans-serif;
+            font-size:10px;
+            color:#b0b8c5;
+          "
+        >
+          © ${getJharJeevanEmailYear()} JharJeevan Blood Bank
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+function getJharJeevanEmailShell({
+  eyebrow = "",
+  title = "",
+  intro = "",
+  content = "",
+  accent = "#e11d2e",
+}) {
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+  <meta
+    name="color-scheme"
+    content="light"
+  >
+  <title>JharJeevan</title>
+</head>
+
+<body
+  style="
+    margin:0;
+    padding:0;
+    background:#f5f7fa;
+  "
+>
+
+  <table
+    role="presentation"
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    border="0"
+    style="
+      width:100%;
+      background:#f5f7fa;
+    "
+  >
+
+    <tr>
+      <td
+        align="center"
+        style="
+          padding:32px 14px;
+        "
+      >
+
+        <table
+          role="presentation"
+          width="620"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          style="
+            width:100%;
+            max-width:620px;
+            background:#ffffff;
+            border:1px solid #e7ebf0;
+            border-radius:20px;
+            overflow:hidden;
+          "
+        >
+
+          <!-- BRAND HEADER -->
+          <tr>
+            <td
+              style="
+                padding:28px 32px;
+                background:
+                  linear-gradient(
+                    135deg,
+                    #be123c 0%,
+                    #ef3340 52%,
+                    #dc2626 100%
+                  );
+              "
+            >
+
+              <table
+                role="presentation"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+              >
+                <tr>
+
+                  <td
+                    valign="middle"
+                    style="
+                      width:48px;
+                      height:48px;
+                      background:#ffffff;
+                      border-radius:14px;
+                      text-align:center;
+                      vertical-align:middle;
+                      font-family:Arial,Helvetica,sans-serif;
+                      font-size:20px;
+                      font-weight:700;
+                      color:#e11d2e;
+                    "
+                  >
+                    ♥
+                  </td>
+
+                  <td
+                    style="
+                      padding-left:13px;
+                      font-family:Arial,Helvetica,sans-serif;
+                    "
+                  >
+                    <div
+                      style="
+                        color:#ffffff;
+                        font-size:18px;
+                        font-weight:800;
+                        line-height:1.2;
+                      "
+                    >
+                      JharJeevan
+                    </div>
+
+                    <div
+                      style="
+                        margin-top:3px;
+                        color:rgba(255,255,255,.82);
+                        font-size:11px;
+                        font-weight:600;
+                      "
+                    >
+                      Blood Bank
+                    </div>
+                  </td>
+
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+
+          <!-- CONTENT -->
+          <tr>
+            <td
+              style="
+                padding:34px 32px 30px;
+                font-family:Arial,Helvetica,sans-serif;
+                color:#172238;
+              "
+            >
+
+              ${
+                eyebrow
+                  ? `
+                    <div
+                      style="
+                        margin-bottom:10px;
+                        color:${accent};
+                        font-size:10px;
+                        font-weight:800;
+                        letter-spacing:1.4px;
+                      "
+                    >
+                      ${escapeEmailHtml(eyebrow)}
+                    </div>
+                  `
+                  : ""
+              }
+
+              <h1
+                style="
+                  margin:0;
+                  color:#172238;
+                  font-size:27px;
+                  line-height:1.2;
+                  letter-spacing:-.5px;
+                "
+              >
+                ${title}
+              </h1>
+
+              ${
+                intro
+                  ? `
+                    <p
+                      style="
+                        margin:14px 0 0;
+                        color:#667085;
+                        font-size:14px;
+                        line-height:1.7;
+                      "
+                    >
+                      ${intro}
+                    </p>
+                  `
+                  : ""
+              }
+
+              <div
+                style="
+                  margin-top:24px;
+                "
+              >
+                ${content}
+              </div>
+
+            </td>
+          </tr>
+
+          ${getJharJeevanEmailFooter()}
+
+        </table>
+
+      </td>
+    </tr>
+
+  </table>
+
+</body>
+</html>
+`;
+}
+
+function getEmailButton({
+  href,
+  label,
+  accent = "#e11d2e",
+}) {
+
+  return `
+    <table
+      role="presentation"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      align="center"
+      style="margin:26px auto;"
+    >
+      <tr>
+        <td
+          align="center"
+          style="
+            border-radius:12px;
+            background:${accent};
+          "
+        >
+          <a
+            href="${escapeEmailHtml(href)}"
+            style="
+              display:inline-block;
+              padding:14px 24px;
+              color:#ffffff;
+              font-family:Arial,Helvetica,sans-serif;
+              font-size:14px;
+              font-weight:700;
+              line-height:1;
+              text-decoration:none;
+              border-radius:12px;
+            "
+          >
+            ${escapeEmailHtml(label)}
+          </a>
+        </td>
+      </tr>
+    </table>
+  `;
+}
+
+function getEmailInfoCard(rows) {
+
+  return `
+    <table
+      role="presentation"
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="
+        width:100%;
+        background:#f8fafc;
+        border:1px solid #edf0f4;
+        border-radius:14px;
+      "
+    >
+      ${rows.map(row => `
+        <tr>
+
+          <td
+            style="
+              padding:11px 14px;
+              width:38%;
+              color:#667085;
+              font-family:Arial,Helvetica,sans-serif;
+              font-size:12px;
+              font-weight:700;
+              vertical-align:top;
+              border-bottom:1px solid #edf0f4;
+            "
+          >
+            ${escapeEmailHtml(row.label)}
+          </td>
+
+          <td
+            style="
+              padding:11px 14px;
+              color:#172238;
+              font-family:Arial,Helvetica,sans-serif;
+              font-size:12px;
+              font-weight:600;
+              vertical-align:top;
+              border-bottom:1px solid #edf0f4;
+            "
+          >
+            ${row.value}
+          </td>
+
+        </tr>
+      `).join("")}
+    </table>
+  `;
+}
+
 /* -------------------- CLIENT AUTH ROUTES -------------------- */
 
 app.post("/api/client/register", async (req, res) => {
@@ -676,6 +1882,40 @@ app.post("/api/client/register", async (req, res) => {
       .single();
 
     if (error) throw error;
+
+    /*
+     * Registration succeeded.
+     * Notification/email failures must NEVER undo
+     * a successfully-created account.
+     */
+
+    await Promise.allSettled([
+      createClientNotification({
+        recipientId: client.id,
+        type: "account_created",
+        title: "Welcome to JharJeevan â¤ï¸",
+        message:
+          "Your client account has been created successfully.",
+        data: {
+          clientId: client.id,
+        },
+      }),
+
+      createAdminNotification({
+        type: "client_registered",
+        title: "New client registered",
+        message:
+          `${client.name} has created a new JharJeevan client account.`,
+        data: {
+          clientId: client.id,
+          email: client.email,
+        },
+      }),
+
+      sendClientWelcomeEmail(client),
+
+      sendNewClientAdminEmail(client),
+    ]);
 
     const token = jwt.sign(
       {
@@ -1198,7 +2438,7 @@ app.post("/api/requests", async (req, res) => {
         );
 
         console.log(
-          "🚨 Urgent donor notifications:",
+          "ðŸš¨ Urgent donor notifications:",
           results.filter((r) => r.status === "fulfilled").length,
           "sent,",
           results.filter((r) => r.status === "rejected").length,
@@ -1356,9 +2596,9 @@ app.get("/api/health", async (_req, res) => {
 try {
   const { initAIRoutes } = require("./server/routes/aiRoutes");
   app.use("/api/ai", initAIRoutes(supabase, verifyAdmin));
-  console.log("âœ… Supabase AI routes initialized");
+  console.log("Ã¢Å“â€¦ Supabase AI routes initialized");
 } catch (error) {
-  console.error("âŒ Failed to load AI routes:", error);
+  console.error("Ã¢ÂÅ’ Failed to load AI routes:", error);
 }
 
 app.get("/", (_req, res) => res.sendFile(path.join(PUBLIC_DIR, "index.html")));
@@ -1377,16 +2617,16 @@ async function startServer() {
     await initAdmin();
     app.listen(PORT, () => {
       console.log("\n" + "=".repeat(60));
-      console.log("ðŸ©¸ Jhar Jeevan Blood Bank - Supabase Edition");
+      console.log("Ã°Å¸Â©Â¸ Jhar Jeevan Blood Bank - Supabase Edition");
       console.log("=".repeat(60));
-      console.log(`ðŸ“¡ http://localhost:${PORT}`);
-      console.log(`ðŸ’š http://localhost:${PORT}/api/health`);
-      console.log("ðŸ—„ï¸ Database: Supabase PostgreSQL");
-      console.log("ðŸ” Admin auth: server-side JWT + Supabase admins table");
+      console.log(`Ã°Å¸â€œÂ¡ http://localhost:${PORT}`);
+      console.log(`Ã°Å¸â€™Å¡ http://localhost:${PORT}/api/health`);
+      console.log("Ã°Å¸â€”â€žÃ¯Â¸Â Database: Supabase PostgreSQL");
+      console.log("Ã°Å¸â€Â Admin auth: server-side JWT + Supabase admins table");
       console.log("=".repeat(60) + "\n");
     });
   } catch (error) {
-    console.error("âŒ Failed to start server:", error);
+    console.error("Ã¢ÂÅ’ Failed to start server:", error);
     process.exit(1);
   }
 }

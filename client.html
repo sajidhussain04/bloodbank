@@ -1,0 +1,658 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard | JharJeevan Blood Bank</title>
+    <link rel="stylesheet" href="client.css">
+    <link rel="stylesheet" href="dashboard-premium.css?v=20261007"></head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="client-sidebar">
+
+    <div class="sidebar-brand">
+        <div class="brand-mark">
+            <span>♥</span>
+        </div>
+
+        <div class="sidebar-brand-copy">
+            <strong>JharJeevan</strong>
+            <span>Blood Support</span>
+        </div>
+
+        <span class="sidebar-brand-badge">CLIENT</span>
+    </div>
+
+
+    <div class="sidebar-nav-heading">
+        <span>MAIN MENU</span>
+    </div>
+
+
+    <nav class="sidebar-navigation">
+
+        <button type="button" class="nav-item active" data-section="overview">
+            <span class="nav-icon">⌂</span>
+            <span class="nav-label">Overview</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="find-blood">
+            <span class="nav-icon">🩸</span>
+            <span class="nav-label">Find Blood</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="requests">
+            <span class="nav-icon">▤</span>
+            <span class="nav-label">My Requests</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="donor">
+            <span class="nav-icon">♥</span>
+            <span class="nav-label">Become a Donor</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="notifications">
+            <span class="nav-icon">♧</span>
+            <span class="nav-label">Notifications</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="profile">
+            <span class="nav-icon">●</span>
+            <span class="nav-label">Profile</span>
+        </button>
+
+        <button type="button" class="nav-item" data-section="ai">
+            <span class="nav-icon">✦</span>
+            <span class="nav-label">AI Assistant</span>
+            <span class="nav-ai-badge">AI</span>
+        </button>
+
+    </nav>
+
+
+    <div class="sidebar-bottom">
+
+        <div class="sidebar-support-card">
+            <div class="sidebar-support-icon">♥</div>
+
+            <div>
+                <strong>24/7 Support</strong>
+                <span>We're here to help</span>
+            </div>
+
+            <span class="sidebar-online-dot"></span>
+        </div>
+
+
+        <button id="logoutButton" class="logout-button">
+            <span class="logout-icon">↪</span>
+            <span>Logout</span>
+        </button>
+
+    </div>
+
+</aside>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div>
+                    <p class="eyebrow">CLIENT DASHBOARD</p>
+                    <h1 id="welcomeTitle">Welcome back</h1>
+                    <p id="welcomeSubtitle">Manage your blood support journey from one place.</p>
+                </div>
+
+                <div class="profile-chip">
+                    <span id="profileInitial">C</span>
+                    <div>
+                        <strong id="profileName">Client</strong>
+                        <small id="profileEmail">Loading...</small>
+                    </div>
+                </div>
+            </header>
+
+            <section id="overview" class="dashboard-section active overview-premium">
+
+    <!-- OVERVIEW HEADER -->
+    <div class="overview-intro">
+        <div class="overview-intro-copy">
+            <span class="overview-kicker">
+                <span class="overview-kicker-dot"></span>
+                YOUR BLOOD SUPPORT CENTER
+            </span>
+
+            <h1>Everything you need, in one place.</h1>
+
+            <p>
+                Track your blood requests, discover available blood support,
+                stay updated, and get help when it matters most.
+            </p>
+        </div>
+
+        <div class="overview-intro-badge">
+            <span class="overview-intro-badge-icon">🩸</span>
+            <div>
+                <strong>JharJeevan</strong>
+                <span>Blood Support Network</span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- KPI CARDS -->
+    <div class="overview-stats-grid">
+
+        <article class="overview-stat-card overview-stat-primary">
+            <div class="overview-stat-top">
+                <div class="overview-stat-icon">🩸</div>
+                <span class="overview-stat-label">REQUESTS</span>
+            </div>
+
+            <div class="overview-stat-value" id="requestCount">0</div>
+
+            <div class="overview-stat-bottom">
+                <span>My blood requests</span>
+                <span class="overview-stat-arrow">↗</span>
+            </div>
+        </article>
+
+
+        <article class="overview-stat-card">
+            <div class="overview-stat-top">
+                <div class="overview-stat-icon">⏳</div>
+                <span class="overview-stat-label">PENDING</span>
+            </div>
+
+            <div class="overview-stat-value" id="pendingCount">0</div>
+
+            <div class="overview-stat-bottom">
+                <span>Awaiting review</span>
+                <span class="overview-stat-arrow">→</span>
+            </div>
+        </article>
+
+
+        <article class="overview-stat-card overview-stat-success">
+            <div class="overview-stat-top">
+                <div class="overview-stat-icon">♥</div>
+                <span class="overview-stat-label">APPROVED</span>
+            </div>
+
+            <div class="overview-stat-value" id="approvedCount">0</div>
+
+            <div class="overview-stat-bottom">
+                <span>Approved requests</span>
+                <span class="overview-stat-arrow">✓</span>
+            </div>
+        </article>
+
+
+        <article class="overview-stat-card overview-stat-notification">
+            <div class="overview-stat-top">
+                <div class="overview-stat-icon">🔔</div>
+                <span class="overview-stat-label">ALERTS</span>
+            </div>
+
+            <div class="overview-stat-value" id="notificationCount">0</div>
+
+            <div class="overview-stat-bottom">
+                <span>Unread notifications</span>
+                <span class="overview-stat-arrow">→</span>
+            </div>
+        </article>
+
+    </div>
+
+
+    <!-- MAIN HERO + QUICK ACTIONS -->
+    <div class="overview-main-grid">
+
+        <article class="overview-hero-card">
+
+            <div class="overview-hero-glow overview-hero-glow-one"></div>
+            <div class="overview-hero-glow overview-hero-glow-two"></div>
+
+            <div class="overview-hero-content">
+
+                <span class="overview-section-label">
+                    <span></span>
+                    LIFE-SAVING SUPPORT
+                </span>
+
+                <h2>
+                    Find the blood support<br>
+                    you need, faster.
+                </h2>
+
+                <p>
+                    Search current blood availability, create a request,
+                    and keep track of every important update from your dashboard.
+                </p>
+
+                <div class="overview-hero-actions">
+
+                    <button
+                        type="button"
+                        class="overview-primary-button"
+                        data-section-target="find-blood"
+                    >
+                        <span>Find Blood</span>
+                        <strong>→</strong>
+                    </button>
+
+                    <button
+                        type="button"
+                        class="overview-ghost-button"
+                        data-section-target="requests"
+                    >
+                        View My Requests
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="overview-hero-visual">
+
+                <div class="overview-blood-orbit overview-orbit-one"></div>
+                <div class="overview-blood-orbit overview-orbit-two"></div>
+
+                <div class="overview-blood-drop">
+                    <span>♥</span>
+                </div>
+
+                <div class="overview-floating-card overview-floating-top">
+                    <span>🛡️</span>
+                    <div>
+                        <strong>Secure</strong>
+                        <small>Patient support</small>
+                    </div>
+                </div>
+
+                <div class="overview-floating-card overview-floating-bottom">
+                    <span>✓</span>
+                    <div>
+                        <strong>Connected</strong>
+                        <small>Support network</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <!-- QUICK ACTION PANEL -->
+        <article class="overview-actions-card">
+
+            <div class="overview-card-heading">
+                <div>
+                    <span class="overview-section-label compact">
+                        <span></span>
+                        QUICK ACTIONS
+                    </span>
+
+                    <h3>What do you need?</h3>
+                </div>
+
+                <span class="overview-heading-icon">⚡</span>
+            </div>
+
+
+            <button
+                type="button"
+                class="overview-action-item"
+                data-section-target="find-blood"
+            >
+                <span class="overview-action-icon blood">🩸</span>
+
+                <span class="overview-action-copy">
+                    <strong>Find Blood</strong>
+                    <small>Check current availability</small>
+                </span>
+
+                <span class="overview-action-arrow">→</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="overview-action-item"
+                data-section-target="requests"
+            >
+                <span class="overview-action-icon request">📋</span>
+
+                <span class="overview-action-copy">
+                    <strong>My Requests</strong>
+                    <small>Track request status</small>
+                </span>
+
+                <span class="overview-action-arrow">→</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="overview-action-item"
+                data-section-target="donor"
+            >
+                <span class="overview-action-icon donor">❤️</span>
+
+                <span class="overview-action-copy">
+                    <strong>Become a Donor</strong>
+                    <small>Help save a life</small>
+                </span>
+
+                <span class="overview-action-arrow">→</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="overview-action-item"
+                data-section-target="notifications"
+            >
+                <span class="overview-action-icon notification">🔔</span>
+
+                <span class="overview-action-copy">
+                    <strong>Notifications</strong>
+                    <small>See your latest updates</small>
+                </span>
+
+                <span class="overview-action-arrow">→</span>
+            </button>
+
+        </article>
+
+    </div>
+
+
+    <!-- LOWER INFORMATION ROW -->
+    <div class="overview-lower-grid">
+
+        <article class="overview-status-card">
+
+            <div class="overview-card-heading">
+                <div>
+                    <span class="overview-section-label compact">
+                        <span></span>
+                        REQUEST STATUS
+                    </span>
+
+                    <h3>Your activity at a glance</h3>
+                </div>
+            </div>
+
+            <div class="overview-status-track">
+
+                <div class="overview-status-step">
+                    <div class="overview-status-circle pending">
+                        <span id="overviewPendingMini">0</span>
+                    </div>
+
+                    <div>
+                        <strong>Pending</strong>
+                        <small>Under review</small>
+                    </div>
+                </div>
+
+
+                <div class="overview-status-line"></div>
+
+
+                <div class="overview-status-step">
+                    <div class="overview-status-circle approved">
+                        <span id="overviewApprovedMini">0</span>
+                    </div>
+
+                    <div>
+                        <strong>Approved</strong>
+                        <small>Ready for support</small>
+                    </div>
+                </div>
+
+
+                <div class="overview-status-line"></div>
+
+
+                <div class="overview-status-step">
+                    <div class="overview-status-circle notifications">
+                        <span id="overviewNotificationMini">0</span>
+                    </div>
+
+                    <div>
+                        <strong>Updates</strong>
+                        <small>Latest notifications</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </article>
+
+
+        <article class="overview-help-card">
+
+            <div class="overview-help-icon">💬</div>
+
+            <div class="overview-help-content">
+                <span class="overview-section-label compact">
+                    <span></span>
+                    NEED HELP?
+                </span>
+
+                <h3>We're here when you need us.</h3>
+
+                <p>
+                    Check your notifications or use the AI Assistant
+                    for quick guidance.
+                </p>
+
+                <button
+                    type="button"
+                    class="overview-help-button"
+                    data-section-target="ai"
+                >
+                    Open AI Assistant →
+                </button>
+            </div>
+
+        </article>
+
+    </div>
+
+</section>
+<section id="find-blood" class="dashboard-section">
+
+    <article class="panel find-blood-main-panel">
+
+        <div class="section-header-row">
+            <div>
+                <span class="panel-label">BLOOD SUPPORT</span>
+                <h2>Find Blood</h2>
+                <p class="muted">
+                    Check current blood availability and submit a request when you need support.
+                </p>
+            </div>
+
+            <div class="section-header-icon">🩸</div>
+        </div>
+
+        <div class="find-blood-toolbar">
+
+            <select id="bloodGroupFilter" aria-label="Blood group">
+                <option value="">All blood groups</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+
+            <input
+                id="bloodLocationFilter"
+                type="search"
+                placeholder="Preferred city / location"
+                autocomplete="off"
+                aria-label="Preferred city or location"
+            >
+
+            <button id="bloodSearchButton" type="button">
+                Search Blood
+            </button>
+
+        </div>
+
+        <div class="find-blood-summary">
+            <strong id="bloodResultsTitle">Available blood support</strong>
+            <span id="bloodResultsCount">Loading...</span>
+        </div>
+
+        <div id="findBloodResults" class="find-blood-results">
+
+            <div class="find-blood-empty">
+                <div>
+                    <div class="find-blood-empty-icon">🩸</div>
+                    <h3>Finding available blood...</h3>
+                    <p>Please wait while we load the latest inventory.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="request-callout">
+
+            <div class="request-callout-icon">🚨</div>
+
+            <div class="request-callout-content">
+                <span class="panel-label">NEED BLOOD?</span>
+                <h3>Create a blood request</h3>
+                <p>
+                    Submit the patient and hospital details and our support
+                    team will process your request.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="primary-action"
+                id="openBloodRequestButton"
+            >
+                Create Request →
+            </button>
+
+        </div>
+
+    </article>
+
+</section>
+
+<section id="requests" class="dashboard-section">
+
+    <article class="panel">
+
+        <div class="section-header-row">
+
+            <div>
+                <span class="panel-label">REQUEST HISTORY</span>
+                <h2>My Blood Requests</h2>
+                <p class="muted">
+                    Track your submitted blood requests and their latest status.
+                </p>
+            </div>
+
+            <div class="section-header-icon">📋</div>
+
+        </div>
+
+        <div id="requestsList" class="requests-list">
+
+            <div class="request-empty-state">
+                <div class="request-empty-icon">📋</div>
+                <h3>Loading your requests...</h3>
+                <p>Your blood request history will appear here.</p>
+            </div>
+
+        </div>
+
+    </article>
+
+</section>
+<section id="donor" class="dashboard-section">
+                <article class="panel">
+                    <span class="panel-label">SAVE A LIFE</span>
+                    <h2>Become a Donor</h2>
+                    <p class="muted">
+                        Your donor profile can help patients find compatible blood.
+                    </p>
+
+                    <div class="empty-state">
+                        <span>❤️</span>
+                        <h3>Donor registration</h3>
+                        <p>The live donor connection will be added next.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section id="notifications" class="dashboard-section">
+                <article class="panel">
+                    <span class="panel-label">UPDATES</span>
+                    <h2>Notifications</h2>
+
+                    <div id="notificationsList" class="empty-state">
+                        <span>🔔</span>
+                        <h3>No notifications yet</h3>
+                        <p>Important updates will appear here.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section id="profile" class="dashboard-section">
+                <article class="panel">
+                    <span class="panel-label">ACCOUNT</span>
+                    <h2>My Profile</h2>
+
+                    <div class="profile-details">
+                        <div><span>Name</span><strong id="profileDetailName">—</strong></div>
+                        <div><span>Email</span><strong id="profileDetailEmail">—</strong></div>
+                        <div><span>Phone</span><strong id="profileDetailPhone">—</strong></div>
+                        <div><span>Blood Group</span><strong id="profileDetailBlood">—</strong></div>
+                        <div><span>Location</span><strong id="profileDetailLocation">—</strong></div>
+                    </div>
+                </article>
+            </section>
+
+            <section id="ai" class="dashboard-section">
+                <article class="panel ai-panel">
+                    <span class="panel-label">AI SUPPORT</span>
+                    <h2>JharJeevan AI Assistant</h2>
+                    <p>
+                        Get guidance about blood groups, donation eligibility,
+                        requests, and the next steps.
+                    </p>
+
+                    <div class="empty-state">
+                        <span>🤖</span>
+                        <h3>AI assistant will be connected next</h3>
+                        <p>
+                            Your existing AI backend will be connected to this dashboard.
+                        </p>
+                    </div>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <script src="client.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <meta name="theme-color" content="#e11d2e">
+    <meta name="description" content="Create your JharJeevan Blood Bank client account">
+    <title>Create Account | JharJeevan Blood Bank</title>
+    <link rel="stylesheet" href="client.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+    <main class="auth-page">
+        <section class="auth-card auth-card-wide registration-card">
+            <div class="auth-brand">
+                <div class="brand-mark" aria-hidden="true"><i class="fas fa-heart"></i></div>
+                <div>
+                    <h1>JharJeevan</h1>
+                    <span>Blood Bank</span>
+                </div>
+            </div>
+
+            <div class="auth-header">
+                <p class="eyebrow">CLIENT PORTAL</p>
+                <h2>Create your account</h2>
+                <p>Join the JharJeevan blood-support network.</p>
+            </div>
+
+                        <div class="registration-trust" aria-label="Registration benefits">
+
+                <div class="registration-trust-item">
+                    <span class="registration-trust-icon">
+                        <i class="fas fa-shield-halved"></i>
+                    </span>
+                    <span>
+                        <strong>Secure</strong>
+                        <small>Your data is protected</small>
+                    </span>
+                </div>
+
+                <div class="registration-trust-divider"></div>
+
+                <div class="registration-trust-item">
+                    <span class="registration-trust-icon">
+                        <i class="fas fa-clock"></i>
+                    </span>
+                    <span>
+                        <strong>Quick setup</strong>
+                        <small>About 1 minute</small>
+                    </span>
+                </div>
+
+                <div class="registration-trust-divider"></div>
+
+                <div class="registration-trust-item">
+                    <span class="registration-trust-icon">
+                        <i class="fas fa-heart"></i>
+                    </span>
+                    <span>
+                        <strong>Blood support</strong>
+                        <small>Built to help people</small>
+                    </span>
+                </div>
+
+            </div>
+
+            <form id="clientRegisterForm" novalidate>
+                <div class="form-grid">
+                    <label>
+                        Full name
+                        <input id="name" type="text" autocomplete="name" placeholder="Your full name" required>
+                    </label>
+
+                    <label>
+                        Email
+                        <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+                    </label>
+
+                    <label>
+                        Phone
+                        <input id="phone" type="tel" autocomplete="tel" placeholder="+91 XXXXX XXXXX" required>
+                    </label>
+
+                    <label>
+                        Blood group
+                        <select id="bloodGroup">
+                            <option value="">Select blood group</option>
+                            <option>A+</option>
+                            <option>A-</option>
+                            <option>B+</option>
+                            <option>B-</option>
+                            <option>AB+</option>
+                            <option>AB-</option>
+                            <option>O+</option>
+                            <option>O-</option>
+                        </select>
+                    </label>
+                </div>
+
+                <label>
+                    Location
+                    <input id="location" type="text" autocomplete="address-level2" placeholder="City / Area">
+                </label>
+
+                <label>
+                    Password
+                    <div class="password-wrap"><input id="password" type="password" autocomplete="new-password" placeholder="Minimum 8 characters" required><button type="button" class="password-toggle" data-password-toggle="#password" aria-label="Show password"><i class="fas fa-eye"></i></button></div><div class="password-strength" id="passwordStrength"><div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div><span class="strength-text" id="strengthText">Use at least 8 characters.</span></div>
+                </label>
+
+                <label>
+                    Confirm password
+                    <div class="password-wrap"><input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm your password" required><button type="button" class="password-toggle" data-password-toggle="#confirmPassword" aria-label="Show password"><i class="fas fa-eye"></i></button></div>
+                </label>
+
+                <label class="consent-row">
+    <input
+        id="terms"
+        type="checkbox"
+        required
+    >
+
+    <span>
+        I agree to use JharJeevan responsibly and provide
+        accurate information for blood-support services.
+    </span>
+</label>
+
+<div
+    id="registerMessage"
+    class="form-message"
+    role="alert"
+    aria-live="polite"
+></div>
+
+                <button id="registerButton" type="submit">
+                    <span class="button-text">Create Account</span>
+                    <span class="button-loading">Creating account...</span>
+                </button>
+            </form>
+
+            <p class="auth-switch">
+                Already have an account?
+                <a href="client-login.html">Sign in</a>
+            </p>
+
+            <a class="back-link" href="index.html">&larr; Back to website</a>
+        </section>
+    </main>
+
+    <script src="client.js"></script>
+    <script src="auth-ui.js"></script></body>
+</html>

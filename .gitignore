@@ -36,3 +36,14 @@ Thumbs.db
 
 # Backups / archives
 *.zip
+
+# Local backup files
+backup_*/
+*.backup_*.html
+*.backup_*.css
+*.backup_*.js
+
+# Environment / secrets
+.env
+.env.*
+!.env.example

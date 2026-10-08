@@ -19,7 +19,7 @@ const PUBLIC_DIR = __dirname;
 
 function requireEnv(name) {
   if (!process.env[name]) {
-    console.error(`Ã¢ÂÅ’ Missing required environment variable: ${name}`);
+    console.error(`ÃƒÂ¢Ã‚ÂÃ…â€™ Missing required environment variable: ${name}`);
     process.exit(1);
   }
 }
@@ -110,6 +110,148 @@ app.use(
   }),
 );
 
+/* ============================================================
+   JHARJEEVAN — EARLY NOTIFICATION ROUTES
+   These MUST execute before the global 404 middleware.
+   ============================================================ */
+
+app.patch(
+  "/api/client/notifications/:id/read",
+  verifyClient,
+  async (req, res) => {
+    try {
+      const clientId = req.client?.id;
+      const notificationId = req.params.id;
+
+      if (!clientId) {
+        return res.status(401).json({
+          success: false,
+          message: "Client authentication is required."
+        });
+      }
+
+      if (!notificationId) {
+        return res.status(400).json({
+          success: false,
+          message: "Notification ID is required."
+        });
+      }
+
+      const { data, error } = await supabase
+        .from("notifications")
+        .update({
+          is_read: true,
+          read_at: new Date().toISOString()
+        })
+        .eq("id", notificationId)
+        .eq("recipient_type", "client")
+        .eq("recipient_id", clientId)
+        .select("*")
+        .maybeSingle();
+
+      if (error) {
+        console.error(
+          "Notification read database error:",
+          error
+        );
+
+        return res.status(500).json({
+          success: false,
+          message: "Unable to update notification."
+        });
+      }
+
+      if (!data) {
+        return res.status(404).json({
+          success: false,
+          message: "Notification not found."
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: "Notification marked as read.",
+        notification: data
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Notification read route error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to update notification."
+      });
+    }
+  }
+);
+
+app.patch(
+  "/api/client/notifications/read-all",
+  verifyClient,
+  async (req, res) => {
+    try {
+
+      const clientId = req.client?.id;
+
+      if (!clientId) {
+        return res.status(401).json({
+          success: false,
+          message: "Client authentication is required."
+        });
+      }
+
+      const { error } = await supabase
+        .from("notifications")
+        .update({
+          is_read: true,
+          read_at: new Date().toISOString()
+        })
+        .eq("recipient_type", "client")
+        .eq("recipient_id", clientId)
+        .eq("is_read", false);
+
+      if (error) {
+
+        console.error(
+          "Mark-all-read database error:",
+          error
+        );
+
+        return res.status(500).json({
+          success: false,
+          message: "Unable to update notifications."
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: "All notifications marked as read."
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Mark-all-read route error:",
+        error
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to update notifications."
+      });
+    }
+  }
+);
+
+/* ============================================================
+   END EARLY NOTIFICATION ROUTES
+   ============================================================ */
+
+
 app.use(express.static(PUBLIC_DIR));
 app.get("/favicon.ico", (_req, res) => res.status(204).end());
 
@@ -124,18 +266,18 @@ const transporter =
 
 if (transporter) {
   transporter.verify((error) => {
-    if (error) console.log("Ã¢ÂÅ’ Email config error:", error.message);
-    else console.log("Ã¢Å“â€¦ Email server ready");
+    if (error) console.log("ÃƒÂ¢Ã‚ÂÃ…â€™ Email config error:", error.message);
+    else console.log("ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Email server ready");
   });
 } else {
-  console.log("Ã¢Å¡Â Ã¯Â¸Â Email notifications disabled");
+  console.log("ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Email notifications disabled");
 }
 
 /* -------------------- EMAIL HELPERS -------------------- */
 
 async function sendEmail(options) {
   if (!transporter) {
-    console.log("âš ï¸ Email skipped: SMTP is not configured");
+    console.log("Ã¢Å¡Â Ã¯Â¸Â Email skipped: SMTP is not configured");
     return { success: false, skipped: true };
   }
 
@@ -148,7 +290,7 @@ async function sendEmail(options) {
     console.log(`Email sent: ${options.subject || "(no subject)"}`);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error(`âŒ Email failed: ${options.subject || "(no subject)"} - ${error.message}`);
+    console.error(`Ã¢ÂÅ’ Email failed: ${options.subject || "(no subject)"} - ${error.message}`);
     return { success: false, error: error.message };
   }
 }
@@ -157,7 +299,7 @@ async function sendAdminNotification(subject, html) {
   const adminEmail = normalizeEmail(process.env.ADMIN_EMAIL);
 
   if (!adminEmail) {
-    console.log("âš ï¸ Admin notification skipped: ADMIN_EMAIL is not configured");
+    console.log("Ã¢Å¡Â Ã¯Â¸Â Admin notification skipped: ADMIN_EMAIL is not configured");
     return;
   }
 
@@ -222,7 +364,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
         subject: "Welcome Back to JharJeevan Newsletter",
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
-            <h2 style="color:#c0392b">Welcome back to JharJeevan â¤ï¸</h2>
+            <h2 style="color:#c0392b">Welcome back to JharJeevan Ã¢ÂÂ¤Ã¯Â¸Â</h2>
             <p>Hello ${name || existing.name || "there"},</p>
             <p>Your newsletter subscription is active again.</p>
             <p>Thank you for staying connected with JharJeevan Blood Bank.</p>
@@ -250,11 +392,11 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
 
     await sendEmail({
       to: email,
-      subject: "Welcome to JharJeevan Newsletter â¤ï¸",
+      subject: "Welcome to JharJeevan Newsletter Ã¢ÂÂ¤Ã¯Â¸Â",
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
           <div style="text-align:center">
-            <h2 style="color:#c0392b">Welcome to JharJeevan â¤ï¸</h2>
+            <h2 style="color:#c0392b">Welcome to JharJeevan Ã¢ÂÂ¤Ã¯Â¸Â</h2>
           </div>
           <p>Hello ${name || "there"},</p>
           <p>Thank you for subscribing to the JharJeevan newsletter.</p>
@@ -270,7 +412,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
     });
 
     await sendAdminNotification(
-      "ðŸ“° New Newsletter Subscriber - JharJeevan",
+      "Ã°Å¸â€œÂ° New Newsletter Subscriber - JharJeevan",
       `
         <h3>New newsletter subscription</h3>
         <p><strong>Email:</strong> ${email}</p>
@@ -386,7 +528,7 @@ async function initAdmin() {
   if (findError) throw findError;
 
   if (existing) {
-    console.log(`Ã¢Å“â€¦ Admin account ready: ${email}`);
+    console.log(`ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Admin account ready: ${email}`);
     return;
   }
 
@@ -399,7 +541,7 @@ async function initAdmin() {
   });
 
   if (error) throw error;
-  console.log(`Ã¢Å“â€¦ Admin account created: ${email}`);
+  console.log(`ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Admin account created: ${email}`);
 }
 
 /* -------------------- AUTH -------------------- */
@@ -504,7 +646,7 @@ app.post("/api/admin/forgot", async (req, res) => {
       return res.json({ success: true, message: "Password reset link has been sent to your email" });
     }
 
-    console.log(`Ã¢Å¡Â Ã¯Â¸Â Email not configured. Reset URL for ${email}: ${resetUrl}`);
+    console.log(`ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Email not configured. Reset URL for ${email}: ${resetUrl}`);
     return res.json({ success: true, message: "Email is not configured. Check the server console for the reset link." });
   } catch (error) {
     console.error("Forgot password error:", error);
@@ -590,7 +732,13 @@ function publicClient(client) {
     name: client.name,
     email: client.email,
     phone: client.phone || null,
-    bloodGroup: client.blood_group || null,
+
+    // Always expose the frontend contract as camelCase.
+    bloodGroup:
+      client.blood_group ??
+      client.bloodGroup ??
+      null,
+
     location: client.location || null,
     isActive: client.is_active,
     lastLoginAt: client.last_login_at || null,
@@ -754,7 +902,7 @@ async function sendClientWelcomeEmail(client) {
           font-family:Arial,Helvetica,sans-serif;
         "
       >
-        ❤️ Welcome to the JharJeevan network
+        â¤ï¸ Welcome to the JharJeevan network
       </strong>
 
       <p
@@ -800,19 +948,19 @@ async function sendNewClientAdminEmail(client) {
   }
 
   const safeEmail =
-    escapeEmailHtml(client.email || "—");
+    escapeEmailHtml(client.email || "â€”");
 
   const safePhone =
-    escapeEmailHtml(client.phone || "—");
+    escapeEmailHtml(client.phone || "â€”");
 
   const safeBloodGroup =
-    escapeEmailHtml(client.blood_group || "—");
+    escapeEmailHtml(client.blood_group || "â€”");
 
   const safeLocation =
-    escapeEmailHtml(client.location || "—");
+    escapeEmailHtml(client.location || "â€”");
 
   const safeName =
-    escapeEmailHtml(client.name || "—");
+    escapeEmailHtml(client.name || "â€”");
 
   const registeredAt =
     new Date().toLocaleString(
@@ -911,7 +1059,7 @@ async function sendNewClientAdminEmail(client) {
 
   return sendEmail({
     to: adminEmail,
-    subject: "New Client Registration — JharJeevan Blood Bank",
+    subject: "New Client Registration â€” JharJeevan Blood Bank",
     from: JHARJEEVAN_EMAIL_FROM,
     html: getJharJeevanEmailShell({
       eyebrow: "ADMIN NOTIFICATION",
@@ -1031,7 +1179,7 @@ async function sendClientPasswordResetEmail(client, resetUrl) {
           font-size:12px;
         "
       >
-        🔒 Secure password reset
+        ðŸ”’ Secure password reset
       </strong>
 
       <p
@@ -1472,7 +1620,7 @@ function getJharJeevanEmailFooter() {
             color:#b0b8c5;
           "
         >
-          © ${getJharJeevanEmailYear()} JharJeevan Blood Bank
+          Â© ${getJharJeevanEmailYear()} JharJeevan Blood Bank
         </div>
       </td>
     </tr>
@@ -1585,7 +1733,7 @@ function getJharJeevanEmailShell({
                       color:#e11d2e;
                     "
                   >
-                    ♥
+                    â™¥
                   </td>
 
                   <td
@@ -1893,7 +2041,7 @@ app.post("/api/client/register", async (req, res) => {
       createClientNotification({
         recipientId: client.id,
         type: "account_created",
-        title: "Welcome to JharJeevan â¤ï¸",
+        title: "Welcome to JharJeevan Ã¢ÂÂ¤Ã¯Â¸Â",
         message:
           "Your client account has been created successfully.",
         data: {
@@ -2026,11 +2174,62 @@ app.post("/api/client/login", async (req, res) => {
   }
 });
 
+/* ============================================================
+   CLIENT REQUEST HISTORY
+   ============================================================ */
+
+app.get("/api/client/requests", verifyClient, async (req, res) => {
+  try {
+    const clientEmail = normalizeEmail(req.client.email);
+
+    if (!clientEmail) {
+      return res.status(401).json({
+        success: false,
+        message: "Client email is unavailable",
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("blood_requests")
+      .select("*")
+      .eq("requester_email", clientEmail)
+      .order("priority_rank", {
+        ascending: true,
+      })
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    return res.json({
+      success: true,
+      requests: (data || []).map(publicRequest),
+      count: (data || []).length,
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Client request history error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load your request history",
+    });
+  }
+});
 app.get("/api/client/verify", verifyClient, async (req, res) => {
   try {
     const { data: client, error } = await supabase
       .from("client_users")
-      .select("id,name,email,phone,blood_group,location,is_active,last_login_at,created_at,updated_at")
+      .select(
+        "id,name,email,phone,blood_group,location,is_active,last_login_at,created_at,updated_at"
+      )
       .eq("id", req.client.id)
       .maybeSingle();
 
@@ -2058,11 +2257,793 @@ app.get("/api/client/verify", verifyClient, async (req, res) => {
   }
 });
 
+
+/* -------------------- CLIENT NOTIFICATIONS -------------------- */
+
+/* -------------------- CLIENT DONOR CENTER -------------------- */
+
+app.get("/api/client/donor", verifyClient, async (req, res) => {
+  try {
+    const clientId = req.client?.id;
+
+    if (!clientId) {
+      return res.status(401).json({
+        success: false,
+        message: "Client authentication is required",
+      });
+    }
+
+    const { data: client, error: clientError } = await supabase
+      .from("client_users")
+      .select("id,name,email,phone,blood_group,location")
+      .eq("id", clientId)
+      .maybeSingle();
+
+    if (clientError) throw clientError;
+
+    if (!client) {
+      return res.status(404).json({
+        success: false,
+        message: "Client profile not found",
+      });
+    }
+
+    const clientEmail = normalizeEmail(client.email);
+
+    const { data: donor, error: donorError } = await supabase
+      .from("donors")
+      .select("*")
+      .eq("email", clientEmail)
+      .maybeSingle();
+
+    if (donorError) throw donorError;
+
+    return res.json({
+      success: true,
+      client: {
+        id: client.id,
+        name: client.name,
+        email: client.email,
+        phone: client.phone,
+        blood_group: client.blood_group,
+        location: client.location,
+      },
+      donor: donor ? publicDonor(donor) : null,
+    });
+
+  } catch (error) {
+    console.error("Client donor profile error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load donor profile",
+    });
+  }
+});
+
+app.post("/api/client/donor", verifyClient, async (req, res) => {
+
+  try {
+
+    console.log("");
+    console.log("============================================================");
+    console.log("[CLIENT DONOR] REGISTRATION REQUEST");
+    console.log("============================================================");
+
+    // ----------------------------------------------------------
+    // AUTH
+    // ----------------------------------------------------------
+
+    const clientId = req.client?.id;
+
+    if (!clientId) {
+
+      return res.status(401).json({
+        success: false,
+        message: "Your client session has expired. Please log in again.",
+      });
+
+    }
+
+    // ----------------------------------------------------------
+    // INPUT
+    // ----------------------------------------------------------
+
+    const age = Number(req.body?.age);
+
+    const bloodGroup =
+      String(req.body?.bloodGroup || "")
+        .trim()
+        .toUpperCase();
+
+    const phone =
+      String(req.body?.phone || "")
+        .replace(/\D/g, "");
+
+    const location =
+      String(req.body?.location || "")
+        .trim();
+
+    const lastDonationDate =
+      req.body?.lastDonationDate
+        ? String(req.body.lastDonationDate).trim()
+        : "";
+
+    console.log("[CLIENT DONOR] Input:", {
+      clientId,
+      age,
+      bloodGroup,
+      phone,
+      location,
+      lastDonationDate,
+    });
+
+    // ----------------------------------------------------------
+    // VALIDATION
+    // ----------------------------------------------------------
+
+    const allowedBloodGroups = [
+      "A+",
+      "A-",
+      "B+",
+      "B-",
+      "AB+",
+      "AB-",
+      "O+",
+      "O-",
+    ];
+
+    if (
+      !Number.isInteger(age) ||
+      age < 18 ||
+      age > 65
+    ) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Age must be between 18 and 65 years.",
+      });
+
+    }
+
+    if (!allowedBloodGroups.includes(bloodGroup)) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Please select a valid blood group.",
+      });
+
+    }
+
+    if (!/^\d{10}$/.test(phone)) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Phone number must contain exactly 10 digits.",
+      });
+
+    }
+
+    if (location.length < 2) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Please enter your city or location.",
+      });
+
+    }
+
+    // ----------------------------------------------------------
+    // LOAD CLIENT
+    // ----------------------------------------------------------
+
+    const {
+      data: client,
+      error: clientError,
+    } = await supabase
+      .from("client_users")
+      .select("id,name,email,phone,blood_group,location")
+      .eq("id", clientId)
+      .maybeSingle();
+
+    if (clientError) {
+
+      console.error(
+        "[CLIENT DONOR] CLIENT LOOKUP FAILED:",
+        clientError
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to load your client profile.",
+        debug: clientError.message,
+        code: clientError.code || null,
+        details: clientError.details || null,
+        hint: clientError.hint || null,
+      });
+
+    }
+
+    if (!client) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Client profile not found.",
+      });
+
+    }
+
+    const donorEmail =
+      String(client.email || "")
+        .trim()
+        .toLowerCase();
+
+    const donorName =
+      String(client.name || "JharJeevan Client")
+        .trim();
+
+    if (!donorEmail) {
+
+      return res.status(400).json({
+        success: false,
+        message: "Your account email is unavailable.",
+      });
+
+    }
+
+    // ----------------------------------------------------------
+    // SAFE EXISTING-DONOR CHECK
+    //
+    // IMPORTANT:
+    // Do NOT use maybeSingle() here.
+    // Multiple old rows must not turn into a 500.
+    // ----------------------------------------------------------
+
+    // ----------------------------------------------------------
+    // DUPLICATE DONOR CHECK
+    // Check BOTH email and phone because phone is UNIQUE in donors.
+    // ----------------------------------------------------------
+
+    const [
+      existingByEmailResult,
+      existingByPhoneResult,
+    ] = await Promise.all([
+
+      supabase
+        .from("donors")
+        .select("id,name,email,phone,blood_group,location")
+        .eq("email", donorEmail)
+        .limit(1),
+
+      supabase
+        .from("donors")
+        .select("id,name,email,phone,blood_group,location")
+        .eq("phone", phone)
+        .limit(1),
+
+    ]);
+
+    const existingEmailError =
+      existingByEmailResult.error;
+
+    const existingPhoneError =
+      existingByPhoneResult.error;
+
+    if (
+      existingEmailError ||
+      existingPhoneError
+    ) {
+
+      console.error(
+        "[CLIENT DONOR] DUPLICATE CHECK FAILED"
+      );
+
+      console.error(
+        "Email check:",
+        existingEmailError
+      );
+
+      console.error(
+        "Phone check:",
+        existingPhoneError
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Unable to verify your existing donor profile.",
+
+        debug:
+          existingEmailError?.message ||
+          existingPhoneError?.message ||
+          "Unknown donor lookup error",
+
+        code:
+          existingEmailError?.code ||
+          existingPhoneError?.code ||
+          null,
+
+        details:
+          existingEmailError?.details ||
+          existingPhoneError?.details ||
+          null,
+
+        hint:
+          existingEmailError?.hint ||
+          existingPhoneError?.hint ||
+          null,
+      });
+
+    }
+
+    const existingDonorByEmail =
+      Array.isArray(existingByEmailResult.data) &&
+      existingByEmailResult.data.length > 0
+        ? existingByEmailResult.data[0]
+        : null;
+
+    const existingDonorByPhone =
+      Array.isArray(existingByPhoneResult.data) &&
+      existingByPhoneResult.data.length > 0
+        ? existingByPhoneResult.data[0]
+        : null;
+
+    if (existingDonorByEmail) {
+
+      console.log(
+        "[CLIENT DONOR] Existing donor found by email:",
+        existingDonorByEmail.id
+      );
+
+      return res.status(409).json({
+        success: false,
+        message:
+          "You are already registered as a donor.",
+        donor: existingDonorByEmail,
+      });
+
+    }
+
+    if (existingDonorByPhone) {
+
+      console.log(
+        "[CLIENT DONOR] Existing donor found by phone:",
+        existingDonorByPhone.id
+      );
+
+      return res.status(409).json({
+        success: false,
+        message:
+          "This phone number is already registered as a donor.",
+        donor: existingDonorByPhone,
+      });
+
+    }
+
+    // ----------------------------------------------------------
+    // LAST DONATION
+    // ----------------------------------------------------------
+
+    let lastDonation = null;
+
+    if (lastDonationDate) {
+
+      const parsedDate =
+        new Date(lastDonationDate);
+
+      if (
+        Number.isNaN(
+          parsedDate.getTime()
+        )
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid last donation date.",
+        });
+
+      }
+
+      const today =
+        new Date();
+
+      const todayOnly =
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate()
+        );
+
+      const donationOnly =
+        new Date(
+          parsedDate.getFullYear(),
+          parsedDate.getMonth(),
+          parsedDate.getDate()
+        );
+
+      if (
+        donationOnly > todayOnly
+      ) {
+
+        return res.status(400).json({
+          success: false,
+          message: "Last donation date cannot be in the future.",
+        });
+
+      }
+
+      const daysSince =
+        Math.floor(
+          (
+            todayOnly.getTime() -
+            donationOnly.getTime()
+          ) / 86400000
+        );
+
+      if (daysSince < 90) {
+
+        const remaining =
+          90 - daysSince;
+
+        return res.status(400).json({
+          success: false,
+          message:
+            `You can register after the 90-day waiting period. ${remaining} day${remaining === 1 ? "" : "s"} remaining.`,
+        });
+
+      }
+
+      lastDonation =
+        `${donationOnly.getFullYear()}-${String(
+          donationOnly.getMonth() + 1
+        ).padStart(2, "0")}-${String(
+          donationOnly.getDate()
+        ).padStart(2, "0")}`;
+
+    }
+
+    // ----------------------------------------------------------
+    // DONOR ROW
+    // ----------------------------------------------------------
+
+    const donorRow = {
+
+      name:
+        donorName,
+
+      age:
+        age,
+
+      blood_group:
+        bloodGroup,
+
+      phone:
+        phone,
+
+      email:
+        donorEmail,
+
+      location:
+        location,
+
+      last_donation_date:
+        lastDonation,
+
+      is_available:
+        true,
+
+    };
+
+    console.log(
+      "[CLIENT DONOR] INSERT ROW:",
+      donorRow
+    );
+
+    // ----------------------------------------------------------
+    // INSERT
+    // ----------------------------------------------------------
+
+    const {
+      data: donor,
+      error: donorInsertError,
+    } = await supabase
+      .from("donors")
+      .insert(donorRow)
+      .select("*")
+      .single();
+
+    if (donorInsertError) {
+
+      console.error("");
+      console.error(
+        "============================================================"
+      );
+      console.error(
+        "[CLIENT DONOR] SUPABASE INSERT FAILED"
+      );
+      console.error(
+        "============================================================"
+      );
+      console.error(
+        "message:",
+        donorInsertError.message
+      );
+      console.error(
+        "code:",
+        donorInsertError.code
+      );
+      console.error(
+        "details:",
+        donorInsertError.details
+      );
+      console.error(
+        "hint:",
+        donorInsertError.hint
+      );
+      console.error(
+        "full error:",
+        donorInsertError
+      );
+      console.error(
+        "============================================================"
+      );
+
+      if (
+        donorInsertError.code === "23505"
+      ) {
+
+        console.error(
+          "[CLIENT DONOR] UNIQUE CONSTRAINT VIOLATION"
+        );
+
+        return res.status(409).json({
+          success: false,
+          message:
+            "A donor with this phone number or email already exists.",
+          code:
+            donorInsertError.code,
+        });
+
+      }
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Unable to save your donor profile.",
+
+        debug:
+          donorInsertError.message ||
+          "Unknown database error",
+
+        code:
+          donorInsertError.code ||
+          null,
+
+        details:
+          donorInsertError.details ||
+          null,
+
+        hint:
+          donorInsertError.hint ||
+          null,
+
+      });
+
+    }
+
+    console.log(
+      "[CLIENT DONOR] INSERT SUCCESS:",
+      donor?.id
+    );
+
+    // ----------------------------------------------------------
+    // EMAIL
+    //
+    // Email failure must NEVER make registration fail.
+    // ----------------------------------------------------------
+
+    try {
+
+      if (
+        typeof sendEmail === "function"
+      ) {
+
+        await sendEmail({
+
+          to:
+            donor.email,
+
+          subject:
+            "Thank You for Registering as a Blood Donor - JharJeevan",
+
+          html:
+            `
+              <div
+                style="
+                  font-family:Arial,sans-serif;
+                  max-width:600px;
+                  margin:auto;
+                  padding:24px;
+                  color:#222;
+                "
+              >
+
+                <h2 style="color:#d71945;">
+                  Dear ${donor.name},
+                </h2>
+
+                <p>
+                  Thank you for registering as a blood donor
+                  with <strong>JharJeevan</strong>.
+                </p>
+
+                <p>
+                  Your donor registration has been
+                  successfully received.
+                </p>
+
+                <p>
+                  <strong>Blood Group:</strong>
+                  ${donor.blood_group}
+                </p>
+
+                <p>
+                  <strong>Location:</strong>
+                  ${donor.location}
+                </p>
+
+                <p>
+                  Your donation can help save lives.
+                </p>
+
+              </div>
+            `,
+
+        });
+
+      }
+
+    } catch (emailError) {
+
+      console.error(
+        "[CLIENT DONOR] EMAIL FAILED:",
+        emailError?.message ||
+        emailError
+      );
+
+    }
+
+    // ----------------------------------------------------------
+    // SUCCESS
+    // ----------------------------------------------------------
+
+    return res.status(201).json({
+
+      success:
+        true,
+
+      message:
+        "Donor registration completed successfully.",
+
+      donor:
+        donor,
+
+    });
+
+  } catch (error) {
+
+    console.error("");
+    console.error(
+      "============================================================"
+    );
+    console.error(
+      "[CLIENT DONOR] UNEXPECTED ERROR"
+    );
+    console.error(
+      "============================================================"
+    );
+    console.error(
+      "message:",
+      error?.message
+    );
+    console.error(
+      "name:",
+      error?.name
+    );
+    console.error(
+      "code:",
+      error?.code
+    );
+    console.error(
+      "details:",
+      error?.details
+    );
+    console.error(
+      "hint:",
+      error?.hint
+    );
+    console.error(
+      "stack:",
+      error?.stack
+    );
+    console.error(
+      "============================================================"
+    );
+
+    return res.status(500).json({
+
+      success:
+        false,
+
+      message:
+        error?.message ||
+        "Unable to complete donor registration.",
+
+      debug:
+        error?.message ||
+        null,
+
+      code:
+        error?.code ||
+        null,
+
+      details:
+        error?.details ||
+        null,
+
+      hint:
+        error?.hint ||
+        null,
+
+    });
+
+  }
+
+});
+
+app.get("/api/client/notifications", verifyClient, async (req, res) => {
+  try {
+    const { data: notifications, error } = await supabase
+      .from("notifications")
+      .select("id,recipient_type,recipient_id,type,title,message,data,is_read,created_at,read_at")
+      .eq("recipient_type", "client")
+      .eq("recipient_id", req.client.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error("Client notifications query error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Error loading notifications",
+        notifications: [],
+      });
+    }
+
+    return res.json({
+      success: true,
+      notifications: notifications || [],
+    });
+  } catch (error) {
+    console.error("Client notifications error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Error loading notifications",
+      notifications: [],
+    });
+  }
+});
 app.get("/api/client/profile", verifyClient, async (req, res) => {
   try {
     const { data: client, error } = await supabase
       .from("client_users")
-      .select("id,name,email,phone,blood_group,location,is_active,last_login_at,created_at,updated_at")
+      .select(
+        "id,name,email,phone,blood_group,location,is_active,last_login_at,created_at,updated_at"
+      )
       .eq("id", req.client.id)
       .maybeSingle();
 
@@ -2088,550 +3069,396 @@ app.get("/api/client/profile", verifyClient, async (req, res) => {
     });
   }
 });
-/* -------------------- INVENTORY -------------------- */
+/* -------------------- CLIENT LIVE PROFILE API -------------------- */
+
+/*
+ * Update the authenticated client's editable profile fields.
+ *
+ * Email is intentionally read-only here.
+ * Password changes have their own authenticated endpoint.
+ */
+app.put("/api/client/profile", verifyClient, async (req, res) => {
+  try {
+    const clientId = req.client?.id;
+
+    if (!clientId) {
+      return res.status(401).json({
+        success: false,
+        message: "Client authentication is required",
+      });
+    }
+
+    const name = String(req.body?.name || "").trim();
+    const phone = String(req.body?.phone || "").trim();
+    const bloodGroup = String(
+      req.body?.bloodGroup ??
+      req.body?.blood_group ??
+      ""
+    ).trim().toUpperCase();
+    const location = String(req.body?.location || "").trim();
+
+    if (name.length < 2 || name.length > 80) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must contain 2 to 80 characters.",
+      });
+    }
+
+    if (phone && !/^\d{10}$/.test(phone)) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number must contain exactly 10 digits.",
+      });
+    }
+
+    if (
+      bloodGroup &&
+      !["A+","A-","B+","B-","AB+","AB-","O+","O-"].includes(bloodGroup)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select a valid blood group.",
+      });
+    }
+
+    if (location.length > 120) {
+      return res.status(400).json({
+        success: false,
+        message: "Location must be 120 characters or fewer.",
+      });
+    }
+
+    /*
+     * Read the current profile first.
+     *
+     * This is important because pressing "Save Changes"
+     * without actually changing anything must NOT generate
+     * another "Profile updated" notification.
+     */
+    const {
+      data: existingClient,
+      error: existingClientError,
+    } = await supabase
+      .from("client_users")
+      .select(
+        "id,name,email,phone,blood_group,location,is_active,last_login_at,created_at,updated_at"
+      )
+      .eq("id", clientId)
+      .single();
+
+    if (existingClientError) {
+      throw existingClientError;
+    }
+
+    if (!existingClient || !existingClient.is_active) {
+      return res.status(404).json({
+        success: false,
+        message: "Client account not found.",
+      });
+    }
+
+    /*
+     * Normalize old and new values before comparison so that
+     * null, empty strings and formatting differences do not
+     * create unnecessary notifications.
+     */
+    const oldName = String(
+      existingClient.name || ""
+    ).trim();
+
+    const oldPhone = String(
+      existingClient.phone || ""
+    ).trim();
+
+    const oldBloodGroup = String(
+      existingClient.blood_group || ""
+    ).trim().toUpperCase();
+
+    const oldLocation = String(
+      existingClient.location || ""
+    ).trim();
+
+    const newName = name.trim();
+
+    const newPhone = phone.trim();
+
+    const newBloodGroup = bloodGroup.trim().toUpperCase();
+
+    const newLocation = location.trim();
+
+    const profileChanged =
+      oldName !== newName ||
+      oldPhone !== newPhone ||
+      oldBloodGroup !== newBloodGroup ||
+      oldLocation !== newLocation;
+
+    /*
+     * Nothing changed.
+     *
+     * Return the existing profile without creating a new
+     * database notification.
+     */
+    if (!profileChanged) {
+      return res.json({
+        success: true,
+        changed: false,
+        message: "No profile changes were made.",
+        client: publicClient(existingClient),
+      });
+    }
+
+    /*
+     * Actual profile change.
+     */
+    const { data: updatedClient, error } = await supabase
+      .from("client_users")
+      .update({
+        name: newName,
+        phone: newPhone || null,
+        blood_group: newBloodGroup || null,
+        location: newLocation || null,
+      })
+      .eq("id", clientId)
+      .select(
+        "id,name,email,phone,blood_group,location,is_active,last_login_at,created_at,updated_at"
+      )
+      .single();
+
+    if (error) throw error;
+
+    if (!updatedClient || !updatedClient.is_active) {
+      return res.status(404).json({
+        success: false,
+        message: "Client account not found.",
+      });
+    }
+
+    /*
+     * Create exactly one notification for a real profile change.
+     *
+     * A real profile change should normally produce one notification.
+     * This additional check prevents rapid/concurrent duplicate requests
+     * from flooding the notification center.
+     */
+    try {
+      if (typeof createClientNotification === "function") {
+        const {
+          data: recentProfileNotification,
+          error: recentProfileNotificationError,
+        } = await supabase
+          .from("notifications")
+          .select("id,created_at")
+          .eq("recipient_id", clientId)
+          .eq("recipient_type", "client")
+          .eq("type", "profile_updated")
+          .eq("title", "Profile updated")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (recentProfileNotificationError) {
+          console.warn(
+            "Profile notification duplicate check failed:",
+            recentProfileNotificationError.message
+          );
+        }
+
+        const lastNotificationTime =
+          recentProfileNotification?.created_at
+            ? new Date(recentProfileNotification.created_at).getTime()
+            : 0;
+
+        const notificationAge =
+          lastNotificationTime > 0
+            ? Date.now() - lastNotificationTime
+            : Number.POSITIVE_INFINITY;
+
+        const duplicateWindowMs = 5 * 60 * 1000;
+
+        if (notificationAge >= duplicateWindowMs) {
+          await createClientNotification({
+            recipientId: clientId,
+            type: "profile_updated",
+            title: "Profile updated",
+            message: "Your JharJeevan profile was updated successfully.",
+            data: {
+              clientId,
+            },
+          });
+
+          console.log(
+            `Profile update notification created for client ${clientId}.`
+          );
+        } else {
+          console.log(
+            `Skipped duplicate profile notification for client ${clientId}.`
+          );
+        }
+      }
+    } catch (notificationError) {
+      console.warn(
+        "Profile update notification failed:",
+        notificationError?.message || notificationError
+      );
+    }
+    return res.json({
+      success: true,
+      changed: true,
+      message: "Profile updated successfully.",
+      client: publicClient(updatedClient),
+    });
+  } catch (error) {
+    console.error("Client profile update error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update your profile right now.",
+    });
+  }
+});
+
+
+
+app.patch(
+  "/api/client/notifications/read-all",
+  verifyClient,
+  async (req, res) => {
+    try {
+
+      const clientId = req.client?.id;
+
+      if (!clientId) {
+        return res.status(401).json({
+          success: false,
+          message: "Client authentication is required."
+        });
+      }
+
+      const { error } = await supabase
+        .from("notifications")
+        .update({
+          is_read: true,
+          read_at: new Date().toISOString()
+        })
+        .eq("recipient_type", "client")
+        .eq("recipient_id", clientId)
+        .eq("is_read", false);
+
+      if (error) {
+
+        console.error("Mark-all-read database error:", error);
+
+        return res.status(500).json({
+          success: false,
+          message: "Unable to update notifications."
+        });
+      }
+
+      return res.json({
+        success: true,
+        message: "All notifications marked as read."
+      });
+
+    } catch (error) {
+
+      console.error("Mark-all-read route error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to update notifications."
+      });
+    }
+  }
+);
+
+
+/* -------------------- CLIENT BLOOD INVENTORY -------------------- */
+
 app.get("/api/inventory", async (_req, res) => {
   try {
-    const [{ data: donors, error: donorError }, { data: approved, error: requestError }] = await Promise.all([
-      supabase.from("donors").select("blood_group"),
-      supabase.from("blood_requests").select("blood_group,units_required").eq("status", "Approved"),
+    const [
+      { data: donors, error: donorError },
+      { data: approved, error: requestError }
+    ] = await Promise.all([
+      supabase.from("donors").select("blood_group").eq("is_available", true),
+      supabase.from("blood_requests").select("blood_group,units_required").eq("status", "Approved")
     ]);
+
     if (donorError) throw donorError;
     if (requestError) throw requestError;
 
-    const inventory = Object.fromEntries(BLOOD_GROUPS.map((bg) => [bg, 0]));
-    for (const donor of donors || []) inventory[donor.blood_group] += 1;
-    for (const request of approved || []) inventory[request.blood_group] = Math.max(0, inventory[request.blood_group] - Number(request.units_required || 0));
+    const inventory = Object.fromEntries(
+      BLOOD_GROUPS.map((bg) => [bg, 0])
+    );
+
+    for (const donor of donors || []) {
+      if (BLOOD_GROUPS.includes(donor.blood_group)) {
+        inventory[donor.blood_group] += 1;
+      }
+    }
+
+    for (const request of approved || []) {
+      if (BLOOD_GROUPS.includes(request.blood_group)) {
+        inventory[request.blood_group] = Math.max(
+          0,
+          inventory[request.blood_group] - Number(request.units_required || 0)
+        );
+      }
+    }
+
     return res.json(inventory);
   } catch (error) {
     console.error("Inventory error:", error);
-    return res.status(500).json({ success: false, message: "Error fetching inventory" });
-  }
-});
 
-/* -------------------- DONORS -------------------- */
-app.get("/api/donors", verifyAdmin, async (req, res) => {
-  try {
-    const { bloodGroup, isAvailable, search } = req.query;
-    let query = supabase.from("donors").select("*").order("created_at", { ascending: false });
-    if (bloodGroup && validBloodGroup(bloodGroup)) query = query.eq("blood_group", bloodGroup);
-    if (isAvailable !== undefined) query = query.eq("is_available", isAvailable === "true");
-    if (search) {
-      const safe = sanitizeSearch(search);
-      query = query.or(`name.ilike.%${safe}%,phone.ilike.%${safe}%,location.ilike.%${safe}%`);
-    }
-    const { data, error } = await query;
-    if (error) throw error;
-    return res.json({ success: true, donors: (data || []).map(publicDonor) });
-  } catch (error) {
-    console.error("Fetch donors error:", error);
-    return res.status(500).json({ success: false, message: "Error fetching donors" });
-  }
-});
-
-app.post("/api/donors", async (req, res) => {
-  try {
-        const donorEmail = normalizeEmail(req.body.email);
-const { name, age, bloodGroup, phone, email, location, lastDonationDate } = req.body;
-    const numericAge = Number(age);
-    if (!name || !numericAge || !bloodGroup || !phone || !email || !location) {
-      return res.status(400).json({ success: false, message: "Name, age, blood group, phone, email and location are required" });
-    }
-    if (numericAge < 18 || numericAge > 65) return res.status(400).json({ success: false, message: "Age must be between 18 and 65 years" });
-    if (!validBloodGroup(bloodGroup)) return res.status(400).json({ success: false, message: "Invalid blood group" });
-    if (!/^\d{10}$/.test(String(phone))) return res.status(400).json({ success: false, message: "Phone number must contain exactly 10 digits" });
-
-    let lastDonation = null;
-    if (lastDonationDate) {
-      const parsed = parseDate(lastDonationDate);
-      if (!parsed) return res.status(400).json({ success: false, message: "Invalid last donation date" });
-      const daysSinceDonation = Math.floor((Date.now() - parsed.getTime()) / 86400000);
-      if (daysSinceDonation < 90) return res.status(400).json({ success: false, message: `Donors can only donate every 90 days. Last donation was ${daysSinceDonation} days ago.` });
-      lastDonation = parsed.toISOString();
-    }
-
-    const row = {
-      name: String(name).trim(), age: numericAge, blood_group: bloodGroup,
-      phone: String(phone).trim(), email: donorEmail,
-      location: String(location).trim(), last_donation_date: lastDonation,
-      is_available: true,
-    };
-
-    const { data: donor, error } = await supabase.from("donors").insert(row).select("*").single();
-    if (error) {
-      if (error.code === "23505") return res.status(400).json({ success: false, message: "A donor with this phone number already exists" });
-      throw error;
-    }
-
-    await sendEmail({
-      to: donor.email,
-      subject: "Thank You for Registering as a Blood Donor - JharJeevan",
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px">
-        <h2 style="color:#c0392b">Dear ${donor.name},</h2>
-        <p>Thank you for registering as a blood donor with <strong>JharJeevan</strong>.</p>
-        <p>Your donor registration has been successfully received.</p>
-        <ul>
-          <li><strong>Blood Group:</strong> ${donor.blood_group}</li>
-          <li><strong>Location:</strong> ${donor.location}</li>
-          <li><strong>Phone:</strong> ${donor.phone}</li>
-        </ul>
-        <p>Your donation can help save lives.</p>
-      </div>`,
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching inventory"
     });
-
-    await sendAdminNotification(
-      "New Blood Donor Registered - JharJeevan",
-      `<p>A new donor has registered.</p>
-       <ul>
-         <li><strong>Name:</strong> ${donor.name}</li>
-         <li><strong>Blood Group:</strong> ${donor.blood_group}</li>
-         <li><strong>Phone:</strong> ${donor.phone}</li>
-         <li><strong>Email:</strong> ${donor.email}</li>
-         <li><strong>Location:</strong> ${donor.location}</li>
-       </ul>`
-    );
-
-    return res.status(201).json({ success: true, message: "Donor registered successfully", donor: publicDonor(donor) });
-  } catch (error) {
-    console.error("Create donor error:", error);
-    return res.status(500).json({ success: false, message: "Server error while registering donor", debug: process.env.NODE_ENV === "development" ? error.message : undefined });
   }
 });
-
-app.put("/api/donors/:id", verifyAdmin, async (req, res) => {
-  try {
-    if (!validUUID(req.params.id)) return res.status(400).json({ success: false, message: "Invalid donor ID" });
-    const allowed = ["name", "age", "bloodGroup", "phone", "email", "location", "lastDonationDate", "isAvailable"];
-    const update = {};
-    for (const key of allowed) {
-      if (req.body[key] !== undefined) {
-        const dbKey = { bloodGroup: "blood_group", lastDonationDate: "last_donation_date", isAvailable: "is_available" }[key] || key;
-        update[dbKey] = key === "email" ? normalizeEmail(req.body[key]) || null : req.body[key];
-      }
-    }
-    if (update.blood_group && !validBloodGroup(update.blood_group)) return res.status(400).json({ success: false, message: "Invalid blood group" });
-    if (update.age !== undefined && (Number(update.age) < 18 || Number(update.age) > 65)) return res.status(400).json({ success: false, message: "Age must be between 18 and 65 years" });
-    if (update.last_donation_date) {
-      const date = parseDate(update.last_donation_date);
-      if (!date) return res.status(400).json({ success: false, message: "Invalid last donation date" });
-      update.last_donation_date = date.toISOString();
-    }
-
-    const { data: donor, error } = await supabase.from("donors").update(update).eq("id", req.params.id).select("*").maybeSingle();
-    if (error) throw error;
-    if (!donor) return res.status(404).json({ success: false, message: "Donor not found" });
-    return res.json({ success: true, message: "Donor updated successfully", donor: publicDonor(donor) });
-  } catch (error) {
-    console.error("Update donor error:", error);
-    return res.status(500).json({ success: false, message: "Error updating donor" });
-  }
-});
-
-app.delete("/api/donors/:id", verifyAdmin, async (req, res) => {
-  try {
-    if (!validUUID(req.params.id)) return res.status(400).json({ success: false, message: "Invalid donor ID" });
-    const { data, error } = await supabase.from("donors").delete().eq("id", req.params.id).select("id").maybeSingle();
-    if (error) throw error;
-    if (!data) return res.status(404).json({ success: false, message: "Donor not found" });
-    return res.json({ success: true, message: "Donor deleted successfully" });
-  } catch (error) {
-    console.error("Delete donor error:", error);
-    return res.status(500).json({ success: false, message: "Error deleting donor" });
-  }
-});
-
-app.get("/api/donors/:id", verifyAdmin, async (req, res) => {
-  try {
-    if (!validUUID(req.params.id)) return res.status(400).json({ success: false, message: "Invalid donor ID" });
-    const { data, error } = await supabase.from("donors").select("*").eq("id", req.params.id).maybeSingle();
-    if (error) throw error;
-    if (!data) return res.status(404).json({ success: false, message: "Donor not found" });
-    return res.json({ success: true, donor: publicDonor(data) });
-  } catch (error) {
-    console.error("Get donor error:", error);
-    return res.status(500).json({ success: false, message: "Error fetching donor" });
-  }
-});
-
-/* -------------------- BLOOD REQUESTS -------------------- */
-app.get("/api/requests", verifyAdmin, async (req, res) => {
-  try {
-    const { status, bloodGroup, priority } = req.query;
-    let query = supabase.from("blood_requests").select("*").order("priority_rank", { ascending: true }).order("created_at", { ascending: false });
-    if (status && REQUEST_STATUSES.includes(status)) query = query.eq("status", status);
-    if (bloodGroup && validBloodGroup(bloodGroup)) query = query.eq("blood_group", bloodGroup);
-    if (priority && ["Normal", "Urgent"].includes(priority)) query = query.eq("priority", priority);
-    const { data, error } = await query;
-    if (error) throw error;
-    return res.json({ success: true, requests: (data || []).map(publicRequest) });
-  } catch (error) {
-    console.error("Fetch requests error:", error);
-    return res.status(500).json({ success: false, message: "Error fetching requests" });
-  }
-});
-
-app.patch("/api/requests/:id/approve", verifyAdmin, async (req, res) => {
-  return updateRequestStatus(req, res, "Approved");
-});
-
-async function updateRequestStatus(req, res, forcedStatus = null) {
-  try {
-    if (!validUUID(req.params.id)) return res.status(400).json({ success: false, message: "Invalid request ID" });
-    const status = forcedStatus || req.body.status;
-    const notes = req.body.notes;
-    if (!REQUEST_STATUSES.includes(status)) return res.status(400).json({ success: false, message: "Invalid status value" });
-
-    const { data: existing, error: fetchError } = await supabase.from("blood_requests").select("*").eq("id", req.params.id).maybeSingle();
-    if (fetchError) throw fetchError;
-    if (!existing) return res.status(404).json({ success: false, message: "Blood request not found" });
-
-    // Prevent accidental repeated approvals and make status transitions explicit.
-    if (forcedStatus === "Approved" && existing.status !== "Pending") {
-      return res.status(409).json({ success: false, message: `Request is already ${existing.status}` });
-    }
-
-    const update = { status };
-    if (notes !== undefined) update.notes = String(notes);
-    if (status === "Approved") {
-      update.approved_by = req.admin.email;
-      update.approved_at = new Date().toISOString();
-    }
-
-    let query = supabase.from("blood_requests").update(update).eq("id", req.params.id);
-    if (forcedStatus === "Approved") query = query.eq("status", "Pending");
-    const { data: request, error } = await query.select("*").maybeSingle();
-    if (error) throw error;
-    if (!request) return res.status(409).json({ success: false, message: "Request was changed by another admin. Refresh and try again." });
-
-    // ==================== REQUEST STATUS NOTIFICATION ====================
-
-    let subject = "";
-    let message = "";
-
-    if (status === "Approved") {
-      subject = "Blood Request Approved - JharJeevan";
-      message = `
-        <h2 style="color:#16803c">Blood Request Approved</h2>
-        <p>Dear <strong>${request.requester_name}</strong>,</p>
-        <p>Your blood request has been approved by JharJeevan.</p>
-        <p>A suitable donor can now be contacted regarding your request.</p>
-        <p><strong>Blood Group:</strong> ${request.blood_group}</p>
-        <p><strong>Units:</strong> ${request.units_required}</p>
-      `;
-    }
-
-    if (status === "Rejected") {
-      subject = "Blood Request Update - JharJeevan";
-      message = `
-        <h2 style="color:#c0392b">Blood Request Status Update</h2>
-        <p>Dear <strong>${request.requester_name}</strong>,</p>
-        <p>Your blood request could not be approved at this time.</p>
-        <p>Please contact JharJeevan if you still require assistance.</p>
-      `;
-    }
-
-    if (status === "Completed") {
-      subject = "Blood Request Completed - JharJeevan";
-      message = `
-        <h2 style="color:#16803c">Blood Request Completed</h2>
-        <p>Dear <strong>${request.requester_name}</strong>,</p>
-        <p>Your blood request has been marked as completed.</p>
-        <p>Thank you for using JharJeevan.</p>
-      `;
-    }
-
-    if (message && request.requester_email) {
-      await sendEmail({
-        to: request.requester_email,
-        subject,
-        html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">${message}</div>`,
-      });
-    }
-
-    return res.json({ success: true, message: `Request ${status.toLowerCase()} successfully`, request: publicRequest(request) });
-  } catch (error) {
-    console.error("Update request error:", error);
-    return res.status(500).json({ success: false, message: "Error updating request status" });
-  }
-}
-
-app.post("/api/requests", async (req, res) => {
-  try {
-    const data = { ...req.body };
-    if (!data.requesterName && data.name) data.requesterName = data.name;
-
-    const requiredFields = ["patientName", "bloodGroup", "unitsRequired", "hospitalName", "hospitalAddress", "city", "requiredDate", "requesterPhone"];
-    for (const field of requiredFields) {
-      if (data[field] === undefined || data[field] === null || String(data[field]).trim() === "") return res.status(400).json({ success: false, message: `Missing required field: ${field}` });
-    }
-    if (!data.requesterName) {
-      return res.status(400).json({
-        success: false,
-        message: "Missing required field: requesterName or name"
-      });
-    }
-
-    const requesterEmail = normalizeEmail(data.requesterEmail);
-
-    if (!requesterEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(requesterEmail)) {
-      return res.status(400).json({
-        success: false,
-        message: "A valid requester email address is required"
-      });
-    }
-    if (!/^\d{10}$/.test(String(data.requesterPhone))) return res.status(400).json({ success: false, message: "Valid phone number is required (10 digits)" });
-    if (!validBloodGroup(data.bloodGroup)) return res.status(400).json({ success: false, message: "Invalid blood group" });
-
-    const units = Number(data.unitsRequired);
-    if (!Number.isInteger(units) || units < 1 || units > 10) return res.status(400).json({ success: false, message: "Units must be between 1 and 10" });
-    const requiredDate = parseDate(data.requiredDate);
-    if (!requiredDate) return res.status(400).json({ success: false, message: "Invalid required date format" });
-
-    const priority = Math.ceil((requiredDate.getTime() - Date.now()) / 86400000) <= 1 ? "Urgent" : "Normal";
-    const row = {
-      patient_name: String(data.patientName).trim(), blood_group: data.bloodGroup,
-      units_required: units, hospital_name: String(data.hospitalName).trim(),
-      hospital_address: String(data.hospitalAddress).trim(), city: String(data.city).trim(),
-      required_date: requiredDate.toISOString(), requester_name: String(data.requesterName).trim(),
-      requester_phone: String(data.requesterPhone).trim(), requester_email: requesterEmail,
-      priority, priority_rank: priority === "Urgent" ? 0 : 1, status: "Pending",
-    };
-
-    const { data: request, error } = await supabase.from("blood_requests").insert(row).select("*").single();
-    if (error) throw error;
-
-    // ==================== BLOOD REQUEST NOTIFICATIONS ====================
-
-    // Urgent request -> matching available donors
-    if (priority === "Urgent" && transporter) {
-      const { data: donors, error: donorError } = await supabase
-        .from("donors")
-        .select("name,email")
-        .eq("blood_group", data.bloodGroup)
-        .eq("is_available", true)
-        .not("email", "is", null)
-        .limit(10);
-
-      if (donorError) {
-        console.error("Urgent donor lookup failed:", donorError.message);
-      } else if (donors?.length) {
-        const results = await Promise.allSettled(
-          donors.map((donor) =>
-            sendEmail({
-              to: donor.email,
-              subject: "URGENT: Blood Donation Needed - JharJeevan",
-              html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
-                <h2 style="color:#c0392b">Urgent Blood Donation Request</h2>
-                <p>Dear <strong>${donor.name}</strong>,</p>
-                <p>An urgent request for <strong>${data.bloodGroup}</strong> blood has been raised.</p>
-                <ul>
-                  <li><strong>Patient:</strong> ${data.patientName}</li>
-                  <li><strong>Hospital:</strong> ${data.hospitalName}</li>
-                  <li><strong>Location:</strong> ${data.city}</li>
-                  <li><strong>Required by:</strong> ${requiredDate.toLocaleDateString()}</li>
-                  <li><strong>Units:</strong> ${units}</li>
-                </ul>
-                <p><strong>Requester contact:</strong> ${data.requesterPhone}</p>
-                <p>Please contact the requester if you are available to donate.</p>
-              </div>`,
-            })
-          )
-        );
-
-        console.log(
-          "ðŸš¨ Urgent donor notifications:",
-          results.filter((r) => r.status === "fulfilled").length,
-          "sent,",
-          results.filter((r) => r.status === "rejected").length,
-          "failed"
-        );
-      }
-    }
-
-    // Requester -> confirmation
-    await sendEmail({
-      to: request.requester_email,
-      subject: "Blood Request Received - JharJeevan",
-      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
-        <h2 style="color:#c0392b">Blood Request Confirmation</h2>
-        <p>Dear <strong>${request.requester_name}</strong>,</p>
-        <p>Your blood request has been submitted successfully.</p>
-        <ul>
-          <li><strong>Request ID:</strong> ${request.id.slice(-6)}</li>
-          <li><strong>Status:</strong> ${request.status}</li>
-          <li><strong>Priority:</strong> ${request.priority}</li>
-          <li><strong>Blood Group:</strong> ${request.blood_group}</li>
-          <li><strong>Units:</strong> ${request.units_required}</li>
-          <li><strong>Hospital:</strong> ${request.hospital_name}</li>
-        </ul>
-        <p>We will notify you when the status changes.</p>
-      </div>`,
-    });
-
-    // Request -> admin
-    await sendAdminNotification(
-      priority === "Urgent"
-        ? "URGENT Blood Request - JharJeevan"
-        : "New Blood Request - JharJeevan",
-      `<h3>${priority === "Urgent" ? "URGENT BLOOD REQUEST" : "New blood request received"}</h3>
-       <ul>
-         <li><strong>Patient:</strong> ${request.patient_name}</li>
-         <li><strong>Blood Group:</strong> ${request.blood_group}</li>
-         <li><strong>Units:</strong> ${request.units_required}</li>
-         <li><strong>Priority:</strong> ${request.priority}</li>
-         <li><strong>Hospital:</strong> ${request.hospital_name}</li>
-         <li><strong>City:</strong> ${request.city}</li>
-         <li><strong>Requester:</strong> ${request.requester_name}</li>
-         <li><strong>Phone:</strong> ${request.requester_phone}</li>
-         <li><strong>Email:</strong> ${request.requester_email}</li>
-       </ul>`
-    );
-
-    return res.status(201).json({ success: true, message: "Blood request submitted successfully", request: publicRequest(request) });
-  } catch (error) {
-    console.error("Create request error:", error);
-    return res.status(500).json({ success: false, message: "Error submitting request" });
-  }
-});
-
-app.put("/api/requests/:id", verifyAdmin, async (req, res) => updateRequestStatus(req, res));
-
-app.delete("/api/requests/:id", verifyAdmin, async (req, res) => {
-  try {
-    if (!validUUID(req.params.id)) return res.status(400).json({ success: false, message: "Invalid request ID" });
-    const { data, error } = await supabase.from("blood_requests").delete().eq("id", req.params.id).select("id").maybeSingle();
-    if (error) throw error;
-    if (!data) return res.status(404).json({ success: false, message: "Request not found" });
-    return res.json({ success: true, message: "Request deleted successfully" });
-  } catch (error) {
-    console.error("Delete request error:", error);
-    return res.status(500).json({ success: false, message: "Error deleting request" });
-  }
-});
-
-app.get("/api/requests/blood/:bloodGroup", async (req, res) => {
-  try {
-    const bloodGroup = req.params.bloodGroup;
-    if (!validBloodGroup(bloodGroup)) return res.status(400).json({ success: false, message: "Invalid blood group" });
-    const { data, error } = await supabase.from("blood_requests").select("*").eq("blood_group", bloodGroup).eq("status", "Pending").order("priority_rank", { ascending: true }).order("created_at", { ascending: true }).limit(20);
-    if (error) throw error;
-    return res.json({ success: true, requests: (data || []).map(publicRequest) });
-  } catch (error) {
-    console.error("Public request lookup error:", error);
-    return res.status(500).json({ success: false, message: "Error fetching requests" });
-  }
-});
-
-/* -------------------- STATISTICS -------------------- */
-app.get("/api/stats", verifyAdmin, async (_req, res) => {
-  try {
-    const [donorsResult, requestsResult] = await Promise.all([
-      supabase.from("donors").select("id,name,blood_group,created_at,is_available"),
-      supabase.from("blood_requests").select("id,patient_name,blood_group,status,priority,created_at,hospital_name,city,units_required"),
-    ]);
-    if (donorsResult.error) throw donorsResult.error;
-    if (requestsResult.error) throw requestsResult.error;
-
-    const donors = donorsResult.data || [];
-    const requests = requestsResult.data || [];
-    const donorsByBloodGroup = Object.fromEntries(BLOOD_GROUPS.map((bg) => [bg, 0]));
-    const requestsByBloodGroup = Object.fromEntries(BLOOD_GROUPS.map((bg) => [bg, 0]));
-    donors.forEach((d) => { donorsByBloodGroup[d.blood_group] += 1; });
-    requests.forEach((r) => { if (r.status === "Pending") requestsByBloodGroup[r.blood_group] += 1; });
-
-    return res.json({
-      success: true,
-      stats: {
-        totalDonors: donors.length,
-        activeDonors: donors.filter((d) => d.is_available).length,
-        totalRequests: requests.length,
-        pendingRequests: requests.filter((r) => r.status === "Pending").length,
-        urgentRequests: requests.filter((r) => r.priority === "Urgent" && r.status === "Pending").length,
-        approvedRequests: requests.filter((r) => r.status === "Approved").length,
-        completedRequests: requests.filter((r) => r.status === "Completed").length,
-        donorsByBloodGroup,
-        requestsByBloodGroup,
-        recentDonors: donors.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,5).map(publicDonor),
-        recentRequests: requests.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0,5).map(publicRequest),
-      },
-    });
-  } catch (error) {
-    console.error("Stats error:", error);
-    return res.status(500).json({ success: false, message: "Error fetching statistics" });
-  }
-});
-
-app.get("/api/search/donors", verifyAdmin, async (req, res) => {
-  try {
-    const queryText = sanitizeSearch(req.query.query);
-    if (queryText.length < 2) return res.status(400).json({ success: false, message: "Search query must be at least 2 characters" });
-    const { data, error } = await supabase.from("donors").select("*").or(`name.ilike.%${queryText}%,phone.ilike.%${queryText}%,blood_group.ilike.%${queryText}%,location.ilike.%${queryText}%`).limit(20);
-    if (error) throw error;
-    return res.json({ success: true, donors: (data || []).map(publicDonor) });
-  } catch (error) {
-    console.error("Search error:", error);
-    return res.status(500).json({ success: false, message: "Error searching donors" });
-  }
-});
-
-/* -------------------- HEALTH -------------------- */
-app.get("/api/health", async (_req, res) => {
-  try {
-    const { error } = await supabase.from("admins").select("id").limit(1);
-    return res.json({
-      success: true,
-      status: error ? "DEGRADED" : "OK",
-      timestamp: new Date().toISOString(),
-      database: error ? "Error" : "Supabase Connected",
-      supabase: error ? error.message : "Connected",
-      email: transporter ? "Configured" : "Not configured",
-      uptime: process.uptime(),
-      environment: process.env.NODE_ENV || "development",
-    });
-  } catch (error) {
-    return res.status(500).json({ success: false, status: "ERROR", message: error.message });
-  }
-});
-
-/* -------------------- AI -------------------- */
-try {
-  const { initAIRoutes } = require("./server/routes/aiRoutes");
-  app.use("/api/ai", initAIRoutes(supabase, verifyAdmin));
-  console.log("Ã¢Å“â€¦ Supabase AI routes initialized");
-} catch (error) {
-  console.error("Ã¢ÂÅ’ Failed to load AI routes:", error);
-}
-
-app.get("/", (_req, res) => res.sendFile(path.join(PUBLIC_DIR, "index.html")));
-
-app.use((err, _req, res, _next) => {
-  console.error("Unhandled error:", err);
-  res.status(500).json({ success: false, message: "Something went wrong on the server" });
-});
-
-app.use((req, res) => res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` }));
-
-module.exports = app;
 
 async function startServer() {
   try {
     await initAdmin();
+
     app.listen(PORT, () => {
       console.log("\n" + "=".repeat(60));
-      console.log("Ã°Å¸Â©Â¸ Jhar Jeevan Blood Bank - Supabase Edition");
+      console.log("🚀 Jhar Jeevan Blood Bank - Supabase Edition");
       console.log("=".repeat(60));
-      console.log(`Ã°Å¸â€œÂ¡ http://localhost:${PORT}`);
-      console.log(`Ã°Å¸â€™Å¡ http://localhost:${PORT}/api/health`);
-      console.log("Ã°Å¸â€”â€žÃ¯Â¸Â Database: Supabase PostgreSQL");
-      console.log("Ã°Å¸â€Â Admin auth: server-side JWT + Supabase admins table");
+      console.log(`📡 http://localhost:${PORT}`);
+      console.log(`💚 http://localhost:${PORT}/api/health`);
+      console.log("🗄️ Database: Supabase PostgreSQL");
+      console.log("🔐 Admin auth: server-side JWT + Supabase admins table");
       console.log("=".repeat(60) + "\n");
     });
+
   } catch (error) {
-    console.error("Ã¢ÂÅ’ Failed to start server:", error);
+    console.error("❌ Failed to start server:", error);
     process.exit(1);
   }
 }
 
+if (require.main === "module") startServer();
+
 if (require.main === module) startServer();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

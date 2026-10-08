@@ -6963,3 +6963,2242 @@
     }
 }
 
+
+/* ============================================================
+   FIND BLOOD — STABLE NATIVE SELECT FIX
+   ============================================================ */
+
+/*
+ * The dashboard currently contains both the native select and
+ * the older custom dropdown layer. Keep the native select as the
+ * single source of truth.
+ */
+
+.find-blood-custom-select {
+    display: none !important;
+}
+
+#bloodGroupFilter,
+#bloodGroupFilter.find-blood-native-hidden {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    min-height: 54px !important;
+    height: 54px !important;
+    pointer-events: auto !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    background: #ffffff !important;
+    color: #172033 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 15px !important;
+    padding: 0 16px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+#bloodGroupFilter:focus {
+    outline: none !important;
+    border-color: #ef233c !important;
+    box-shadow: 0 0 0 4px rgba(239, 35, 60, .08) !important;
+}
+
+/*
+ * Keep the three Find Blood controls balanced.
+ */
+.find-blood-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.35fr) 150px !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+}
+
+.find-blood-toolbar > select,
+.find-blood-toolbar > input {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 54px !important;
+    height: 54px !important;
+    box-sizing: border-box !important;
+}
+
+.find-blood-toolbar > button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 54px !important;
+    height: 54px !important;
+    margin: 0 !important;
+}
+
+@media (max-width: 900px) {
+
+    .find-blood-toolbar {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .find-blood-toolbar > button {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .find-blood-toolbar {
+        grid-template-columns: 1fr !important;
+    }
+
+    .find-blood-toolbar > button {
+        grid-column: auto !important;
+    }
+}
+
+/*
+ * Prevent result area from looking like the page is frozen.
+ */
+.find-blood-results {
+    min-height: 160px;
+}
+
+.find-blood-empty {
+    min-height: 160px;
+}
+
+
+/* ============================================================
+   FIND BLOOD — RESTORE EXISTING CUSTOM DROPDOWN
+   ============================================================ */
+
+/*
+ * The project already has a custom blood-group dropdown.
+ * Restore that component instead of replacing it with a
+ * second native selector.
+ */
+
+/* Native select is the hidden data source. */
+#bloodGroupFilter.find-blood-native-hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+}
+
+/* Custom dropdown must be visible. */
+.find-blood-toolbar .find-blood-custom-select {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 54px !important;
+    z-index: 500 !important;
+}
+
+/* Custom trigger */
+.find-blood-toolbar .find-blood-custom-trigger {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    width: 100% !important;
+    min-height: 54px !important;
+    height: 54px !important;
+
+    padding: 0 16px !important;
+
+    background: #ffffff !important;
+    color: #172033 !important;
+
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 15px !important;
+
+    box-shadow: none !important;
+    transform: none !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-align: left !important;
+
+    cursor: pointer !important;
+}
+
+.find-blood-toolbar .find-blood-custom-trigger:hover {
+    background: #ffffff !important;
+    border-color: #ef233c !important;
+    color: #172033 !important;
+    box-shadow:
+        0 0 0 4px rgba(239, 35, 60, .07) !important;
+}
+
+/* Arrow */
+.find-blood-custom-arrow {
+    flex: 0 0 auto !important;
+    margin-left: 12px !important;
+}
+
+/* Dropdown menu */
+.find-blood-custom-options {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    z-index: 999999 !important;
+
+    max-height: 300px !important;
+    overflow-y: auto !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #e5e7eb !important;
+    border-radius: 14px !important;
+
+    box-shadow:
+        0 24px 60px rgba(15, 23, 42, .16),
+        0 6px 18px rgba(15, 23, 42, .07) !important;
+}
+
+/* Closed state */
+.find-blood-custom-select:not(.open)
+.find-blood-custom-options {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Open state */
+.find-blood-custom-select.open
+.find-blood-custom-options {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Options */
+.find-blood-custom-option {
+    display: flex !important;
+    align-items: center !important;
+
+    width: 100% !important;
+    min-height: 46px !important;
+
+    padding: 0 15px !important;
+
+    background: #ffffff !important;
+    color: #172033 !important;
+
+    cursor: pointer !important;
+}
+
+.find-blood-custom-option:hover {
+    background: #fff1f2 !important;
+    color: #d71939 !important;
+}
+
+.find-blood-custom-option.selected {
+    background: #fff5f6 !important;
+    color: #d71939 !important;
+    font-weight: 800 !important;
+}
+
+/*
+ * Restore the intended three-column layout:
+ *
+ * [ Blood Group ] [ Location ] [ Search ]
+ */
+.find-blood-toolbar {
+    display: grid !important;
+    grid-template-columns:
+        minmax(220px, 1fr)
+        minmax(260px, 1.35fr)
+        150px !important;
+
+    gap: 12px !important;
+    align-items: stretch !important;
+    position: relative !important;
+    z-index: 100 !important;
+    overflow: visible !important;
+}
+
+.find-blood-toolbar
+.find-blood-custom-select,
+.find-blood-toolbar
+#bloodLocationFilter,
+.find-blood-toolbar
+#bloodSearchButton {
+    min-width: 0 !important;
+    width: 100% !important;
+}
+
+.find-blood-toolbar #bloodLocationFilter {
+    min-height: 54px !important;
+    height: 54px !important;
+    box-sizing: border-box !important;
+}
+
+.find-blood-toolbar #bloodSearchButton {
+    min-height: 54px !important;
+    height: 54px !important;
+    margin: 0 !important;
+}
+
+@media (max-width: 900px) {
+
+    .find-blood-toolbar {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .find-blood-toolbar #bloodSearchButton {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .find-blood-toolbar {
+        grid-template-columns: 1fr !important;
+    }
+
+    .find-blood-toolbar #bloodSearchButton {
+        grid-column: auto !important;
+    }
+}
+
+/* Never let results cover the dropdown. */
+.find-blood-results {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.find-blood-result {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+
+
+
+/* ============================================================
+   JHARJEEVAN — DONOR REGISTERED STATE 10/10
+   Premium desktop + mobile presentation
+   ============================================================ */
+
+/* ---------- REGISTERED CONTAINER ---------- */
+
+#donorRegisteredState.donor-registered-state {
+
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr);
+
+    column-gap: 22px;
+    row-gap: 4px;
+
+    width: 100%;
+    max-width: none;
+
+    box-sizing: border-box;
+
+    margin: 22px 0 0;
+
+    padding: 28px 30px 30px;
+
+    overflow: hidden;
+
+    text-align: left;
+
+    border: 1px solid rgba(34, 197, 94, .24);
+
+    border-radius: 24px;
+
+    background:
+        radial-gradient(
+            circle at 92% 0%,
+            rgba(34, 197, 94, .13),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 0% 100%,
+            rgba(225, 29, 72, .045),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f8fffb 100%
+        );
+
+    box-shadow:
+        0 18px 45px rgba(15, 23, 42, .07),
+        0 3px 10px rgba(15, 23, 42, .035);
+
+    animation:
+        donorRegisteredReveal .55s cubic-bezier(.2,.8,.2,1) both;
+
+}
+
+/* subtle green glow */
+
+#donorRegisteredState.donor-registered-state::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 210px;
+    height: 210px;
+
+    top: -125px;
+    right: -85px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(34, 197, 94, .16),
+            rgba(34, 197, 94, 0) 70%
+        );
+
+    pointer-events: none;
+
+}
+
+/* ---------- SUCCESS ICON ---------- */
+
+#donorRegisteredState .donor-success-icon {
+
+    position: relative;
+    z-index: 2;
+
+    grid-column: 1;
+
+    grid-row: 1 / span 3;
+
+    width: 68px;
+    height: 68px;
+
+    display: grid;
+    place-items: center;
+
+    margin: 0;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #22c55e,
+            #16a34a
+        );
+
+    color: #ffffff;
+
+    font-size: 30px;
+    font-weight: 900;
+
+    box-shadow:
+        0 14px 28px rgba(34, 197, 94, .24),
+        inset 0 1px 0 rgba(255,255,255,.35);
+
+    animation:
+        donorSuccessPop .65s cubic-bezier(.16,1,.3,1) .08s both;
+
+}
+
+/* white tick */
+
+#donorRegisteredState .donor-success-icon::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 5px;
+
+    border: 1px solid rgba(255,255,255,.28);
+
+    border-radius: 18px;
+
+}
+
+/* ---------- LABEL ---------- */
+
+#donorRegisteredState .panel-label {
+
+    position: relative;
+    z-index: 2;
+
+    grid-column: 2;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    width: fit-content;
+
+    margin: 2px 0 2px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background: rgba(34,197,94,.10);
+
+    color: #15803d;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: .09em;
+
+    text-transform: uppercase;
+
+}
+
+/* small green status dot */
+
+#donorRegisteredState .panel-label::before {
+
+    content: "";
+
+    width: 7px;
+    height: 7px;
+
+    margin-right: 7px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 0 4px rgba(34,197,94,.10);
+
+    animation: donorStatusPulse 2s ease-in-out infinite;
+
+}
+
+/* ---------- TITLE ---------- */
+
+#donorRegisteredState h3 {
+
+    position: relative;
+    z-index: 2;
+
+    grid-column: 2;
+
+    margin: 5px 0 0;
+
+    color: #172033;
+
+    font-size: clamp(21px, 2vw, 28px);
+
+    font-weight: 850;
+
+    line-height: 1.15;
+
+    letter-spacing: -.035em;
+
+}
+
+/* ---------- DESCRIPTION ---------- */
+
+#donorRegisteredState p {
+
+    position: relative;
+    z-index: 2;
+
+    grid-column: 2;
+
+    max-width: 700px;
+
+    margin: 6px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    line-height: 1.65;
+
+}
+
+/* ---------- SUMMARY GRID ---------- */
+
+#donorRegisteredState .donor-profile-summary {
+
+    position: relative;
+    z-index: 2;
+
+    grid-column: 1 / -1;
+
+    width: 100%;
+    max-width: none;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin: 22px 0 0;
+
+}
+
+/* ---------- SUMMARY CARDS ---------- */
+
+#donorRegisteredState .donor-profile-summary > div {
+
+    position: relative;
+
+    min-height: 88px;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    padding: 17px 18px;
+
+    border:
+        1px solid rgba(15, 23, 42, .075);
+
+    border-radius: 18px;
+
+    background:
+        rgba(255,255,255,.88);
+
+    box-shadow:
+        0 7px 20px rgba(15,23,42,.045);
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease,
+        border-color .22s ease;
+
+}
+
+#donorRegisteredState .donor-profile-summary > div:hover {
+
+    transform: translateY(-3px);
+
+    border-color:
+        rgba(225,29,72,.16);
+
+    box-shadow:
+        0 14px 30px rgba(15,23,42,.08);
+
+}
+
+/* top accent */
+
+#donorRegisteredState .donor-profile-summary > div::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+
+    width: 3px;
+
+    border-radius: 0 4px 4px 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            #e11d48,
+            #fb7185
+        );
+
+}
+
+/* labels */
+
+#donorRegisteredState .donor-profile-summary span {
+
+    display: block;
+
+    margin: 0 0 7px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: .075em;
+
+    text-transform: uppercase;
+
+}
+
+/* values */
+
+#donorRegisteredState .donor-profile-summary strong {
+
+    display: block;
+
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 18px;
+
+    font-weight: 850;
+
+    letter-spacing: -.025em;
+
+}
+
+/* blood group emphasis */
+
+#donorRegisteredState #donorRegisteredBlood {
+
+    color: #e11d48;
+
+}
+
+/* availability */
+
+#donorRegisteredState
+.donor-profile-summary
+.donor-active-value {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    width: fit-content;
+
+    color: #15803d;
+
+    font-size: 14px;
+
+}
+
+/* availability dot */
+
+#donorRegisteredState
+.donor-profile-summary
+.donor-active-value::before {
+
+    content: "";
+
+    width: 8px;
+    height: 8px;
+
+    margin-right: 7px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    box-shadow:
+        0 0 0 4px rgba(34,197,94,.11);
+
+}
+
+/* ---------- REGISTERED STATE ANIMATION ---------- */
+
+@keyframes donorRegisteredReveal {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(14px)
+            scale(.985);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+@keyframes donorSuccessPop {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.65)
+            rotate(-8deg);
+
+    }
+
+    65% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.08)
+            rotate(1deg);
+
+    }
+
+    100% {
+
+        transform:
+            scale(1)
+            rotate(0);
+
+    }
+
+}
+
+@keyframes donorStatusPulse {
+
+    0%,
+    100% {
+
+        opacity: 1;
+
+        transform: scale(1);
+
+    }
+
+    50% {
+
+        opacity: .55;
+
+        transform: scale(.82);
+
+    }
+
+}
+
+/* ============================================================
+   DONOR HERO POLISH
+   ============================================================ */
+
+#donor .donor-hero {
+
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 26px;
+
+    border:
+        1px solid rgba(225,29,72,.13);
+
+    box-shadow:
+        0 18px 45px rgba(15,23,42,.055);
+
+}
+
+#donor .donor-hero-icon {
+
+    flex-shrink: 0;
+
+    box-shadow:
+        0 18px 35px rgba(225,29,72,.23);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+#donor .donor-hero-icon:hover {
+
+    transform:
+        translateY(-4px)
+        rotate(-2deg);
+
+    box-shadow:
+        0 22px 42px rgba(225,29,72,.28);
+
+}
+
+#donor .donor-trust-row > span {
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+
+}
+
+#donor .donor-trust-row > span:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 18px rgba(15,23,42,.07);
+
+}
+
+/* ============================================================
+   DESKTOP WIDTH OPTIMIZATION
+   ============================================================ */
+
+@media (min-width: 1200px) {
+
+    #donorRegisteredState.donor-registered-state {
+
+        padding:
+            32px 34px 34px;
+
+    }
+
+    #donorRegisteredState
+    .donor-profile-summary > div {
+
+        min-height: 96px;
+
+        padding:
+            18px 20px;
+
+    }
+
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+    #donorRegisteredState.donor-registered-state {
+
+        grid-template-columns:
+            62px minmax(0, 1fr);
+
+        column-gap: 17px;
+
+        padding:
+            24px 22px 24px;
+
+        border-radius: 22px;
+
+    }
+
+    #donorRegisteredState
+    .donor-success-icon {
+
+        width: 58px;
+        height: 58px;
+
+        border-radius: 18px;
+
+        font-size: 25px;
+
+    }
+
+    #donorRegisteredState
+    .donor-profile-summary {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 10px;
+
+    }
+
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 720px) {
+
+    #donorRegisteredState.donor-registered-state {
+
+        display: block;
+
+        padding: 24px 18px 20px;
+
+        border-radius: 20px;
+
+        text-align: left;
+
+    }
+
+    #donorRegisteredState
+    .donor-success-icon {
+
+        width: 58px;
+        height: 58px;
+
+        margin:
+            0 0 16px;
+
+        border-radius: 18px;
+
+    }
+
+    #donorRegisteredState
+    .panel-label {
+
+        margin-bottom: 4px;
+
+    }
+
+    #donorRegisteredState h3 {
+
+        margin-top: 7px;
+
+        font-size: 22px;
+
+    }
+
+    #donorRegisteredState p {
+
+        font-size: 12px;
+
+        line-height: 1.65;
+
+    }
+
+    #donorRegisteredState
+    .donor-profile-summary {
+
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+
+        margin-top: 18px;
+
+    }
+
+    #donorRegisteredState
+    .donor-profile-summary > div {
+
+        min-height: 76px;
+
+        padding:
+            15px 16px;
+
+        border-radius: 16px;
+
+    }
+
+}
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 460px) {
+
+    #donorRegisteredState.donor-registered-state {
+
+        margin-top: 16px;
+
+        padding:
+            20px 15px 16px;
+
+        border-radius: 18px;
+
+    }
+
+    #donorRegisteredState
+    .donor-success-icon {
+
+        width: 54px;
+        height: 54px;
+
+        border-radius: 17px;
+
+        font-size: 23px;
+
+    }
+
+    #donorRegisteredState h3 {
+
+        font-size: 20px;
+
+    }
+
+    #donorRegisteredState
+    .donor-profile-summary strong {
+
+        font-size: 16px;
+
+    }
+
+}
+
+/* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    #donorRegisteredState.donor-registered-state,
+    #donorRegisteredState .donor-success-icon {
+
+        animation: none !important;
+
+    }
+
+    #donorRegisteredState
+    .donor-profile-summary > div,
+    #donor .donor-hero-icon,
+    #donor .donor-trust-row > span {
+
+        transition: none !important;
+
+    }
+
+}
+
+/* ============================================================
+   JHARJEEVAN - NOTIFICATIONS FINAL RESPONSIVE CONTAINMENT
+   ============================================================ */
+
+#notifications {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+#notifications .panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+#notifications .live-client-notifications,
+#notifications .jj-notifications-shell {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+#notifications .jj-notification-toolbar,
+#notifications .jj-notification-heading,
+#notifications .jj-notification-list {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#notifications .jj-notification-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#notifications .jj-notification-card * {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+#notifications .jj-notification-content {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+#notifications .jj-notification-title,
+#notifications .jj-notification-message {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+#notifications .jj-notification-footer {
+    min-width: 0;
+    max-width: 100%;
+}
+
+@media (max-width: 700px) {
+
+    #notifications {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    #notifications .panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 14px !important;
+        border-radius: 20px;
+        overflow-x: hidden !important;
+    }
+
+    #notifications .jj-notification-toolbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    #notifications .jj-notification-card {
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 10px;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 13px !important;
+        border-radius: 16px;
+    }
+
+    #notifications .jj-notification-content {
+        min-width: 0 !important;
+        width: 100%;
+    }
+
+    #notifications .jj-notification-footer {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    #notifications .jj-mark-all {
+        max-width: 100%;
+        white-space: nowrap;
+    }
+}
+
+/* Global dashboard horizontal overflow guard */
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.dashboard-shell,
+.dashboard-main,
+.dashboard-content,
+.dashboard-section,
+.dashboard-section.active {
+    min-width: 0;
+    max-width: 100%;
+}
+
+
+/* ============================================================
+   JHARJEEVAN - MY REQUESTS FINAL UI
+   ============================================================ */
+
+#requests {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+#requests .panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#requests .jj-request-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 24px 0 30px;
+}
+
+#requests .jj-summary-card,
+#requests .request-summary-card {
+    min-width: 0;
+    overflow: hidden;
+    position: relative;
+
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.99),
+        rgba(248,250,253,.96)
+    );
+
+    border: 1px solid #e5e9f0;
+    border-radius: 17px;
+
+    box-shadow:
+        0 8px 24px rgba(24,33,54,.05),
+        inset 0 1px 0 rgba(255,255,255,.95);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+#requests .jj-summary-card:hover,
+#requests .request-summary-card:hover {
+    transform: translateY(-2px);
+    border-color: #d9e0ea;
+
+    box-shadow:
+        0 16px 32px rgba(24,33,54,.085),
+        inset 0 1px 0 rgba(255,255,255,.98);
+}
+
+#requests .jj-request-card {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    background: linear-gradient(
+        145deg,
+        #ffffff 0%,
+        #ffffff 70%,
+        #fbfcfe 100%
+    );
+
+    border: 1px solid #e1e6ee;
+    border-radius: 22px;
+
+    box-shadow:
+        0 12px 36px rgba(24,33,54,.06),
+        0 2px 8px rgba(24,33,54,.025);
+
+    overflow: hidden;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease;
+}
+
+#requests .jj-request-card:hover {
+    transform: translateY(-2px);
+    border-color: #d6dde8;
+
+    box-shadow:
+        0 20px 44px rgba(24,33,54,.095),
+        0 3px 10px rgba(24,33,54,.035);
+}
+
+#requests .jj-request-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+
+    background: linear-gradient(
+        180deg,
+        #ed1b3c,
+        #ff4d68
+    );
+}
+
+#requests .jj-request-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    min-width: 0;
+}
+
+#requests .jj-request-card-top > * {
+    min-width: 0;
+}
+
+#requests .jj-blood-group,
+#requests .blood-group {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: linear-gradient(
+        145deg,
+        #fff0f3,
+        #ffe5e9
+    );
+
+    border: 1px solid #ffcbd4;
+
+    color: #c91438;
+    font-size: 16px;
+    font-weight: 900;
+
+    box-shadow:
+        0 6px 16px rgba(215,25,63,.08);
+}
+
+#requests .status-badge,
+#requests .jj-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 30px;
+    padding: 0 11px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 850;
+    white-space: nowrap;
+
+    border: 1px solid transparent;
+}
+
+#requests .status-pending {
+    background: #fff7e9;
+    color: #c96a08;
+    border-color: #ffe0b2;
+}
+
+#requests .status-approved {
+    background: #ecfbf4;
+    color: #11855a;
+    border-color: #c9efdd;
+}
+
+#requests .jj-request-summary-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    background: linear-gradient(
+        180deg,
+        #f8fafc,
+        #f5f8fb
+    );
+
+    border: 1px solid #e4e9f0;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+#requests .jj-request-summary-strip > * {
+    min-width: 0;
+}
+
+#requests .jj-request-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+#requests .jj-request-meta,
+#requests .request-meta {
+    min-width: 0;
+
+    background: #ffffff;
+    border: 1px solid #e4e9f0;
+    border-radius: 14px;
+
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        transform .18s ease;
+}
+
+#requests .jj-request-meta:hover,
+#requests .request-meta:hover {
+    border-color: #d7dfe9;
+    background: #fbfcfe;
+    transform: translateY(-1px);
+}
+
+#requests .jj-request-review,
+#requests .request-review {
+    margin-top: 16px;
+    padding: 13px 15px;
+
+    background: linear-gradient(
+        100deg,
+        #fffaf1,
+        #fffdf9
+    );
+
+    border: 1px solid #f4e1c1;
+    border-radius: 14px;
+}
+
+#requests button[title*="Refresh"],
+#requests button[aria-label*="Refresh"] {
+    min-width: 50px;
+    min-height: 50px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #ffcbd4;
+    border-radius: 15px;
+
+    background: #ffffff;
+    color: #d7193f;
+
+    box-shadow:
+        0 8px 20px rgba(215,25,63,.07);
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+}
+
+#requests button[title*="Refresh"]:hover,
+#requests button[aria-label*="Refresh"]:hover {
+    transform: translateY(-2px);
+    background: #fff7f8;
+
+    box-shadow:
+        0 12px 28px rgba(215,25,63,.12);
+}
+
+#requests [role="tooltip"] {
+    max-width: min(250px, calc(100vw - 24px));
+    white-space: normal;
+    overflow-wrap: anywhere;
+    z-index: 99999;
+}
+
+#requests .jj-request-card:focus-within {
+    outline: 2px solid rgba(215,25,63,.18);
+    outline-offset: 3px;
+}
+
+#requests button:focus-visible {
+    outline: 3px solid rgba(215,25,63,.18);
+    outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+
+    #requests .jj-request-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #requests .jj-request-summary-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #requests .jj-request-meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+
+    #requests {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    #requests .jj-request-summary {
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin-top: 18px;
+        margin-bottom: 20px;
+    }
+
+    #requests .jj-request-card {
+        border-radius: 18px;
+    }
+
+    #requests .jj-request-card-top {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #requests .jj-request-summary-strip {
+        grid-template-columns: 1fr 1fr;
+        border-radius: 13px;
+    }
+
+    #requests .jj-request-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    #requests .jj-blood-group,
+    #requests .blood-group {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+    }
+}
+
+@media (max-width: 420px) {
+
+    #requests .jj-request-summary {
+        grid-template-columns: 1fr;
+    }
+
+    #requests .jj-request-summary-strip {
+        grid-template-columns: 1fr;
+    }
+
+    #requests .jj-request-card {
+        border-radius: 16px;
+    }
+}
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.dashboard-shell,
+.dashboard-main,
+.dashboard-content,
+.dashboard-section,
+.dashboard-section.active {
+    min-width: 0;
+    max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    #requests *,
+    #requests *::before,
+    #requests *::after {
+        transition: none !important;
+        animation: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+
+
+/* ============================================================
+   JHARJEEVAN - REQUESTS FINAL 10/10 POLISH
+   ============================================================ */
+
+#requests {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+#requests .jj-request-summary {
+    margin-top: 20px;
+    margin-bottom: 24px;
+    gap: 10px;
+}
+
+#requests .jj-summary-card,
+#requests .request-summary-card {
+    min-height: 66px;
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff 0%,
+            #fafbfd 100%
+        );
+
+    box-shadow:
+        0 5px 18px rgba(24,33,54,.045),
+        inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+#requests .jj-summary-card:hover,
+#requests .request-summary-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 26px rgba(24,33,54,.075),
+        inset 0 1px 0 rgba(255,255,255,.98);
+}
+
+
+/* ------------------------------------------------------------
+   REQUEST CARD
+   ------------------------------------------------------------ */
+
+#requests .jj-request-card {
+    margin-bottom: 14px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 8px 28px rgba(24,33,54,.052),
+        0 1px 5px rgba(24,33,54,.025);
+}
+
+#requests .jj-request-card:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 14px 34px rgba(24,33,54,.075),
+        0 2px 8px rgba(24,33,54,.025);
+}
+
+
+/* ------------------------------------------------------------
+   REQUEST HEADER
+   ------------------------------------------------------------ */
+
+#requests .jj-request-card-top {
+    gap: 14px;
+}
+
+#requests .jj-blood-group,
+#requests .blood-group {
+    width: 50px;
+    height: 50px;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 5px 14px rgba(215,25,63,.075);
+}
+
+
+/* ------------------------------------------------------------
+   STATUS BADGES
+   ------------------------------------------------------------ */
+
+#requests .status-badge,
+#requests .jj-status-badge {
+    min-height: 29px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    font-size: 10px;
+    letter-spacing: .01em;
+}
+
+#requests .status-pending {
+    background: #fff8ec;
+    color: #b96206;
+    border-color: #ffe1b7;
+}
+
+#requests .status-approved {
+    background: #eefbf5;
+    color: #137b57;
+    border-color: #cceedd;
+}
+
+
+/* ------------------------------------------------------------
+   REQUEST INFORMATION STRIP
+   ------------------------------------------------------------ */
+
+#requests .jj-request-summary-strip {
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f8fafc,
+            #f6f8fb
+        );
+}
+
+#requests .jj-request-summary-strip > * {
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+
+/* ------------------------------------------------------------
+   DETAIL BOXES
+   ------------------------------------------------------------ */
+
+#requests .jj-request-meta-grid {
+    gap: 10px;
+}
+
+#requests .jj-request-meta,
+#requests .request-meta {
+    min-height: 51px;
+
+    border-radius: 13px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 1px 3px rgba(24,33,54,.018);
+}
+
+#requests .jj-request-meta:hover,
+#requests .request-meta:hover {
+    transform: translateY(-1px);
+
+    background: #fcfdff;
+}
+
+
+/* ------------------------------------------------------------
+   REVIEW AREA
+   ------------------------------------------------------------ */
+
+#requests .jj-request-review,
+#requests .request-review {
+    margin-top: 13px;
+    padding: 11px 13px;
+
+    border-radius: 13px;
+
+    background:
+        linear-gradient(
+            100deg,
+            #fffaf2,
+            #fffdf9
+        );
+}
+
+
+/* ------------------------------------------------------------
+   REFRESH BUTTON
+   ------------------------------------------------------------ */
+
+#requests button[title*="Refresh"],
+#requests button[aria-label*="Refresh"] {
+
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 6px 18px rgba(215,25,63,.07);
+}
+
+#requests button[title*="Refresh"]:hover,
+#requests button[aria-label*="Refresh"]:hover {
+
+    transform: translateY(-2px) rotate(8deg);
+
+    background: #fff8f9;
+
+    box-shadow:
+        0 10px 24px rgba(215,25,63,.12);
+}
+
+
+/* ------------------------------------------------------------
+   PREVENT BROKEN ICONS FROM BREAKING LAYOUT
+   ------------------------------------------------------------ */
+
+#requests .jj-request-card svg,
+#requests .jj-summary-card svg,
+#requests .jj-request-meta svg {
+
+    flex: 0 0 auto;
+    max-width: 18px;
+    max-height: 18px;
+}
+
+
+/* ------------------------------------------------------------
+   TOOLTIP
+   ------------------------------------------------------------ */
+
+#requests [role="tooltip"] {
+
+    max-width:
+        min(
+            230px,
+            calc(100vw - 32px)
+        );
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+
+/* ------------------------------------------------------------
+   DESKTOP
+   ------------------------------------------------------------ */
+
+@media (min-width: 1200px) {
+
+    #requests .jj-request-card {
+        margin-bottom: 13px;
+    }
+
+    #requests .jj-request-summary {
+        gap: 11px;
+    }
+}
+
+
+/* ------------------------------------------------------------
+   TABLET
+   ------------------------------------------------------------ */
+
+@media (max-width: 1000px) {
+
+    #requests .jj-request-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    #requests .jj-request-summary-strip {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    #requests .jj-request-meta-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* ------------------------------------------------------------
+   MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 650px) {
+
+    #requests {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #requests .jj-request-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 8px;
+        margin-top: 16px;
+        margin-bottom: 18px;
+    }
+
+    #requests .jj-summary-card,
+    #requests .request-summary-card {
+        min-height: 62px;
+        border-radius: 14px;
+    }
+
+    #requests .jj-request-card {
+        margin-bottom: 10px;
+        border-radius: 17px;
+    }
+
+    #requests .jj-request-card-top {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #requests .jj-request-summary-strip {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        border-radius: 12px;
+    }
+
+    #requests .jj-request-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    #requests .jj-request-meta,
+    #requests .request-meta {
+        min-height: 48px;
+        border-radius: 12px;
+    }
+
+    #requests .jj-blood-group,
+    #requests .blood-group {
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+    }
+}
+
+
+/* ------------------------------------------------------------
+   VERY SMALL MOBILE
+   ------------------------------------------------------------ */
+
+@media (max-width: 430px) {
+
+    #requests .jj-request-summary {
+        grid-template-columns: 1fr;
+    }
+
+    #requests .jj-request-summary-strip {
+        grid-template-columns: 1fr;
+    }
+
+    #requests .jj-request-card {
+        border-radius: 15px;
+    }
+}
+
+
+/* ------------------------------------------------------------
+   ACCESSIBILITY
+   ------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    #requests *,
+    #requests *::before,
+    #requests *::after {
+
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+
+
+/* JHARJEEVAN - FINAL REQUEST MOBILE 10/10 */
+
+@media (max-width: 650px) {
+
+    #requests {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    #requests .jj-request-summary {
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    #requests .jj-summary-card,
+    #requests .request-summary-card {
+        min-width: 0;
+        width: 100%;
+        min-height: 62px;
+        border-radius: 14px;
+    }
+
+    #requests .jj-request-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-bottom: 10px;
+        border-radius: 17px;
+        overflow: hidden;
+    }
+
+    #requests .jj-request-card-top {
+        width: 100%;
+        min-width: 0;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #requests .jj-request-summary-strip {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border-radius: 12px;
+    }
+
+    #requests .jj-request-meta-grid {
+        width: 100%;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    #requests .jj-request-meta,
+    #requests .request-meta {
+        width: 100%;
+        min-width: 0;
+        min-height: 48px;
+        border-radius: 12px;
+    }
+
+    #requests .jj-blood-group,
+    #requests .blood-group {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: 13px;
+    }
+
+    #requests .status-badge,
+    #requests .jj-status-badge {
+        max-width: 100%;
+        white-space: nowrap;
+    }
+
+    #requests [role="tooltip"] {
+        max-width: calc(100vw - 24px);
+    }
+}
+
+
+/* ============================================================
+   JHARJEEVAN — STABLE DESKTOP/TABLET DASHBOARD
+   Keep sidebar locked while main content scrolls.
+   Mobile drawer below 760px remains controlled by existing rules.
+   ============================================================ */
+
+@media (min-width: 761px) {
+
+    html,
+    body {
+        min-height: 100%;
+        overflow-x: hidden !important;
+    }
+
+    body {
+        overflow-y: auto !important;
+    }
+
+    .dashboard-shell {
+        display: block !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        overflow: visible !important;
+    }
+
+    .client-sidebar {
+        position: fixed !important;
+
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+
+        width: 270px !important;
+        min-width: 270px !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+
+        margin: 0 !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+
+        z-index: 1000 !important;
+
+        align-self: auto !important;
+    }
+
+    .dashboard-main {
+        display: block !important;
+
+        width: calc(100% - 270px) !important;
+        max-width: none !important;
+
+        min-width: 0 !important;
+        min-height: 100vh !important;
+
+        margin-left: 270px !important;
+
+        height: auto !important;
+        max-height: none !important;
+
+        overflow: visible !important;
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
+    }
+
+    .dashboard-header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 100 !important;
+    }
+
+    .sidebar-navigation {
+        flex: 0 0 auto !important;
+    }
+
+    .sidebar-bottom {
+        margin-top: auto !important;
+        flex: 0 0 auto !important;
+    }
+}
+
+/* ============================================================
+   TABLET WIDTH — keep the same stable sidebar
+   ============================================================ */
+
+@media (min-width: 761px) and (max-width: 1100px) {
+
+    .client-sidebar {
+        width: 270px !important;
+        min-width: 270px !important;
+    }
+
+    .dashboard-main {
+        width: calc(100% - 270px) !important;
+        margin-left: 270px !important;
+    }
+}
+
+/* ============================================================
+   MOBILE — do not interfere with existing drawer
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+    .dashboard-shell {
+        display: block !important;
+        min-height: 100vh !important;
+    }
+
+    .dashboard-main {
+        width: 100% !important;
+        margin-left: 0 !important;
+        min-height: 100vh !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+}

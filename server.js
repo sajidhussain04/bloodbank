@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -291,11 +291,11 @@ const transporter =
 
 if (transporter) {
   transporter.verify((error) => {
-    if (error) console.log("ÃƒÂ¢Ã‚ÂÃ…â€™ Email config error:", error.message);
-    else console.log("ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Email server ready");
+    if (error) console.log("Email configuration error:", error.message);
+    else console.log("Email server ready");
   });
 } else {
-  console.log("ÃƒÂ¢Ã…Â¡Ã‚Â ÃƒÂ¯Ã‚Â¸Ã‚Â Email notifications disabled");
+  console.log("Email notifications disabled");
 }
 
 /* -------------------- EMAIL HELPERS -------------------- */
@@ -553,7 +553,7 @@ async function initAdmin() {
   if (findError) throw findError;
 
   if (existing) {
-    console.log(`ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Admin account ready: ${email}`);
+    console.log(`Admin account ready: ${email}`);
     return;
   }
 
@@ -570,29 +570,132 @@ async function initAdmin() {
 }
 
 /* -------------------- AUTH -------------------- */
-function verifyAdmin(req, res, next) {
+async function verifyAdmin(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ success: false, message: "Authentication required" });
   }
 
+  let decoded;
   try {
-    const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET);
-    if (decoded.role !== "admin" || !decoded.id || !validUUID(decoded.id)) {
-      return res.status(403).json({ success: false, message: "Admin privileges required" });
-    }
-    req.admin = decoded;
-    return next();
+    decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET);
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: error.name === "TokenExpiredError" ? "Token expired. Please login again." : "Invalid token",
+      message: error.name === "TokenExpiredError"
+        ? "Token expired. Please login again."
+        : "Invalid token",
+    });
+  }
+
+  if (
+    decoded.role !== "admin" ||
+    !decoded.id ||
+    !validUUID(decoded.id) ||
+    !Number.isInteger(decoded.auth_version)
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: "Admin privileges required. Please log in again.",
+    });
+  }
+
+  try {
+    const { data: admin, error } = await supabase
+      .from("admins")
+      .select("id,auth_version")
+      .eq("id", decoded.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Admin session verification failed:", error.message);
+      return res.status(503).json({
+        success: false,
+        message: "Unable to verify admin session. Please try again.",
+      });
+    }
+
+    if (!admin || admin.auth_version !== decoded.auth_version) {
+      return res.status(401).json({
+        success: false,
+        message: "Admin session is no longer valid. Please log in again.",
+      });
+    }
+
+    req.admin = decoded;
+    return next();
+  } catch (error) {
+    console.error("Admin session verification failed:", error.message);
+    return res.status(503).json({
+      success: false,
+      message: "Unable to verify admin session. Please try again.",
     });
   }
 }
 
+/* -------------------- ADMIN AUTH RATE LIMITING -------------------- */
+// Per-IP limiter for a single Node process. Use a shared store for
+// multi-instance deployments. Ensure trust proxy matches your host.
+function createAdminRateLimiter({ windowMs, maxRequests, message }) {
+  const requests = new Map();
+
+  return function adminRateLimiter(req, res, next) {
+    const now = Date.now();
+    const key = String(req.ip || req.socket?.remoteAddress || "unknown");
+    let entry = requests.get(key);
+
+    if (!entry || now - entry.windowStart >= windowMs) {
+      entry = { windowStart: now, count: 0 };
+    }
+
+    if (entry.count >= maxRequests) {
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((entry.windowStart + windowMs - now) / 1000)
+      );
+      res.set("Retry-After", String(retryAfterSeconds));
+      return res.status(429).json({
+        success: false,
+        message,
+        retryAfterSeconds
+      });
+    }
+
+    entry.count += 1;
+    requests.set(key, entry);
+
+    if (requests.size > 5000) {
+      for (const [storedKey, storedEntry] of requests) {
+        if (now - storedEntry.windowStart >= windowMs) {
+          requests.delete(storedKey);
+        }
+      }
+    }
+
+    return next();
+  };
+}
+
+const adminLoginLimiter = createAdminRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 10,
+  message: "Too many login attempts. Please try again later."
+});
+
+const adminForgotLimiter = createAdminRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 5,
+  message: "Too many password reset requests. Please try again later."
+});
+
+const adminResetLimiter = createAdminRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 10,
+  message: "Too many password reset attempts. Please try again later."
+});
+
 /* -------------------- AUTH ROUTES -------------------- */
-app.post("/api/admin/login", async (req, res) => {
+app.post("/api/admin/login", adminLoginLimiter, async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password || "");
@@ -607,7 +710,13 @@ app.post("/api/admin/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { role: "admin", id: admin.id, email: admin.email, name: admin.name },
+      {
+        role: "admin",
+        id: admin.id,
+        email: admin.email,
+        name: admin.name,
+        auth_version: Number.isInteger(admin.auth_version) ? admin.auth_version : 1,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "24h" },
     );
@@ -635,7 +744,7 @@ app.get("/api/admin/verify", verifyAdmin, async (req, res) => {
   }
 });
 
-app.post("/api/admin/forgot", async (req, res) => {
+app.post("/api/admin/forgot", adminForgotLimiter, async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
     if (!email) return res.status(400).json({ success: false, message: "Email is required" });
@@ -679,17 +788,17 @@ app.post("/api/admin/forgot", async (req, res) => {
   }
 });
 
-app.post("/api/admin/reset/:token", async (req, res) => {
+app.post("/api/admin/reset/:token", adminResetLimiter, async (req, res) => {
   try {
     const newPassword = String(req.body.newPassword || "");
-    if (newPassword.length < 6) {
-      return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
+    if (newPassword.length < 12 || newPassword.length > 128) {
+      return res.status(400).json({ success: false, message: "Password must be between 12 and 128 characters" });
     }
 
     const tokenHash = crypto.createHash("sha256").update(String(req.params.token)).digest("hex");
     const { data: admin, error } = await supabase
       .from("admins")
-      .select("id")
+      .select("id,auth_version")
       .eq("reset_token_hash", tokenHash)
       .gt("reset_token_expires", new Date().toISOString())
       .maybeSingle();
@@ -699,7 +808,12 @@ app.post("/api/admin/reset/:token", async (req, res) => {
     const passwordHash = await bcrypt.hash(newPassword, 12);
     const { error: updateError } = await supabase
       .from("admins")
-      .update({ password_hash: passwordHash, reset_token_hash: null, reset_token_expires: null })
+      .update({
+        password_hash: passwordHash,
+        reset_token_hash: null,
+        reset_token_expires: null,
+        auth_version: (admin.auth_version || 1) + 1,
+      })
       .eq("id", admin.id);
     if (updateError) throw updateError;
 
@@ -4223,36 +4337,3 @@ async function startServer() {
 
 
 if (require.main === module) startServer();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -41,12 +41,23 @@ class BloodBankChatbot {
       .toLowerCase()
       .trim()
       .replace(/[.!?,]+$/g, "")
-      .replace(/\s+/g, " ");
+      .replace(/\s+/g, " ")
+      .replace(/\beligble\b/g, "eligible");
 
     if (/^(hi|hello|hey|hiya|greetings|namaste|hola)( there)?$/.test(normalized) ||
         /^(good morning|good afternoon|good evening)$/.test(normalized)) {
       return this.INTENTS.GREETING;
     }
+    // Handle specific phrases before general keyword matching.
+    if (/\bwhere\b.*\bdonate\b.*\bblood\b/.test(normalized)) {
+      return this.INTENTS.DONATION_PROCESS;
+    }
+
+    if (/\b(can|could)\s+o\s*negative\b.*\b(donate|give)\b/.test(normalized) ||
+        /\bo\s*negative\b.*\b(universal donor|donate to everyone|donate to all)\b/.test(normalized)) {
+      return this.INTENTS.BLOOD_GROUPS;
+    }
+
     const intentMap = [
       { intent: this.INTENTS.ELIGIBILITY, keywords: ['eligible', 'eligibility', 'can i donate', 'who can donate', 'am i eligible', 'criteria', 'qualify', 'requirements'] },
       { intent: this.INTENTS.DONATION_PROCESS, keywords: ['how to donate', 'donation process', 'donate blood', 'become donor', 'register donor', 'donor registration', 'where to donate', 'how can i donate', 'process of donation'] },
@@ -60,7 +71,7 @@ class BloodBankChatbot {
     ];
     
     for (const { intent, keywords } of intentMap) {
-      if (this.matchKeywords(question, keywords)) {
+      if (this.matchKeywords(normalized, keywords)) {
         return intent;
       }
     }

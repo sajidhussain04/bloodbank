@@ -47,3 +47,22 @@ backup_*/
 .env
 .env.*
 !.env.example
+# Local debugging backups - keep on this computer only
+/client_backup_*.js
+/client_backup_*.html
+/client_before_*.js
+/client_css_backup_*.css
+/client_css_before_*.css
+/client_html_backup_*.html
+/client_js_backup_*.js
+/client_js_before_*.js
+/server_backup_*.js
+/server_before_*.js
+/overview_audit_*.txt
+# Local environment secrets
+/.env
+/.env.*
+!/.env.example
+
+# Broken debugging patches
+/client_js_broken_profile_patch_*.js

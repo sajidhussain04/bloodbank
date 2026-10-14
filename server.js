@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const helmet = require("helmet");
 const path = require("path");
+const { initAIRoutes } = require("./server/routes/aiRoutes");
 
 // Load environment variables.
 dotenv.config();
@@ -252,6 +253,30 @@ app.patch(
    ============================================================ */
 
 
+app.get("/api/health", async (_req, res) => {
+  try {
+    const { error } = await supabase
+      .from("donors")
+      .select("id", { head: true, count: "exact" });
+
+    if (error) throw error;
+
+    return res.status(200).json({
+      status: "healthy",
+      database: "Supabase",
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error("Health check failed:", error.message);
+
+    return res.status(503).json({
+      status: "unhealthy",
+      database: "Supabase",
+      message: "Database connectivity check failed",
+      timestamp: new Date().toISOString()
+    });
+  }
+});
 app.use(express.static(PUBLIC_DIR));
 app.get("/favicon.ico", (_req, res) => res.status(204).end());
 
@@ -686,7 +711,7 @@ app.post("/api/admin/reset/:token", async (req, res) => {
 });
 
 /* -------------------- CLIENT AUTH -------------------- */
-function verifyClient(req, res, next) {
+async function verifyClient(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -696,25 +721,13 @@ function verifyClient(req, res, next) {
     });
   }
 
+  let decoded;
+
   try {
-    const decoded = jwt.verify(
+    decoded = jwt.verify(
       authHeader.slice(7),
       process.env.JWT_SECRET
     );
-
-    if (
-      decoded.role !== "client" ||
-      !decoded.id ||
-      !validUUID(decoded.id)
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: "Client access required",
-      });
-    }
-
-    req.client = decoded;
-    return next();
   } catch (error) {
     return res.status(401).json({
       success: false,
@@ -722,6 +735,49 @@ function verifyClient(req, res, next) {
         error.name === "TokenExpiredError"
           ? "Token expired. Please login again."
           : "Invalid token",
+    });
+  }
+
+  if (
+    decoded.role !== "client" ||
+    !decoded.id ||
+    !validUUID(decoded.id)
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: "Client access required",
+    });
+  }
+
+  try {
+    const { data: client, error } = await supabase
+      .from("client_users")
+      .select("id,is_active")
+      .eq("id", decoded.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Client authentication database check failed:", error.message);
+      return res.status(503).json({
+        success: false,
+        message: "Unable to verify client account. Please try again.",
+      });
+    }
+
+    if (!client || client.is_active !== true) {
+      return res.status(403).json({
+        success: false,
+        message: "Client account not found or inactive",
+      });
+    }
+
+    req.client = decoded;
+    return next();
+  } catch (error) {
+    console.error("Client authentication error:", error.message);
+    return res.status(503).json({
+      success: false,
+      message: "Unable to verify client account. Please try again.",
     });
   }
 }
@@ -2180,19 +2236,10 @@ app.post("/api/client/login", async (req, res) => {
 
 app.get("/api/client/requests", verifyClient, async (req, res) => {
   try {
-    const clientEmail = normalizeEmail(req.client.email);
-
-    if (!clientEmail) {
-      return res.status(401).json({
-        success: false,
-        message: "Client email is unavailable",
-      });
-    }
-
     const { data, error } = await supabase
       .from("blood_requests")
       .select("*")
-      .eq("requester_email", clientEmail)
+      .eq("client_user_id", req.client.id)
       .order("priority_rank", {
         ascending: true,
       })
@@ -3077,6 +3124,157 @@ app.get("/api/client/profile", verifyClient, async (req, res) => {
  * Email is intentionally read-only here.
  * Password changes have their own authenticated endpoint.
  */
+/*
+ * Change password for the authenticated client.
+ *
+ * Requires:
+ * - current password
+ * - strong new password
+ * - password confirmation on the frontend
+ */
+app.post("/api/client/change-password", verifyClient, async (req, res) => {
+  try {
+    const clientId = req.client?.id;
+
+    if (!clientId) {
+      return res.status(401).json({
+        success: false,
+        message: "Client authentication is required.",
+      });
+    }
+
+    const currentPassword = String(req.body?.currentPassword || "");
+    const newPassword = String(req.body?.newPassword || "");
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Current and new passwords are required.",
+      });
+    }
+
+    if (
+      newPassword.length < 8 ||
+      newPassword.length > 128 ||
+      !/[A-Z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword) ||
+      !/[^A-Za-z0-9]/.test(newPassword)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Password must be 8–128 characters and include an uppercase letter, a number, and a special character.",
+      });
+    }
+
+    const { data: client, error: clientError } = await supabase
+      .from("client_users")
+      .select("id,name,email,password_hash,is_active")
+      .eq("id", clientId)
+      .maybeSingle();
+
+    if (clientError) throw clientError;
+
+    if (!client || !client.is_active) {
+      return res.status(404).json({
+        success: false,
+        message: "Client account not found.",
+      });
+    }
+
+    const matches = await bcrypt.compare(
+      currentPassword,
+      client.password_hash
+    );
+
+    if (!matches) {
+      return res.status(401).json({
+        success: false,
+        message: "Current password is incorrect.",
+      });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be different from your current password.",
+      });
+    }
+
+    const newPasswordHash = await bcrypt.hash(newPassword, 12);
+
+    const { error: updateError } = await supabase
+      .from("client_users")
+      .update({
+        password_hash: newPasswordHash,
+      })
+      .eq("id", clientId);
+
+    if (updateError) throw updateError;
+
+    /*
+     * Invalidate outstanding reset tokens after a successful
+     * authenticated password change.
+     */
+    try {
+      await supabase
+        .from("client_password_resets")
+        .update({
+          used_at: new Date().toISOString(),
+        })
+        .eq("client_id", String(clientId))
+        .is("used_at", null);
+    } catch (resetError) {
+      console.warn(
+        "Password reset-token cleanup failed:",
+        resetError?.message || resetError
+      );
+    }
+
+    try {
+      if (typeof sendClientPasswordChangedEmail === "function") {
+        await sendClientPasswordChangedEmail(client);
+      }
+    } catch (emailError) {
+      console.warn(
+        "Password-change notification email failed:",
+        emailError?.message || emailError
+      );
+    }
+
+    try {
+      if (typeof createClientNotification === "function") {
+        await createClientNotification({
+          recipientId: clientId,
+          type: "password_changed",
+          title: "Password changed",
+          message: "Your JharJeevan password was changed successfully.",
+          data: {
+            clientId,
+          },
+        });
+      }
+    } catch (notificationError) {
+      console.warn(
+        "Password-change notification failed:",
+        notificationError?.message || notificationError
+      );
+    }
+
+    return res.json({
+      success: true,
+      message: "Password changed successfully.",
+    });
+  } catch (error) {
+    console.error("Client change-password error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to change your password right now.",
+    });
+  }
+});
+
 app.put("/api/client/profile", verifyClient, async (req, res) => {
   try {
     const clientId = req.client?.id;
@@ -3374,45 +3572,630 @@ app.patch(
 
 /* -------------------- CLIENT BLOOD INVENTORY -------------------- */
 
-app.get("/api/inventory", async (_req, res) => {
+
+// ============================================================
+// P0 API ROUTE RESTORATION — SUPABASE
+// Uses the existing tables and authentication middleware.
+// ============================================================
+
+function donorApi(row) {
+  if (!row) return row;
+  return {
+    ...row,
+    bloodGroup: row.blood_group,
+    lastDonationDate: row.last_donation_date,
+    isAvailable: row.is_available,
+    createdAt: row.created_at
+  };
+}
+
+function requestApi(row) {
+  if (!row) return row;
+  return {
+    ...row,
+    patientName: row.patient_name,
+    bloodGroup: row.blood_group,
+    unitsRequired: row.units_required,
+    hospitalName: row.hospital_name,
+    hospitalAddress: row.hospital_address,
+    requiredDate: row.required_date,
+    requesterName: row.requester_name,
+    requesterPhone: row.requester_phone,
+    requesterEmail: row.requester_email,
+    createdAt: row.created_at
+  };
+}
+
+// GET donors — admin only.
+app.get("/api/donors", verifyAdmin, async (req, res) => {
   try {
-    const [
-      { data: donors, error: donorError },
-      { data: approved, error: requestError }
-    ] = await Promise.all([
-      supabase.from("donors").select("blood_group").eq("is_available", true),
-      supabase.from("blood_requests").select("blood_group,units_required").eq("status", "Approved")
-    ]);
+    let query = supabase.from("donors").select("*").order("created_at", {
+      ascending: false
+    });
 
-    if (donorError) throw donorError;
-    if (requestError) throw requestError;
+    if (req.query.bloodGroup) {
+      query = query.eq("blood_group", req.query.bloodGroup);
+    }
 
-    const inventory = Object.fromEntries(
-      BLOOD_GROUPS.map((bg) => [bg, 0])
-    );
+    if (req.query.available === "true") {
+      query = query.eq("is_available", true);
+    }
 
-    for (const donor of donors || []) {
-      if (BLOOD_GROUPS.includes(donor.blood_group)) {
-        inventory[donor.blood_group] += 1;
+    const { data, error } = await query;
+    if (error) throw error;
+
+    return res.json({
+      success: true,
+      donors: (data || []).map(donorApi)
+    });
+  } catch (error) {
+    console.error("GET /api/donors:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch donors."
+    });
+  }
+});
+
+// PUBLIC donor registration.
+app.post("/api/donors", async (req, res) => {
+  try {
+    const b = req.body || {};
+    const donor = {
+      name: String(b.name || "").trim(),
+      age: Number(b.age),
+      blood_group: b.bloodGroup || b.blood_group,
+      phone: String(b.phone || "").trim(),
+      email: String(b.email || "").trim() || null,
+      location: String(b.location || "").trim(),
+      last_donation_date: b.lastDonationDate || b.last_donation_date || null,
+      is_available: true
+    };
+
+    if (
+      !donor.name ||
+      !Number.isInteger(donor.age) ||
+      donor.age < 18 ||
+      donor.age > 65 ||
+      !BLOOD_GROUPS.includes(donor.blood_group) ||
+      !donor.phone ||
+      !donor.location
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide valid donor details."
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("donors")
+      .insert(donor)
+      .select("*")
+      .single();
+
+    if (error) {
+      if (error.code === "23505") {
+        return res.status(409).json({
+          success: false,
+          message: "A donor with this phone number already exists."
+        });
+      }
+      throw error;
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "Donor registered successfully.",
+      donor: donorApi(data)
+    });
+  } catch (error) {
+    console.error("POST /api/donors:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to register donor."
+    });
+  }
+});
+
+// UPDATE donor — admin only.
+app.put("/api/donors/:id", verifyAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const updates = {};
+
+    const fields = {
+      name: "name",
+      age: "age",
+      bloodGroup: "blood_group",
+      blood_group: "blood_group",
+      phone: "phone",
+      email: "email",
+      location: "location",
+      lastDonationDate: "last_donation_date",
+      last_donation_date: "last_donation_date",
+      isAvailable: "is_available",
+      is_available: "is_available"
+    };
+
+    for (const [key, column] of Object.entries(fields)) {
+      if (Object.prototype.hasOwnProperty.call(b, key)) {
+        updates[column] = b[key];
       }
     }
 
-    for (const request of approved || []) {
-      if (BLOOD_GROUPS.includes(request.blood_group)) {
-        inventory[request.blood_group] = Math.max(
-          0,
-          inventory[request.blood_group] - Number(request.units_required || 0)
-        );
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid donor fields supplied."
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("donors")
+      .update(updates)
+      .eq("id", req.params.id)
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Donor not found."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Donor updated successfully.",
+      donor: donorApi(data)
+    });
+  } catch (error) {
+    console.error("PUT /api/donors/:id:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update donor."
+    });
+  }
+});
+
+// DELETE donor — admin only.
+app.delete("/api/donors/:id", verifyAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("donors")
+      .delete()
+      .eq("id", req.params.id)
+      .select("id")
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Donor not found."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Donor deleted successfully."
+    });
+  } catch (error) {
+    console.error("DELETE /api/donors/:id:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to delete donor."
+    });
+  }
+});
+
+// GET blood requests — admin only.
+app.get("/api/requests", verifyAdmin, async (req, res) => {
+  try {
+    let query = supabase
+      .from("blood_requests")
+      .select("*")
+      .order("priority_rank", { ascending: true })
+      .order("created_at", { ascending: false });
+
+    if (req.query.status) {
+      query = query.eq("status", req.query.status);
+    }
+    if (req.query.bloodGroup) {
+      query = query.eq("blood_group", req.query.bloodGroup);
+    }
+    if (req.query.priority) {
+      query = query.eq("priority", req.query.priority);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    return res.json({
+      success: true,
+      requests: (data || []).map(requestApi)
+    });
+  } catch (error) {
+    console.error("GET /api/requests:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to fetch blood requests."
+    });
+  }
+});
+
+// PUBLIC blood-request submission.
+app.post("/api/requests", async (req, res) => {
+  try {
+    const b = req.body || {};
+
+    let clientUserId = null;
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+      if (!authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid authorization header."
+        });
+      }
+
+      try {
+        const decoded = jwt.verify(authHeader.slice(7), process.env.JWT_SECRET);
+        if (decoded.role !== "client" || !decoded.id || !validUUID(decoded.id)) {
+          return res.status(403).json({
+            success: false,
+            message: "Client authentication required."
+          });
+        }
+        clientUserId = decoded.id;
+      } catch (authError) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid or expired client session."
+        });
+      }
+    }
+
+    const request = {
+      client_user_id: clientUserId,
+      patient_name: String(b.patientName || b.patient_name || "").trim(),
+      blood_group: b.bloodGroup || b.blood_group,
+      units_required: Number(b.unitsRequired ?? b.units_required),
+      hospital_name: String(b.hospitalName || b.hospital_name || "").trim(),
+      hospital_address: String(b.hospitalAddress || b.hospital_address || "").trim(),
+      city: String(b.city || "").trim(),
+      required_date: b.requiredDate || b.required_date,
+      requester_name: String(
+        b.requesterName || b.requester_name || b.patientName || b.patient_name || ""
+      ).trim(),
+      requester_phone: String(
+        b.requesterPhone || b.requester_phone || ""
+      ).trim(),
+      requester_email: String(
+        b.requesterEmail || b.requester_email || ""
+      ).trim() || null,
+      status: "Pending",
+      priority: b.priority === "Urgent" ? "Urgent" : "Normal",
+      priority_rank: b.priority === "Urgent" ? 0 : 1
+    };
+
+    if (
+      !request.patient_name ||
+      !BLOOD_GROUPS.includes(request.blood_group) ||
+      !Number.isInteger(request.units_required) ||
+      request.units_required < 1 ||
+      request.units_required > 10 ||
+      !request.hospital_name ||
+      !request.hospital_address ||
+      !request.city ||
+      !request.required_date ||
+      !request.requester_name ||
+      !request.requester_phone ||
+      Number.isNaN(Date.parse(request.required_date))
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required blood-request details."
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("blood_requests")
+      .insert(request)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+
+    return res.status(201).json({
+      success: true,
+      message: "Blood request submitted successfully.",
+      request: publicRequest(data)
+    });
+  } catch (error) {
+    console.error("POST /api/requests:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to submit blood request."
+    });
+  }
+});
+
+// APPROVE request — admin only.
+app.patch("/api/requests/:id/approve", verifyAdmin, async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("blood_requests")
+      .update({
+        status: "Approved",
+        approved_by: req.admin?.email || "Administrator",
+        approved_at: new Date().toISOString()
+      })
+      .eq("id", req.params.id)
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Blood request not found."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Blood request approved.",
+      request: requestApi(data)
+    });
+  } catch (error) {
+    console.error("PATCH /api/requests/:id/approve:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to approve blood request."
+    });
+  }
+});
+
+// UPDATE request status — admin only.
+app.put("/api/requests/:id", verifyAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const status = b.status;
+
+    if (!REQUEST_STATUSES.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid request status."
+      });
+    }
+
+    if (status === "Completed") {
+      return res.status(400).json({
+        success: false,
+        message: "Requests can only be marked Completed by successfully issuing the requested blood."
+      });
+    }
+
+    const updates = { status };
+    if (status === "Approved") {
+      updates.approved_by = req.admin?.email || "Administrator";
+      updates.approved_at = new Date().toISOString();
+    }
+
+    const { data, error } = await supabase
+      .from("blood_requests")
+      .update(updates)
+      .eq("id", req.params.id)
+      .select("*")
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Blood request not found."
+      });
+    }
+
+    return res.json({
+      success: true,
+      request: requestApi(data)
+    });
+  } catch (error) {
+    console.error("PUT /api/requests/:id:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Unable to update blood request."
+    });
+  }
+});
+
+// DELETE request — admin only.
+// Preserve completed requests and issuance/inventory audit history.
+app.delete("/api/requests/:id", verifyAdmin, async (req, res) => {
+  try {
+    const requestId = String(req.params.id || "").trim();
+
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid blood request ID."
+      });
+    }
+
+    const { data: existing, error: lookupError } = await supabase
+      .from("blood_requests")
+      .select("id,status")
+      .eq("id", requestId)
+      .maybeSingle();
+
+    if (lookupError) throw lookupError;
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: "Blood request not found."
+      });
+    }
+
+    if (existing.status === "Completed") {
+      return res.status(409).json({
+        success: false,
+        message: "Completed requests cannot be deleted because issuance and inventory history must be preserved."
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("blood_requests")
+      .delete()
+      .eq("id", requestId)
+      .select("id")
+      .maybeSingle();
+
+    if (error) {
+      if (error.code === "23503") {
+        return res.status(409).json({
+          success: false,
+          message: "This request is linked to an issuance or inventory history record and cannot be deleted."
+        });
+      }
+      throw error;
+    }
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Blood request not found or already deleted."
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Blood request deleted successfully."
+    });
+  } catch (error) {
+    console.error("DELETE /api/requests/:id:", {
+      code: error.code,
+      message: error.message
+    });
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to delete blood request due to a server or database error."
+    });
+  }
+});
+// Mount the existing AI router at the URL prefix used by the frontend.
+app.use("/api/ai", initAIRoutes(supabase, verifyAdmin));
+
+// Physical blood stock — this endpoint intentionally does not count donor records.
+app.get("/api/inventory", async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("blood_inventory")
+      .select("blood_group,units_available");
+
+    if (error) throw error;
+
+    const inventory = Object.fromEntries(
+      BLOOD_GROUPS.map((group) => [group, 0])
+    );
+
+    for (const row of data || []) {
+      if (BLOOD_GROUPS.includes(row.blood_group)) {
+        inventory[row.blood_group] = Number(row.units_available) || 0;
       }
     }
 
     return res.json(inventory);
   } catch (error) {
-    console.error("Inventory error:", error);
+    console.error("Physical inventory error:", error.message || error);
+    return res.status(503).json({
+      success: false,
+      message: "Physical inventory is unavailable. Verify that the blood inventory migration has been applied."
+    });
+  }
+});
 
+// Add physically received blood units — admin only.
+app.post("/api/inventory/add", verifyAdmin, async (req, res) => {
+  try {
+    const body = req.body || {};
+    const bloodGroup = String(body.bloodGroup || "").trim();
+    const units = Number(body.units);
+    const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) : null;
+
+    if (!BLOOD_GROUPS.includes(bloodGroup)) {
+      return res.status(400).json({ success: false, message: "Select a valid blood group." });
+    }
+
+    if (!Number.isInteger(units) || units < 1 || units > 100000) {
+      return res.status(400).json({ success: false, message: "Units must be a whole number between 1 and 100000." });
+    }
+
+    const { data, error } = await supabase.rpc("add_blood_inventory", {
+      p_blood_group: bloodGroup,
+      p_units: units,
+      p_performed_by: req.admin?.email || "Administrator",
+      p_note: note
+    });
+
+    if (error) throw error;
+
+    return res.json({
+      success: true,
+      message: "Physical stock added successfully.",
+      inventory: data
+    });
+  } catch (error) {
+    console.error("POST /api/inventory/add:", error.message || error);
+    return res.status(503).json({
+      success: false,
+      message: "Unable to add stock. Verify that the inventory migration has been applied."
+    });
+  }
+});
+
+// Issue the full requested quantity — admin only.
+// Stock deduction, issuance ledger, and request completion occur atomically in PostgreSQL.
+app.post("/api/requests/:id/issue", verifyAdmin, async (req, res) => {
+  try {
+    if (!validUUID(req.params.id)) {
+      return res.status(400).json({ success: false, message: "Invalid request ID." });
+    }
+
+    const { data, error } = await supabase.rpc("issue_blood_request", {
+      p_request_id: req.params.id,
+      p_issued_by: req.admin?.email || "Administrator"
+    });
+
+    if (error) {
+      const message = String(error.message || "");
+      const status = /not found/i.test(message) ? 404
+        : /only approved|already been issued|insufficient physical stock|no inventory record/i.test(message) ? 409
+        : 503;
+
+      return res.status(status).json({
+        success: false,
+        message: status === 503
+          ? "Issuance failed. Verify that the inventory migration has been applied."
+          : message
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Blood issued and request completed successfully.",
+      issuance: data
+    });
+  } catch (error) {
+    console.error("POST /api/requests/:id/issue:", error.message || error);
     return res.status(500).json({
       success: false,
-      message: "Error fetching inventory"
+      message: "Unable to issue blood."
     });
   }
 });
@@ -3438,9 +4221,10 @@ async function startServer() {
   }
 }
 
-if (require.main === "module") startServer();
 
 if (require.main === module) startServer();
+
+
 
 
 

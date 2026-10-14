@@ -16,7 +16,56 @@ A complete Blood Bank Management System using:
 
 This project uses **Supabase PostgreSQL only**.
 
-Run `supabase/schema.sql` in the **Blood Bank** Supabase project's SQL Editor before starting the server.
+### Fresh database setup
+
+1. Create a new Supabase project.
+2. Open Supabase SQL Editor and execute `supabase/schema.sql`.
+3. Review the migration files in `supabase/migrations/`.
+4. Install or access Supabase CLI and authenticate:
+
+   ```powershell
+   npx supabase login
+   npx supabase link --project-ref YOUR_PROJECT_REF
+   ```
+
+5. Check the migration history:
+
+   ```powershell
+   npx supabase migration list
+   ```
+
+6. After verifying that the pending migrations are compatible with the existing schema, apply them:
+
+   ```powershell
+   npx supabase db push
+   ```
+
+7. Verify the migration history again:
+
+   ```powershell
+   npx supabase migration list
+   ```
+
+### What the core schema and migrations create
+
+`supabase/schema.sql` creates the core `admins`, `donors`, and `blood_requests` tables and the `blood_group_summary` view. It does not create every table required by the full application.
+
+The additional client-dashboard tables, password-reset storage, request-ownership changes, indexes, and related security settings are defined in `supabase/migrations/`. For a fresh database, execute `supabase/schema.sql` first, then link the Supabase CLI to the project, inspect `npx supabase migration list`, and review and apply the pending migrations with `npx supabase db push`.
+
+The two zero-byte `client_users_auth` migration files are historical migration entries. Do not delete them or add SQL to them. Preserve the existing migration history when setting up or updating a database.
+### Existing database
+
+Do not rerun `supabase/schema.sql` or apply migrations without first checking the live schema and migration history.
+
+The migration `20261007145204_client_request_ownership.sql` uses the existing `blood_requests.client_user_id` column. It associates existing blood requests with client accounts when their email addresses match.
+
+Review the ownership backfill before applying it to a database containing real requests.
+
+### Security
+
+Keep the Supabase server-side secret/service-role key in `.env`.
+
+Never expose credentials in frontend JavaScript, HTML, screenshots, or GitHub.
 
 ## Local PowerShell setup
 

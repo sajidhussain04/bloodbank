@@ -725,3 +725,4692 @@ tbody tr:last-child td {
         scroll-behavior: auto !important;
     }
 }
+
+/* JHARJEEVAN FINAL VISUAL POLISH START */
+
+/* Improve navigation readability on the light sidebar */
+.sidebar ul li a,
+.sidebar a {
+    color: #475569 !important;
+}
+
+.sidebar ul li a i,
+.sidebar a i {
+    color: #64748b !important;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active,
+.sidebar a:hover {
+    color: #be123c !important;
+    background: linear-gradient(90deg, #ffe4ec, #f3e8ff) !important;
+}
+
+.sidebar ul li a:hover i,
+.sidebar ul li a.active i,
+.sidebar a:hover i {
+    color: #be123c !important;
+}
+
+.sidebar-label {
+    color: #64748b !important;
+    font-weight: 800 !important;
+}
+
+/* Compact, consistent desktop KPI cards */
+.stats {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+}
+
+.stats .card {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 170px !important;
+    min-height: 170px !important;
+    padding: 18px !important;
+    align-items: center !important;
+    gap: 13px !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+}
+
+.stats .card h3 {
+    color: #64748b !important;
+    line-height: 1.45 !important;
+}
+
+.stats .card p {
+    color: #111827 !important;
+    overflow-wrap: anywhere;
+}
+
+/* The AI card needs its own stronger selector to beat generic card rules */
+.stats .card.ai-insights-card {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(255,255,255,.18), transparent 38%),
+        linear-gradient(135deg, #6d28d9, #4338ca) !important;
+    border: 0 !important;
+    color: #ffffff !important;
+}
+
+.stats .card.ai-insights-card h3,
+.stats .card.ai-insights-card p,
+.stats .card.ai-insights-card small {
+    color: #ffffff !important;
+}
+
+.stats .card.ai-insights-card p {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    line-height: 1.5 !important;
+}
+
+.stats .card.ai-insights-card > i {
+    flex-shrink: 0;
+    background: rgba(255,255,255,.16) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* Consistent section headings and readable status messages */
+.main section h2 {
+    color: #111827;
+    line-height: 1.35;
+}
+
+#inventoryChartStatus {
+    line-height: 1.6;
+    font-size: 13px;
+    border-radius: 11px;
+}
+
+/* Tables: improve scanning and prevent actions from wrapping awkwardly */
+.table-wrapper,
+.table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table th {
+    color: #475569;
+}
+
+table td {
+    color: #334155;
+    vertical-align: middle;
+}
+
+.action-btn,
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(124,58,237,.35);
+    outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .stats .card {
+        height: 155px !important;
+        min-height: 155px !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .stats {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .stats .card {
+        height: auto !important;
+        min-height: 112px !important;
+        padding: 16px !important;
+    }
+
+    .stats .card p {
+        font-size: 25px !important;
+    }
+
+    .stats .card.ai-insights-card p {
+        -webkit-line-clamp: 5;
+    }
+
+    #inventoryChart {
+        max-height: 260px !important;
+    }
+
+    .inventory-stock-controls {
+        align-items: stretch !important;
+    }
+
+    .inventory-stock-controls > * {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .table-wrapper table,
+    .table-wrap table {
+        min-width: 680px;
+    }
+}
+
+/* Respect accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+    .stats .card,
+    .sidebar a,
+    button {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* JHARJEEVAN FINAL VISUAL POLISH END */
+
+/* JHARJEEVAN PREMIUM SIDEBAR START */
+
+/* Refined light sidebar */
+.sidebar {
+    background: linear-gradient(180deg, #ffffff 0%, #fcfbff 58%, #f8f7ff 100%) !important;
+    border-right: 1px solid #e9e8f2 !important;
+    box-shadow: 8px 0 32px rgba(31, 24, 54, 0.045) !important;
+    scrollbar-width: thin;
+    scrollbar-color: #d8d3e7 transparent;
+}
+
+/* Brand panel: stronger contrast and cleaner proportions */
+.sidebar .admin-brand {
+    display: block !important;
+    margin: 0 8px 27px !important;
+    padding: 0 !important;
+    border-radius: 19px !important;
+    text-decoration: none !important;
+    transform: none !important;
+}
+
+.sidebar .brand-box {
+    box-sizing: border-box;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-height: 76px;
+    padding: 13px !important;
+    border: 1px solid #f0d9e7 !important;
+    border-radius: 18px !important;
+    background: linear-gradient(135deg, #fff0f5 0%, #f1eaff 100%) !important;
+    box-shadow: 0 8px 22px rgba(124, 58, 237, .065) !important;
+    color: #172033 !important;
+    transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease;
+}
+
+.sidebar .brand-box:hover {
+    border-color: #e9b8d0 !important;
+    box-shadow: 0 12px 26px rgba(124, 58, 237, .11) !important;
+}
+
+.sidebar .brand-icon {
+    flex: 0 0 44px;
+    width: 44px !important;
+    height: 44px !important;
+    display: grid !important;
+    place-items: center !important;
+    border-radius: 14px !important;
+    background: linear-gradient(145deg, #f02759, #be123c) !important;
+    color: #ffffff !important;
+    box-shadow: 0 7px 16px rgba(190, 18, 60, .22) !important;
+}
+
+.sidebar .brand-icon i,
+.sidebar .brand-icon svg {
+    color: #ffffff !important;
+}
+
+.sidebar .brand-box h2,
+.sidebar .brand-box h3,
+.sidebar .brand-box strong,
+.sidebar .brand-box .brand-name {
+    color: #172033 !important;
+    font-size: 15px !important;
+    font-weight: 850 !important;
+    letter-spacing: -.025em;
+    line-height: 1.35;
+}
+
+.sidebar .brand-box p,
+.sidebar .brand-box small,
+.sidebar .brand-box .brand-subtitle {
+    color: #77718c !important;
+    font-size: 9px !important;
+    font-weight: 750 !important;
+    letter-spacing: .085em;
+    line-height: 1.5;
+}
+
+/* Navigation group headings */
+.sidebar .sidebar-label {
+    margin: 23px 10px 9px !important;
+    color: #858198 !important;
+    font-size: 10px !important;
+    font-weight: 850 !important;
+    letter-spacing: .14em !important;
+    line-height: 1.5;
+    text-transform: uppercase;
+}
+
+/* Predictable vertical rhythm */
+.sidebar ul {
+    gap: 5px !important;
+}
+
+.sidebar ul li {
+    margin: 0 !important;
+}
+
+.sidebar ul li a {
+    position: relative;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 12px 13px !important;
+    gap: 12px !important;
+    border: 1px solid transparent !important;
+    border-radius: 12px !important;
+    color: #475569 !important;
+    font-size: 12px !important;
+    font-weight: 750 !important;
+    line-height: 1.4;
+    text-decoration: none !important;
+    transform: none !important;
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease !important;
+}
+
+.sidebar ul li a i {
+    flex: 0 0 19px;
+    width: 19px !important;
+    color: #7c8498 !important;
+    font-size: 14px !important;
+    text-align: center;
+    transition: color .2s ease, transform .2s ease;
+}
+
+/* Hover: subtle movement without distracting effects */
+.sidebar ul li a:hover {
+    background: linear-gradient(100deg, #fff0f5, #f5efff) !important;
+    border-color: #f4dfed !important;
+    color: #9f1239 !important;
+    transform: translateX(3px) !important;
+}
+
+.sidebar ul li a:hover i {
+    color: #be123c !important;
+    transform: scale(1.06);
+}
+
+/* Current section: clear, premium active treatment */
+.sidebar ul li a.active,
+.sidebar ul li a[aria-current="page"] {
+    background: linear-gradient(105deg, #ffe6ef 0%, #f0e8ff 100%) !important;
+    border-color: #f3d8eb !important;
+    color: #9f1239 !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, .055) !important;
+    font-weight: 850 !important;
+}
+
+.sidebar ul li a.active::before,
+.sidebar ul li a[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: -1px;
+    top: 9px;
+    bottom: 9px;
+    width: 3px;
+    border-radius: 0 5px 5px 0;
+    background: linear-gradient(180deg, #e11d48, #8b5cf6);
+}
+
+.sidebar ul li a.active i,
+.sidebar ul li a[aria-current="page"] i {
+    color: #be123c !important;
+}
+
+/* Keyboard accessibility */
+.sidebar a:focus-visible {
+    outline: 3px solid rgba(124, 58, 237, .38) !important;
+    outline-offset: 3px;
+}
+
+/* Compact screens */
+@media (max-width: 768px) {
+    .sidebar .admin-brand {
+        margin-bottom: 17px !important;
+    }
+
+    .sidebar .brand-box {
+        min-height: 66px;
+        padding: 10px !important;
+        border-radius: 15px !important;
+    }
+
+    .sidebar .sidebar-label {
+        margin-top: 17px !important;
+    }
+
+    .sidebar ul li a {
+        min-height: 42px;
+        padding: 10px 11px !important;
+    }
+}
+
+/* Honor reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar *,
+    .sidebar *::before,
+    .sidebar *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* JHARJEEVAN PREMIUM SIDEBAR END */
+
+/* JHARJEEVAN SIDEBAR FINAL REFINEMENT START */
+
+/* Brand: ensure every text element has readable contrast */
+.sidebar .admin-brand .brand-box {
+    color: #172033 !important;
+    background: linear-gradient(135deg, #fff0f5 0%, #f1eaff 100%) !important;
+    border: 1px solid #f0d9e7 !important;
+}
+
+.sidebar .admin-brand .brand-box > :not(.brand-icon),
+.sidebar .admin-brand .brand-box > :not(.brand-icon) * {
+    color: #172033 !important;
+}
+
+.sidebar .admin-brand .brand-box p,
+.sidebar .admin-brand .brand-box small,
+.sidebar .admin-brand .brand-box span,
+.sidebar .admin-brand .brand-box .brand-subtitle {
+    color: #716982 !important;
+    opacity: 1 !important;
+    text-shadow: none !important;
+}
+
+/* Keep the logo icon visually distinct */
+.sidebar .admin-brand .brand-icon,
+.sidebar .admin-brand .brand-icon i,
+.sidebar .admin-brand .brand-icon svg {
+    color: #ffffff !important;
+}
+
+/* Consistent navigation typography */
+.sidebar ul li a {
+    color: #475569 !important;
+    font-size: 12px !important;
+    font-weight: 750 !important;
+    letter-spacing: .005em;
+}
+
+.sidebar ul li a i {
+    color: #778198 !important;
+}
+
+/* Clear active state, compatible with the existing .active class */
+.sidebar ul li a.active,
+.sidebar ul li a[aria-current="page"] {
+    color: #9f1239 !important;
+    background: linear-gradient(105deg, #ffe6ef, #f0e8ff) !important;
+    border-color: #f3d8eb !important;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, .06) !important;
+}
+
+.sidebar ul li a.active i,
+.sidebar ul li a[aria-current="page"] i {
+    color: #be123c !important;
+}
+
+/* Group headings: readable but visually secondary */
+.sidebar .sidebar-label {
+    color: #77718c !important;
+    font-size: 10px !important;
+    font-weight: 850 !important;
+    letter-spacing: .14em !important;
+}
+
+/* Avoid awkward horizontal overflow in compact layouts */
+@media (max-width: 768px) {
+    .sidebar {
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    .sidebar .admin-brand .brand-box {
+        min-width: 0;
+    }
+
+    .sidebar ul li a {
+        overflow-wrap: anywhere;
+    }
+}
+
+/* Accessibility */
+.sidebar a:focus-visible {
+    outline: 3px solid rgba(124, 58, 237, .4) !important;
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar *,
+    .sidebar *::before,
+    .sidebar *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* JHARJEEVAN SIDEBAR FINAL REFINEMENT END */
+
+/* JHARJEEVAN MOBILE DRAWER UPGRADE START */
+
+/* Navigation foundation */
+.sidebar {
+    isolation: isolate;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(194, 24, 91, .24) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+.sidebar a,
+.sidebar button {
+    -webkit-tap-highlight-color: transparent;
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
+}
+
+.sidebar a:focus-visible,
+.sidebar button:focus-visible,
+.mobile-menu-btn:focus-visible {
+    outline: 3px solid rgba(194, 24, 91, .48);
+    outline-offset: 3px;
+}
+
+.sidebar a:active,
+.sidebar button:active {
+    transform: scale(.985);
+}
+
+/* Clear active item without changing the existing brand palette */
+.sidebar a.active,
+.sidebar a[aria-current="page"] {
+    position: relative;
+}
+
+.sidebar a.active::before,
+.sidebar a[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 9px;
+    bottom: 9px;
+    width: 3px;
+    border-radius: 0 5px 5px 0;
+    background: #ec2460;
+    pointer-events: none;
+}
+
+/* Backdrop remains behind the drawer but above the page */
+.sidebar-overlay {
+    display: none;
+}
+
+@media (min-width: 761px) {
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    .mobile-menu-btn {
+        /* Preserve any existing desktop behavior. */
+    }
+
+    body.jv-drawer-open {
+        overflow: auto;
+    }
+}
+
+/* Mobile drawer */
+@media (max-width: 760px) {
+    .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: min(86vw, 320px) !important;
+        max-width: 320px !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        margin: 0 !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+        box-sizing: border-box !important;
+        z-index: 1201 !important;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translate3d(-102%, 0, 0);
+        transition:
+            transform .28s cubic-bezier(.2, .75, .25, 1),
+            visibility .28s;
+        box-shadow: 18px 0 55px rgba(24, 18, 44, .16);
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+
+    .sidebar.open {
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate3d(0, 0, 0);
+    }
+
+    .sidebar-overlay {
+        display: block !important;
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        background: rgba(17, 20, 35, .48);
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 1200 !important;
+        transition: opacity .24s ease, visibility .24s ease;
+        cursor: pointer;
+        touch-action: manipulation;
+    }
+
+    .sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    body.jv-drawer-open {
+        overflow: hidden !important;
+        overscroll-behavior: none;
+        touch-action: pan-y;
+    }
+
+    .main {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .dashboard-header {
+        min-width: 0;
+    }
+
+    .mobile-menu-btn {
+        display: inline-flex !important;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 14px;
+        cursor: pointer;
+        touch-action: manipulation;
+        position: relative;
+        z-index: 1;
+    }
+
+    .sidebar a,
+    .sidebar button {
+        min-height: 42px;
+    }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar-overlay,
+    .sidebar a,
+    .sidebar button,
+    .mobile-menu-btn {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* JHARJEEVAN MOBILE DRAWER UPGRADE END */
+
+/* JHARJEEVAN FINAL 10 OUT OF 10 POLISH START */
+.sidebar a,
+.sidebar button {
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color .2s ease, color .2s ease,
+                box-shadow .2s ease, transform .18s ease;
+}
+
+.sidebar a:focus-visible,
+.sidebar button:focus-visible,
+.mobile-menu-btn:focus-visible {
+    outline: 3px solid rgba(194, 24, 91, .5);
+    outline-offset: 3px;
+}
+
+.sidebar a:active,
+.sidebar button:active {
+    transform: scale(.985);
+}
+
+.sidebar a.active,
+.sidebar a[aria-current="page"] {
+    position: relative;
+}
+
+.sidebar a.active::before,
+.sidebar a[aria-current="page"]::before {
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: 0 4px 4px 0;
+    pointer-events: none;
+}
+
+@media (max-width: 760px) {
+    .sidebar {
+        width: min(300px, 86vw) !important;
+        max-width: 300px !important;
+        z-index: 1201 !important;
+        box-sizing: border-box !important;
+    }
+
+    .sidebar.open {
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate3d(0, 0, 0);
+    }
+
+    .sidebar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        z-index: 1200 !important;
+    }
+
+    .sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .main {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .mobile-menu-btn {
+        min-width: 44px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar-overlay,
+    .sidebar a,
+    .sidebar button,
+    .mobile-menu-btn {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+/* JHARJEEVAN FINAL 10 OUT OF 10 POLISH END */
+
+/* JHARJEEVAN DASHBOARD PREMIUM UPGRADE START */
+
+/* Consistent page rhythm */
+.main {
+    min-width: 0;
+}
+
+.dashboard-header {
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.dashboard-header h1 {
+    line-height: 1.25;
+    letter-spacing: -0.035em;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-header .subtitle {
+    line-height: 1.65;
+}
+
+/* Existing four dashboard summary cards */
+.stats {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px !important;
+    align-items: stretch;
+    margin-block: 22px;
+}
+
+.stats > .card {
+    position: relative;
+    min-width: 0;
+    min-height: 112px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, .19);
+    border-radius: 20px;
+    background: linear-gradient(145deg, #ffffff 0%, #fffafd 100%);
+    box-shadow: 0 8px 26px rgba(40, 25, 60, .045);
+    transition: transform .22s ease, box-shadow .22s ease,
+                border-color .22s ease;
+}
+
+.stats > .card > i {
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    color: #be185d;
+    background: #fce7f3;
+    font-size: 19px;
+}
+
+.stats > .card > div {
+    min-width: 0;
+}
+
+.stats > .card h3 {
+    margin: 0 0 7px;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.stats > .card p {
+    margin: 0;
+    font-size: clamp(21px, 2vw, 29px);
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -.035em;
+    overflow-wrap: anywhere;
+    color: #172033;
+}
+
+.stats > .card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(219, 39, 119, .23);
+    box-shadow: 0 14px 32px rgba(40, 25, 60, .09);
+}
+
+/* Welcome panel */
+.ai-welcome {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, .5);
+    box-shadow: 0 14px 34px rgba(109, 40, 217, .09);
+}
+
+.ai-welcome-content {
+    min-width: 0;
+}
+
+.ai-welcome h2 {
+    line-height: 1.3;
+    letter-spacing: -.025em;
+    overflow-wrap: anywhere;
+}
+
+.ai-welcome p {
+    max-width: 680px;
+    line-height: 1.75;
+}
+
+/* AI Command Center */
+.ai-command-center {
+    min-width: 0;
+    margin-block: 24px;
+    padding: clamp(16px, 2.5vw, 25px);
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 22px;
+    background: linear-gradient(145deg, #ffffff 0%, #fdfaff 100%);
+    box-shadow: 0 10px 30px rgba(40, 25, 60, .045);
+}
+
+.ai-command-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.ai-command-title {
+    min-width: 0;
+}
+
+.ai-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.ai-mini {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #f0e7f2;
+    border-radius: 16px;
+    background: #ffffff;
+    overflow-wrap: anywhere;
+}
+
+.ai-mini-label {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+    font-weight: 600;
+}
+
+.ai-mini-value {
+    margin-block: 9px 6px;
+    color: #1e293b;
+    font-size: clamp(19px, 2vw, 26px);
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.ai-mini-desc {
+    color: #8490a3;
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.ai-recommendation {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 15px;
+    border: 1px solid #f5d7e8;
+    border-radius: 15px;
+    background: #fff7fb;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.ai-recommendation > i {
+    flex: 0 0 auto;
+    margin-top: 3px;
+    color: #be185d;
+}
+
+/* Existing inventory and management sections */
+#inventory,
+#donors,
+#requests {
+    min-width: 0;
+    margin-block: 24px;
+    padding: clamp(16px, 2.5vw, 24px);
+    border: 1px solid rgba(148, 163, 184, .2);
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 8px 26px rgba(40, 25, 60, .035);
+    scroll-margin-top: 22px;
+}
+
+#inventory h2,
+#donors h2,
+#requests h2 {
+    margin-bottom: 18px;
+    color: #172033;
+    font-size: clamp(18px, 2vw, 22px);
+    line-height: 1.4;
+    letter-spacing: -.02em;
+}
+
+#inventory canvas {
+    max-width: 100%;
+}
+
+.table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+}
+
+#donors table,
+#requests table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#donors th,
+#requests th {
+    white-space: nowrap;
+}
+
+#donors td,
+#requests td {
+    overflow-wrap: anywhere;
+}
+
+/* Tablet */
+@media (max-width: 1050px) {
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ai-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .dashboard-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .dashboard-header h1 {
+        font-size: clamp(20px, 5.5vw, 27px);
+    }
+
+    .dashboard-header .subtitle {
+        font-size: 12px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px !important;
+        margin-block: 16px;
+    }
+
+    .stats > .card {
+        min-height: 102px;
+        padding: 13px;
+        gap: 10px;
+        border-radius: 16px;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .stats > .card > i {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        font-size: 15px;
+    }
+
+    .stats > .card h3 {
+        font-size: 11px;
+        margin-bottom: 5px;
+    }
+
+    .stats > .card p {
+        font-size: clamp(19px, 5vw, 25px);
+    }
+
+    .ai-welcome {
+        border-radius: 18px;
+    }
+
+    .ai-command-center {
+        margin-block: 18px;
+        padding: 15px;
+        border-radius: 18px;
+    }
+
+    .ai-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .ai-mini {
+        padding: 12px;
+        border-radius: 13px;
+    }
+
+    .ai-mini-value {
+        font-size: 21px;
+    }
+
+    #inventory,
+    #donors,
+    #requests {
+        margin-block: 16px;
+        padding: 14px;
+        border-radius: 16px;
+    }
+}
+
+/* Very narrow devices */
+@media (max-width: 360px) {
+    .stats {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .stats > .card {
+        min-height: 0;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .ai-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Accessible motion */
+@media (prefers-reduced-motion: reduce) {
+    .stats > .card {
+        transition: none !important;
+    }
+
+    .stats > .card:hover {
+        transform: none;
+    }
+}
+
+/* JHARJEEVAN DASHBOARD PREMIUM UPGRADE END */
+
+/* JHARJEEVAN SIDEBAR FINAL POLISH START */
+
+/* Brand card */
+.sidebar .admin-brand {
+    display: block;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.sidebar .admin-brand:hover {
+    transform: translateY(-1px);
+}
+
+.sidebar .brand-box {
+    border: 1px solid rgba(219, 39, 119, .13);
+    box-shadow: 0 8px 24px rgba(190, 24, 93, .07);
+}
+
+.sidebar .brand-text strong {
+    letter-spacing: -.025em;
+}
+
+.sidebar .brand-text span {
+    letter-spacing: .11em;
+}
+
+/* Navigation links */
+.sidebar a {
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        box-shadow .2s ease,
+        transform .18s ease;
+}
+
+.sidebar a:focus-visible,
+.mobile-menu-btn:focus-visible {
+    outline: 3px solid rgba(219, 39, 119, .48);
+    outline-offset: 3px;
+}
+
+.sidebar a:active {
+    transform: scale(.99);
+}
+
+/* Active state remains clear and aligned */
+.sidebar a.active,
+.sidebar a[aria-current="page"] {
+    position: relative;
+    isolation: isolate;
+}
+
+.sidebar a.active::before,
+.sidebar a[aria-current="page"]::before {
+    left: 0;
+    top: 9px;
+    bottom: 9px;
+    width: 3px;
+    border-radius: 0 5px 5px 0;
+    pointer-events: none;
+}
+
+/* Consistent section labels */
+.sidebar .nav-section-title,
+.sidebar .sidebar-section-title {
+    letter-spacing: .14em;
+}
+
+/* Mobile drawer proportions and layering */
+@media (max-width: 760px) {
+    .sidebar {
+        width: min(280px, 84vw) !important;
+        max-width: 280px !important;
+        box-sizing: border-box !important;
+        z-index: 1201 !important;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar.open {
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate3d(0, 0, 0);
+    }
+
+    .sidebar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        z-index: 1200 !important;
+        background: rgba(17, 24, 39, .46) !important;
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+    }
+
+    .sidebar-overlay.show {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+    .sidebar a {
+        min-height: 42px;
+        touch-action: manipulation;
+    }
+
+    .mobile-menu-btn {
+        min-width: 44px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        touch-action: manipulation;
+    }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar a,
+    .sidebar .admin-brand,
+    .sidebar-overlay,
+    .mobile-menu-btn {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .sidebar a:hover,
+    .sidebar .admin-brand:hover {
+        transform: none !important;
+    }
+}
+
+/* JHARJEEVAN SIDEBAR FINAL POLISH END */
+
+/* JHARJEEVAN LOGOUT BOTTOM START */
+@media (min-width: 761px) {
+    #sidebar {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #sidebar #sidebarLogout {
+        margin-top: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    #sidebar {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #sidebar #sidebarLogout {
+        margin-top: auto;
+        margin-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+}
+/* JHARJEEVAN LOGOUT BOTTOM END */
+
+/* JHARJEEVAN LOGOUT TRUE BOTTOM START */
+
+/* The sidebar already has a vertical flex layout. Let the System group
+   consume the free space above it, keeping Logout at the bottom. */
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+#sidebar .sidebar-system-group {
+    margin-top: auto;
+    flex: 0 0 auto;
+    width: 100%;
+}
+
+#sidebar .sidebar-system-group > .sidebar-label {
+    margin-top: 0;
+}
+
+#sidebar .sidebar-system-group > ul {
+    margin-bottom: 0;
+}
+
+#sidebar #sidebarLogout {
+    min-height: 44px;
+    border-radius: 12px;
+}
+
+@media (min-width: 761px) {
+    #sidebar {
+        height: 100vh;
+        height: 100dvh;
+    }
+}
+
+@media (max-width: 760px) {
+    #sidebar {
+        height: 100vh !important;
+        height: 100dvh !important;
+        min-height: 0 !important;
+        overflow-y: auto;
+    }
+
+    #sidebar .sidebar-system-group {
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-height: 520px) {
+    #sidebar {
+        overflow-y: auto;
+    }
+}
+
+/* JHARJEEVAN LOGOUT TRUE BOTTOM END */
+
+/* ==========================================================
+   JHARJEEVAN DASHBOARD PREMIUM POLISH V1
+   Visual-only enhancement. Existing sidebar and logic intact.
+   ========================================================== */
+
+:root {
+  --jj-accent: #c2185b;
+  --jj-accent-dark: #9d174d;
+  --jj-purple: #7c3aed;
+  --jj-text: #20243a;
+  --jj-muted: #737991;
+  --jj-border: #ece8f2;
+  --jj-surface: #ffffff;
+  --jj-soft-pink: #fff1f7;
+  --jj-soft-purple: #f5f0ff;
+  --jj-shadow: 0 10px 32px rgba(48, 28, 75, 0.065);
+  --jj-shadow-hover: 0 18px 42px rgba(74, 35, 93, 0.12);
+}
+
+/* Main dashboard heading */
+.dashboard-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+  padding: 8px 0 18px;
+}
+
+.dashboard-header h1 {
+  color: var(--jj-text);
+  font-weight: 800;
+  letter-spacing: -0.7px;
+  line-height: 1.25;
+}
+
+.dashboard-header .subtitle {
+  margin-top: 7px;
+  color: var(--jj-muted);
+  line-height: 1.7;
+}
+
+.dashboard-header .header-icon {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid #f4d7e7;
+  border-radius: 17px;
+  color: var(--jj-accent);
+  background: linear-gradient(145deg, #fff0f7, #f2eaff);
+  box-shadow: 0 8px 22px rgba(194, 24, 91, 0.08);
+}
+
+/* Welcome panel */
+.ai-welcome {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 26px;
+  padding: clamp(22px, 3.2vw, 36px);
+  border: 1px solid rgba(222, 177, 211, 0.5);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 90% 10%, rgba(224, 196, 255, 0.65), transparent 42%),
+    linear-gradient(115deg, #fff0f7 0%, #fffaff 48%, #f2edff 100%);
+  box-shadow: var(--jj-shadow);
+}
+
+.ai-welcome::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 190px;
+  height: 190px;
+  right: 9%;
+  bottom: -130px;
+  border: 1px solid rgba(194, 24, 91, 0.13);
+  border-radius: 50%;
+  box-shadow: 0 0 0 22px rgba(194, 24, 91, 0.035),
+              0 0 0 45px rgba(124, 58, 237, 0.025);
+}
+
+.ai-welcome-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 13px;
+  color: var(--jj-accent-dark);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.ai-welcome h2 {
+  margin: 0 0 10px;
+  color: #29223e;
+  font-size: clamp(23px, 3vw, 33px);
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.25;
+}
+
+.ai-welcome p {
+  max-width: 620px;
+  margin: 0;
+  color: #69647c;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.ai-brain {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 86px;
+  height: 86px;
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 26px;
+  color: white;
+  background: linear-gradient(145deg, #db2777, #8b5cf6);
+  box-shadow: 0 14px 30px rgba(148, 48, 137, 0.23);
+  font-size: 34px;
+}
+
+/* Four dashboard summary cards */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0 0 28px;
+}
+
+.stats .card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  min-height: 126px;
+  overflow: hidden;
+  padding: 23px 20px;
+  border: 1px solid var(--jj-border);
+  border-radius: 20px;
+  background: var(--jj-surface);
+  box-shadow: var(--jj-shadow);
+  transition: transform 180ms ease, box-shadow 180ms ease,
+              border-color 180ms ease;
+}
+
+.stats .card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #db2777, #a78bfa);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.stats .card:hover {
+  transform: translateY(-4px);
+  border-color: #e8c9e0;
+  box-shadow: var(--jj-shadow-hover);
+}
+
+.stats .card:hover::after {
+  opacity: 1;
+}
+
+.stats .card > i {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  color: var(--jj-accent);
+  background: linear-gradient(145deg, #fff0f7, #f8e5f2);
+  font-size: 20px;
+}
+
+.stats .card:nth-child(2) > i {
+  color: #7c3aed;
+  background: linear-gradient(145deg, #f3eaff, #ede7ff);
+}
+
+.stats .card:nth-child(3) > i {
+  color: #dc2626;
+  background: linear-gradient(145deg, #fff0f0, #ffe4e8);
+}
+
+.stats .card:nth-child(4) > i {
+  color: #6d28d9;
+  background: linear-gradient(145deg, #f1eaff, #e9e2ff);
+}
+
+.stats .card h3 {
+  margin: 0 0 8px;
+  color: var(--jj-muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.stats .card p {
+  margin: 0;
+  color: var(--jj-text);
+  font-size: clamp(24px, 2.3vw, 31px);
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+/* AI Command Center */
+.ai-command-center {
+  margin: 0 0 28px;
+  padding: clamp(19px, 2.6vw, 28px);
+  border: 1px solid var(--jj-border);
+  border-radius: 22px;
+  background: linear-gradient(145deg, #ffffff, #fdfaff);
+  box-shadow: var(--jj-shadow);
+}
+
+.ai-command-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 23px;
+}
+
+.ai-command-title {
+  min-width: 0;
+}
+
+.ai-command-title strong {
+  color: var(--jj-text);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.ai-command-title span {
+  display: block;
+  margin-top: 5px;
+  color: var(--jj-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ai-command-icon {
+  flex-shrink: 0;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #db2777, #8b5cf6);
+  box-shadow: 0 8px 20px rgba(148, 48, 137, 0.18);
+}
+
+.ai-live-badge {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: 1px solid #d9f2e3;
+  border-radius: 999px;
+  color: #15803d;
+  background: #f0fdf4;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+}
+
+.ai-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.ai-mini {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid #eee8f5;
+  border-radius: 17px;
+  background: linear-gradient(145deg, #ffffff, #faf7ff);
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.ai-mini:hover {
+  transform: translateY(-2px);
+  border-color: #dfc6ed;
+}
+
+.ai-mini-label {
+  color: #77758c;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.ai-mini-value {
+  margin: 12px 0 8px;
+  color: #29223e;
+  font-size: clamp(23px, 2.2vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  overflow-wrap: anywhere;
+}
+
+.ai-mini-desc {
+  color: #89859b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.ai-recommendation {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-top: 17px;
+  padding: 17px;
+  border: 1px solid #f1d9e8;
+  border-radius: 16px;
+  color: #5f3b61;
+  background: linear-gradient(110deg, #fff2f8, #f7f2ff);
+  line-height: 1.75;
+}
+
+.ai-recommendation > i {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--jj-accent);
+  font-size: 18px;
+}
+
+.ai-recommendation strong {
+  display: inline-block;
+  margin-right: 5px;
+  color: #8e245f;
+}
+
+/* Inventory and data sections */
+#inventory {
+  min-width: 0;
+  margin: 0 0 28px;
+  padding: clamp(18px, 2.5vw, 27px);
+  border: 1px solid var(--jj-border);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: var(--jj-shadow);
+  scroll-margin-top: 24px;
+}
+
+#inventory > h2 {
+  margin: 0 0 20px;
+  color: var(--jj-text);
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.4;
+}
+
+#inventoryChart {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+}
+
+#inventory .inventory-stock-controls {
+  border-color: var(--jj-border) !important;
+  background: #fdfbff;
+}
+
+#inventory label {
+  color: #5c6075;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#inventory input,
+#inventory select {
+  min-height: 42px;
+  color: var(--jj-text);
+  background-color: #ffffff;
+  border-color: #e5dfea !important;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+#inventory input:focus,
+#inventory select:focus {
+  outline: none;
+  border-color: #c65a98 !important;
+  box-shadow: 0 0 0 3px rgba(194, 24, 91, 0.1);
+}
+
+.table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--jj-border);
+  border-radius: 16px;
+  background: #ffffff;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrapper table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-wrapper thead th {
+  padding: 14px 16px;
+  color: #67647b;
+  background: #faf7fd;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.45px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-wrapper tbody td {
+  padding: 14px 16px;
+  border-top: 1px solid #f0edf4;
+  color: #4c5064;
+  font-size: 13px;
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+.table-wrapper tbody tr {
+  transition: background-color 150ms ease;
+}
+
+.table-wrapper tbody tr:hover {
+  background-color: #fdf8fc;
+}
+
+/* Consistent keyboard focus */
+.stats .card:focus-within,
+.ai-mini:focus-within,
+#inventory button:focus-visible,
+#inventory input:focus-visible,
+#inventory select:focus-visible {
+  outline: 3px solid rgba(194, 24, 91, 0.22);
+  outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 1100px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ai-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .dashboard-header {
+    gap: 11px;
+    margin-bottom: 19px;
+    padding-bottom: 13px;
+  }
+
+  .dashboard-header .header-icon {
+    width: 43px;
+    height: 43px;
+    border-radius: 13px;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(19px, 5vw, 24px);
+    letter-spacing: -0.5px;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-header .subtitle {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .ai-welcome {
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 19px;
+    padding: 22px 18px;
+    border-radius: 19px;
+  }
+
+  .ai-welcome h2 {
+    font-size: 23px;
+  }
+
+  .ai-welcome p {
+    font-size: 12px;
+  }
+
+  .ai-brain {
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    font-size: 20px;
+  }
+
+  .stats {
+    gap: 11px;
+    margin-bottom: 20px;
+  }
+
+  .stats .card {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+    padding: 15px;
+    border-radius: 17px;
+  }
+
+  .stats .card > i {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+    font-size: 17px;
+  }
+
+  .stats .card h3 {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+
+  .stats .card p {
+    font-size: 25px;
+  }
+
+  .ai-command-center,
+  #inventory {
+    margin-bottom: 20px;
+    padding: 17px 14px;
+    border-radius: 18px;
+  }
+
+  .ai-command-head {
+    align-items: flex-start;
+    margin-bottom: 17px;
+  }
+
+  .ai-command-title strong {
+    font-size: 15px;
+  }
+
+  .ai-live-badge {
+    padding: 7px 9px;
+    font-size: 9px;
+  }
+
+  .ai-grid {
+    gap: 10px;
+  }
+
+  .ai-mini {
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
+
+  .ai-mini-label {
+    font-size: 10px;
+  }
+
+  .ai-mini-value {
+    margin: 10px 0 6px;
+    font-size: 24px;
+  }
+
+  .ai-mini-desc {
+    font-size: 10px;
+  }
+
+  .ai-recommendation {
+    gap: 10px;
+    padding: 14px 12px;
+    font-size: 12px;
+  }
+
+  #inventory > h2 {
+    margin-bottom: 15px;
+    font-size: 18px;
+  }
+
+  #inventory .inventory-stock-controls {
+    gap: 12px !important;
+    padding: 13px !important;
+  }
+
+  .table-wrapper {
+    border-radius: 12px;
+  }
+
+  .table-wrapper thead th,
+  .table-wrapper tbody td {
+    padding: 12px 13px;
+  }
+}
+
+/* Very narrow phones */
+@media (max-width: 360px) {
+  .stats .card {
+    padding: 12px;
+  }
+
+  .stats .card p {
+    font-size: 22px;
+  }
+
+  .ai-mini {
+    padding: 12px 10px;
+  }
+
+  .ai-mini-value {
+    font-size: 21px;
+  }
+
+  .ai-live-badge {
+    letter-spacing: 0;
+  }
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .stats .card,
+  .stats .card::after,
+  .ai-mini,
+  .table-wrapper tbody tr {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .stats .card:hover,
+  .ai-mini:hover {
+    transform: none;
+  }
+}
+
+/* End JHARJEEVAN DASHBOARD PREMIUM POLISH V1 */
+
+/* ==========================================================
+   JHARJEEVAN AI INSIGHT CARD FIX V1
+   Fix oversized text, clipping and card alignment.
+   ========================================================== */
+
+.stats .card.ai-insights-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+  min-height: 160px !important;
+  height: 160px !important;
+  max-height: 160px !important;
+  padding: 20px !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 20px !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 52%, #5145cd 100%) !important;
+  box-shadow: 0 12px 28px rgba(91, 45, 190, 0.18) !important;
+}
+
+.stats .card.ai-insights-card > i {
+  display: grid !important;
+  place-items: center !important;
+  flex: 0 0 44px !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 14px !important;
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+  font-size: 18px !important;
+}
+
+.stats .card.ai-insights-card > div {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.stats .card.ai-insights-card h3 {
+  margin: 0 0 8px !important;
+  color: rgba(255, 255, 255, 0.84) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.7px !important;
+  line-height: 1.4 !important;
+  text-transform: uppercase !important;
+}
+
+.stats .card.ai-insights-card #aiPrediction {
+  display: -webkit-box !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  max-height: 57px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.45 !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 3 !important;
+}
+
+.stats .card.ai-insights-card #aiPrediction * {
+  max-width: 100% !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit !important;
+  overflow-wrap: anywhere !important;
+}
+
+.stats .card.ai-insights-card small {
+  display: block !important;
+  margin-top: 5px !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 9px !important;
+  line-height: 1.4 !important;
+}
+
+.stats .card.ai-insights-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 16px 34px rgba(91, 45, 190, 0.25) !important;
+}
+
+@media (max-width: 1100px) {
+  .stats .card.ai-insights-card {
+    min-height: 150px !important;
+    height: 150px !important;
+    max-height: 150px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats .card.ai-insights-card {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    min-height: 185px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 14px !important;
+  }
+
+  .stats .card.ai-insights-card > i {
+    flex-basis: 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    font-size: 16px !important;
+  }
+
+  .stats .card.ai-insights-card > div {
+    width: 100% !important;
+  }
+
+  .stats .card.ai-insights-card #aiPrediction {
+    max-height: 60px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats .card.ai-insights-card,
+  .stats .card.ai-insights-card:hover {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* End JHARJEEVAN AI INSIGHT CARD FIX V1 */
+
+/* ==========================================================
+   JHARJEEVAN WELCOME PANEL FINAL REFINEMENT V1
+   ========================================================== */
+
+/* More balanced desktop header */
+.dashboard-header {
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.dashboard-header .header-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 16px;
+}
+
+/* Compact, premium welcome panel */
+.ai-welcome {
+  min-height: 0;
+  padding: 25px 30px;
+  margin-bottom: 23px;
+  border-radius: 22px;
+}
+
+.ai-welcome-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ai-welcome-kicker {
+  margin-bottom: 10px;
+  font-size: 10px;
+  letter-spacing: 1.3px;
+}
+
+.ai-welcome h2 {
+  margin-bottom: 8px;
+  font-size: clamp(24px, 2.4vw, 31px);
+  line-height: 1.25;
+}
+
+.ai-welcome p {
+  max-width: 580px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Keep the decorative brain icon secondary to the greeting */
+.ai-brain {
+  flex: 0 0 68px;
+  width: 68px;
+  height: 68px;
+  border-radius: 21px;
+  font-size: 27px;
+}
+
+/* Tablet spacing */
+@media (max-width: 900px) {
+  .ai-welcome {
+    padding: 23px 24px;
+  }
+
+  .ai-brain {
+    flex-basis: 60px;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+}
+
+/* Mobile: preserve readable text and prevent overflow */
+@media (max-width: 600px) {
+  .dashboard-header {
+    gap: 10px;
+    margin-bottom: 17px;
+  }
+
+  .dashboard-header .header-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+  }
+
+  .ai-welcome {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 19px 16px;
+    margin-bottom: 18px;
+    border-radius: 18px;
+  }
+
+  .ai-welcome-kicker {
+    margin-bottom: 9px;
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  .ai-welcome h2 {
+    font-size: clamp(20px, 5.3vw, 25px);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .ai-welcome p {
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .ai-brain {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    font-size: 18px;
+  }
+}
+
+/* Reduced-motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .ai-welcome,
+  .ai-brain {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* End JHARJEEVAN WELCOME PANEL FINAL REFINEMENT V1 */
+
+/* ==========================================================
+   JHARJEEVAN DASHBOARD FINAL BALANCE V1
+   ========================================================== */
+
+/* Consistent summary row */
+.stats {
+  align-items: stretch;
+  gap: 14px;
+}
+
+.stats > .card {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Keep the AI card aligned with the three metric cards */
+.stats .card.ai-insights-card {
+  min-height: 160px !important;
+  height: 160px !important;
+  max-height: 160px !important;
+  padding: 17px !important;
+  gap: 12px !important;
+  align-items: center !important;
+  border-radius: 19px !important;
+}
+
+.stats .card.ai-insights-card > i {
+  flex: 0 0 40px !important;
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  border-radius: 13px !important;
+  font-size: 16px !important;
+}
+
+.stats .card.ai-insights-card h3 {
+  margin-bottom: 7px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.6px !important;
+  line-height: 1.4 !important;
+}
+
+.stats .card.ai-insights-card #aiPrediction {
+  display: -webkit-box !important;
+  max-height: 58px !important;
+  overflow: hidden !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+  overflow-wrap: anywhere !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 3 !important;
+}
+
+.stats .card.ai-insights-card #aiPrediction * {
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: inherit !important;
+  overflow-wrap: anywhere !important;
+}
+
+.stats .card.ai-insights-card small {
+  margin-top: 4px !important;
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+}
+
+/* Improve rhythm between major dashboard sections */
+.ai-welcome {
+  margin-bottom: 21px;
+}
+
+.stats {
+  margin-bottom: 22px;
+}
+
+.ai-command-center,
+#inventory {
+  scroll-margin-top: 20px;
+}
+
+/* Tablet and smaller screens */
+@media (max-width: 1100px) {
+  .stats {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats {
+    gap: 11px;
+  }
+
+  .stats .card.ai-insights-card {
+    min-height: 185px !important;
+    height: auto !important;
+    max-height: none !important;
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    padding: 14px !important;
+  }
+
+  .stats .card.ai-insights-card #aiPrediction {
+    max-height: 60px !important;
+    font-size: 12px !important;
+  }
+
+  .ai-welcome {
+    margin-bottom: 18px;
+  }
+
+  .stats {
+    margin-bottom: 19px;
+  }
+}
+
+/* End JHARJEEVAN DASHBOARD FINAL BALANCE V1 */
+
+/* ==========================================================
+   JHARJEEVAN MOBILE DASHBOARD REFINEMENT V1
+   ========================================================== */
+
+@media (max-width: 600px) {
+  /* Keep the dashboard header readable on narrow screens */
+  .dashboard-header {
+    align-items: flex-start;
+    padding: 16px 14px;
+    gap: 10px;
+  }
+
+  .dashboard-header .header-title {
+    min-width: 0;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(19px, 5.5vw, 25px);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .dashboard-header .subtitle {
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  .header-right {
+    flex-shrink: 0;
+    gap: 6px;
+  }
+
+  .system-status {
+    font-size: 9px;
+  }
+
+  .live-time {
+    font-size: 9px;
+  }
+
+  /* Compact welcome panel */
+  .ai-welcome {
+    position: relative;
+    gap: 10px;
+    padding: 19px 15px;
+    min-width: 0;
+  }
+
+  .ai-welcome-content {
+    min-width: 0;
+  }
+
+  .ai-welcome h2 {
+    font-size: clamp(19px, 5.2vw, 24px);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .ai-welcome p {
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .ai-brain {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+    border-radius: 12px;
+  }
+
+  /* Two-column metrics on phones */
+  .stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100%;
+    margin-bottom: 18px !important;
+  }
+
+  .stats > .card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 9px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 128px !important;
+    height: auto !important;
+    max-height: none !important;
+    box-sizing: border-box !important;
+    padding: 14px !important;
+    border-radius: 17px !important;
+    overflow: hidden;
+  }
+
+  .stats > .card > i {
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    font-size: 16px !important;
+  }
+
+  .stats > .card h3 {
+    font-size: 10px !important;
+    line-height: 1.45 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .stats > .card p {
+    font-size: clamp(21px, 6vw, 26px) !important;
+    line-height: 1.25 !important;
+    overflow-wrap: anywhere;
+  }
+
+  /* Fourth card = AI Insight; keep it full-width and readable */
+  .stats > .card:nth-child(4) {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    min-height: 120px !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 16px !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #6d28d9, #7c3aed 55%, #5145cd) !important;
+  }
+
+  .stats > .card:nth-child(4) > i {
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    color: #ffffff !important;
+    background: rgba(255,255,255,.16) !important;
+  }
+
+  .stats > .card:nth-child(4) > div {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    overflow: hidden;
+  }
+
+  .stats > .card:nth-child(4) h3 {
+    color: rgba(255,255,255,.85) !important;
+    margin: 0 0 6px !important;
+  }
+
+  .stats > .card:nth-child(4) #aiPrediction {
+    display: block !important;
+    max-height: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    line-height: 1.55 !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+    -webkit-line-clamp: unset !important;
+  }
+
+  .stats > .card:nth-child(4) #aiPrediction * {
+    color: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .stats > .card:nth-child(4) small {
+    color: rgba(255,255,255,.78) !important;
+    font-size: 9px !important;
+  }
+
+  /* Give the AI panel enough room on small screens */
+  .ai-command-center {
+    padding: 16px 12px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .ai-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+  }
+
+  .ai-mini {
+    min-width: 0;
+    padding: 12px 10px !important;
+  }
+
+  .ai-mini-value {
+    font-size: clamp(19px, 5vw, 24px) !important;
+    overflow-wrap: anywhere;
+  }
+
+  /* Keep the floating assistant compact on phones */
+  .chatbot-toggle {
+    right: 10px !important;
+    bottom: 10px !important;
+    max-width: 48px !important;
+    min-width: 44px !important;
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    box-shadow: 0 6px 18px rgba(91, 45, 190, .24) !important;
+  }
+
+  .chatbot-toggle span,
+  .chatbot-toggle .button-label {
+    display: none !important;
+  }
+
+  /* Keep tables usable without shrinking text excessively */
+  .table-wrapper {
+    max-width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Very narrow devices */
+@media (max-width: 360px) {
+  .stats {
+    gap: 8px !important;
+  }
+
+  .stats > .card {
+    padding: 11px !important;
+  }
+
+  .stats > .card h3 {
+    font-size: 9px !important;
+  }
+
+  .stats > .card p {
+    font-size: 21px !important;
+  }
+
+  .stats > .card:nth-child(4) {
+    padding: 13px !important;
+    gap: 9px !important;
+  }
+
+  .dashboard-header .subtitle {
+    max-width: 190px;
+  }
+}
+
+/* End JHARJEEVAN MOBILE DASHBOARD REFINEMENT V1 */
+
+/* ==========================================================
+   JHARJEEVAN MOBILE SIDEBAR ACCESS V1
+   ========================================================== */
+
+/* Never show the mobile menu on desktop */
+.mobile-menu-btn {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: inline-flex !important;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin: 0 8px 0 0;
+    padding: 0;
+    border: 1px solid rgba(219, 39, 119, .16);
+    border-radius: 12px;
+    color: #be185d;
+    background: #fff5fa;
+    box-shadow: 0 4px 12px rgba(190, 24, 93, .08);
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: min(280px, 84vw) !important;
+    max-width: 84vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    z-index: 1201 !important;
+    transform: translateX(-105%) !important;
+    visibility: hidden !important;
+    transition: transform .25s ease, visibility .25s ease !important;
+    box-shadow: none;
+  }
+
+  #sidebar.open {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    box-shadow: 12px 0 35px rgba(31, 25, 55, .16);
+  }
+
+  #sidebarOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1200 !important;
+    background: rgba(22, 18, 36, .48) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity .25s ease, visibility .25s ease !important;
+  }
+
+  #sidebarOverlay.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  body.sidebar-open {
+    overflow: hidden !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar,
+  #sidebarOverlay {
+    transition: none !important;
+  }
+}
+
+/* End JHARJEEVAN MOBILE SIDEBAR ACCESS V1 */
+
+/* ==========================================================
+   JHARJEEVAN MOBILE DRAWER FINAL FIX V1
+   ========================================================== */
+
+.mobile-menu-btn {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .dashboard-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .dashboard-header .header-title {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .dashboard-header #mobileMenuBtn {
+    display: inline-flex !important;
+    flex: 0 0 38px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 1px solid #f3c9e0 !important;
+    border-radius: 12px !important;
+    background: #fff5fa !important;
+    color: #be185d !important;
+    font-size: 18px !important;
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 1202 !important;
+  }
+
+  #sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: min(280px, 84vw) !important;
+    max-width: 84vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow-y: auto !important;
+    z-index: 1201 !important;
+    transform: translateX(-105%) !important;
+    visibility: hidden !important;
+    transition: transform .25s ease, visibility .25s ease !important;
+  }
+
+  #sidebar.open {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+  }
+
+  #sidebarOverlay {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1200 !important;
+    background: rgba(22, 18, 36, .48) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity .25s ease, visibility .25s ease !important;
+  }
+
+  #sidebarOverlay.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  body.jv-drawer-open {
+    overflow: hidden !important;
+  }
+}
+
+@media (min-width: 761px) {
+  .dashboard-header #mobileMenuBtn {
+    display: none !important;
+  }
+}
+
+/* End JHARJEEVAN MOBILE DRAWER FINAL FIX V1 */
+
+/* ==========================================================
+   JHARJEEVAN MOBILE UI FINAL REFINEMENT V2
+   ========================================================== */
+
+/* Prevent narrow screens from clipping the page horizontally */
+@media (max-width: 760px) {
+    html,
+    body {
+        max-width: 100%;
+        overflow-x: clip;
+    }
+
+    .main {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    /* Mobile drawer: vertical, readable, and independently scrollable */
+    #sidebar {
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: min(300px, 86vw) !important;
+        max-width: 86vw !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #sidebar > ul,
+    #sidebar ul {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+        overflow-y: visible !important;
+        gap: 6px !important;
+    }
+
+    #sidebar li {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        flex: 0 0 auto !important;
+    }
+
+    #sidebar a {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+        gap: 10px !important;
+    }
+
+    #sidebar a span {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+    }
+
+    /* Balanced two-column KPI layout; AI Insight spans both columns */
+    .stats {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .stats > .card {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 112px !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .stats > .card:nth-child(4) {
+        grid-column: 1 / -1 !important;
+        min-height: 145px !important;
+    }
+
+    .stats > .card h3,
+    .stats > .card p {
+        min-width: 0 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    .stats > .card.ai-insights-card p {
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
+        -webkit-line-clamp: unset !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* Compact header with a stable title area */
+    .dashboard-header {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        gap: 10px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .dashboard-header .header-title {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        gap: 9px !important;
+    }
+
+    .dashboard-header .header-title > div:last-child {
+        min-width: 0 !important;
+    }
+
+    .dashboard-header h1 {
+        overflow-wrap: anywhere !important;
+        line-height: 1.2 !important;
+    }
+
+    .dashboard-header .subtitle {
+        font-size: 11px !important;
+        line-height: 1.45 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* AI Command Center must fit the viewport */
+    .ai-command-center {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* Keep the assistant accessible without letting its label grow too wide */
+    .chatbot-widget {
+        right: max(12px, env(safe-area-inset-right)) !important;
+        bottom: max(12px, env(safe-area-inset-bottom)) !important;
+        max-width: calc(100vw - 24px) !important;
+        z-index: 1100 !important;
+    }
+
+    .chatbot-toggle {
+        max-width: 120px !important;
+        min-height: 42px !important;
+        font-size: 11px !important;
+    }
+}
+
+/* Extra-small phones */
+@media (max-width: 380px) {
+    .dashboard-header .header-icon {
+        display: none !important;
+    }
+
+    .dashboard-header h1 {
+        font-size: 18px !important;
+    }
+
+    .dashboard-header .subtitle {
+        font-size: 10px !important;
+    }
+
+    .stats {
+        gap: 8px !important;
+    }
+
+    .stats > .card {
+        padding: 11px !important;
+    }
+
+    .stats > .card h3 {
+        font-size: 10px !important;
+    }
+
+    .stats > .card p {
+        font-size: 20px !important;
+    }
+}
+
+/* End JHARJEEVAN MOBILE UI FINAL REFINEMENT V2 */
+
+/* ==========================================================
+   JHARJEEVAN INVENTORY PREMIUM UI V1
+   Presentation-only refinement; existing API and logic intact
+   ========================================================== */
+
+#inventory {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(192, 132, 252, .07), transparent 36%),
+        linear-gradient(145deg, #ffffff 0%, #fdfcff 100%) !important;
+    border: 1px solid rgba(226, 213, 237, .85) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 18px 50px rgba(39, 30, 65, .055) !important;
+}
+
+#inventory > h2 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px !important;
+    font-size: clamp(20px, 2vw, 25px) !important;
+    letter-spacing: -.65px;
+}
+
+#inventory > h2::before {
+    content: "";
+    display: inline-block;
+    flex: 0 0 5px;
+    width: 5px;
+    height: 27px;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #ec4899, #7c3aed);
+    box-shadow: 0 3px 10px rgba(168, 85, 247, .18);
+}
+
+/* Chart: defined frame and more deliberate proportions */
+#inventoryChart {
+    display: block;
+    box-sizing: border-box;
+    width: 100% !important;
+    height: 265px !important;
+    max-height: 265px !important;
+    margin: 0 0 18px;
+    padding: 12px 14px 8px;
+    background: linear-gradient(180deg, #ffffff, #fdfbff);
+    border: 1px solid #f0e8f6;
+    border-radius: 18px;
+}
+
+/* Existing live status message */
+#inventoryChartStatus {
+    box-sizing: border-box;
+    margin: 0 0 18px !important;
+    padding: 13px 16px !important;
+    border: 1px solid rgba(148, 163, 184, .14);
+    border-radius: 13px !important;
+    font-size: 13px !important;
+    font-weight: 600;
+    line-height: 1.65 !important;
+}
+
+/* Stock entry panel */
+#inventory .inventory-stock-controls {
+    display: grid !important;
+    grid-template-columns: minmax(150px, 1fr) minmax(110px, .45fr) minmax(180px, 1.5fr) auto !important;
+    align-items: end !important;
+    gap: 14px !important;
+    margin: 18px 0 0 !important;
+    padding: 20px !important;
+    background: linear-gradient(135deg, #ffffff, #fbf8ff) !important;
+    border: 1px solid #ece3f4 !important;
+    border-radius: 19px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+#inventory .inventory-stock-controls > div {
+    min-width: 0 !important;
+    width: 100%;
+}
+
+#inventory .inventory-stock-controls label {
+    display: block;
+    margin: 0 0 7px;
+    color: #59627a !important;
+    font-size: 12px !important;
+    font-weight: 750 !important;
+    letter-spacing: .1px;
+}
+
+#inventory .inventory-stock-controls input,
+#inventory .inventory-stock-controls select {
+    box-sizing: border-box;
+    width: 100% !important;
+    min-height: 46px !important;
+    padding: 11px 13px !important;
+    border: 1px solid #e5dced !important;
+    border-radius: 11px !important;
+    background: #ffffff !important;
+    color: #20243a !important;
+    font: inherit;
+    font-size: 13px !important;
+    transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+#inventory .inventory-stock-controls input::placeholder {
+    color: #9b9aad;
+}
+
+#inventory .inventory-stock-controls input:focus,
+#inventory .inventory-stock-controls select:focus {
+    outline: none !important;
+    border-color: #c35aa5 !important;
+    box-shadow: 0 0 0 4px rgba(195, 90, 165, .12) !important;
+}
+
+#inventory .inventory-stock-controls button {
+    box-sizing: border-box;
+    min-height: 46px !important;
+    padding: 0 20px !important;
+    border: 0 !important;
+    border-radius: 11px !important;
+    background: linear-gradient(135deg, #159447, #087a3b) !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 750 !important;
+    white-space: nowrap;
+    box-shadow: 0 5px 13px rgba(21, 148, 71, .16);
+    transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+
+#inventory .inventory-stock-controls button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+    box-shadow: 0 8px 18px rgba(21, 148, 71, .22);
+}
+
+#inventory .inventory-stock-controls button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+#inventory .inventory-stock-controls button:disabled {
+    opacity: .65;
+    cursor: wait;
+    box-shadow: none;
+}
+
+#inventory .inventory-stock-controls button:focus-visible {
+    outline: 3px solid rgba(21, 148, 71, .25) !important;
+    outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+    #inventory .inventory-stock-controls {
+        grid-template-columns: minmax(0, 1fr) minmax(100px, .5fr) !important;
+    }
+
+    #inventory .inventory-stock-controls button {
+        width: 100%;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    #inventory {
+        padding: 17px 14px !important;
+        border-radius: 19px !important;
+    }
+
+    #inventory > h2 {
+        font-size: 19px !important;
+        margin-bottom: 15px !important;
+    }
+
+    #inventoryChart {
+        height: 235px !important;
+        max-height: 235px !important;
+        padding: 7px;
+        margin-bottom: 14px;
+    }
+
+    #inventory .inventory-stock-controls {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 13px !important;
+        padding: 15px !important;
+        border-radius: 15px !important;
+    }
+
+    #inventory .inventory-stock-controls input,
+    #inventory .inventory-stock-controls select,
+    #inventory .inventory-stock-controls button {
+        min-height: 46px !important;
+    }
+
+    #inventory .inventory-stock-controls button {
+        margin-top: 2px;
+    }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    #inventory .inventory-stock-controls input,
+    #inventory .inventory-stock-controls select,
+    #inventory .inventory-stock-controls button {
+        transition: none !important;
+    }
+}
+
+/* End JHARJEEVAN INVENTORY PREMIUM UI V1 */
+
+/* ==========================================================
+   JHARJEEVAN INVENTORY CHART PROPORTION FIX V1
+   Let Chart.js manage canvas drawing dimensions
+   ========================================================== */
+
+#inventory canvas#inventoryChart {
+    display: block !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 0 18px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+#inventory {
+    min-width: 0 !important;
+}
+
+@media (max-width: 600px) {
+    #inventory canvas#inventoryChart {
+        margin-bottom: 14px !important;
+    }
+}
+
+/* End JHARJEEVAN INVENTORY CHART PROPORTION FIX V1 */
+
+/* JHARJEEVAN INVENTORY FOCUS STABILITY V1 */
+#inventory .inventory-stock-controls,
+#inventory .inventory-stock-controls > div {
+    box-sizing: border-box !important;
+    min-width: 0;
+}
+
+#inventory .inventory-stock-controls input,
+#inventory .inventory-stock-controls select {
+    box-sizing: border-box !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+    margin-block: 0 !important;
+    outline-offset: 0 !important;
+    transition: border-color .18s ease, box-shadow .18s ease !important;
+}
+
+#inventory .inventory-stock-controls input:focus,
+#inventory .inventory-stock-controls select:focus {
+    border-width: 1px !important;
+    box-shadow: 0 0 0 3px rgba(195, 90, 165, .12) !important;
+}
+
+#inventory .inventory-stock-controls input[type="number"] {
+    appearance: auto;
+    -moz-appearance: number-input;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #inventory .inventory-stock-controls input,
+    #inventory .inventory-stock-controls select {
+        transition: none !important;
+    }
+}
+/* END INVENTORY FOCUS STABILITY V1 */
+
+/* JHARJEEVAN INVENTORY COMPACT LAYOUT V1 */
+#inventory #inventoryChart {
+    display: block;
+    width: 100% !important;
+    height: 260px !important;
+    max-height: 260px !important;
+    box-sizing: border-box;
+}
+
+#inventory .inventory-stock-controls {
+    display: grid !important;
+    grid-template-columns: minmax(150px, 1fr) minmax(120px, .45fr)
+                           minmax(180px, 1.4fr) auto !important;
+    align-items: end !important;
+    gap: 12px !important;
+    min-width: 0;
+}
+
+#inventory .inventory-stock-controls > div {
+    min-width: 0 !important;
+}
+
+#inventory .inventory-stock-controls input,
+#inventory .inventory-stock-controls select {
+    width: 100%;
+    min-width: 0;
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+    box-sizing: border-box !important;
+}
+
+#inventory .inventory-stock-controls button {
+    min-height: 46px !important;
+    white-space: nowrap;
+}
+
+@media (max-width: 800px) {
+    #inventory #inventoryChart {
+        height: 230px !important;
+        max-height: 230px !important;
+    }
+
+    #inventory .inventory-stock-controls {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    }
+
+    #inventory .inventory-stock-controls > div:nth-child(3) {
+        grid-column: 1 / -1;
+    }
+
+    #inventory .inventory-stock-controls button {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+}
+/* END INVENTORY COMPACT LAYOUT V1 */
+
+/* JHARJEEVAN INVENTORY CHART STABLE FRAME V2 */
+#inventory {
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+#inventory #inventoryChartWrap {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    height: 280px !important;
+    min-height: 280px !important;
+    max-height: 280px !important;
+    min-width: 0 !important;
+    margin: 12px 0 18px !important;
+    box-sizing: border-box !important;
+}
+
+#inventory #inventoryChartWrap canvas#inventoryChart {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+#inventory .inventory-stock-controls {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(130px, .48fr)
+                           minmax(180px, 1.4fr) auto !important;
+    align-items: end !important;
+    gap: 12px !important;
+    min-width: 0 !important;
+    margin-top: 16px !important;
+    box-sizing: border-box !important;
+}
+
+#inventory .inventory-stock-controls > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+#inventory .inventory-stock-controls label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #596780;
+}
+
+#inventory .inventory-stock-controls input,
+#inventory .inventory-stock-controls select {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px !important;
+    padding: 0 12px !important;
+    border: 1px solid #e2d9f1 !important;
+    border-radius: 11px !important;
+    background: #fff !important;
+    color: #252b3b !important;
+    font: inherit;
+    font-size: 13px !important;
+    box-sizing: border-box !important;
+    transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+#inventory .inventory-stock-controls input:focus-visible,
+#inventory .inventory-stock-controls select:focus-visible {
+    outline: 2px solid rgba(219, 39, 119, .18) !important;
+    outline-offset: 1px;
+    border-color: #d946a0 !important;
+    box-shadow: 0 0 0 3px rgba(217, 70, 160, .08) !important;
+}
+
+#inventory .inventory-stock-controls button {
+    min-width: 112px !important;
+    min-height: 46px !important;
+    border-radius: 11px !important;
+    font-weight: 750 !important;
+    white-space: nowrap;
+    transition: transform .18s ease, box-shadow .18s ease,
+                opacity .18s ease;
+}
+
+#inventory .inventory-stock-controls button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(22, 163, 74, .18);
+}
+
+#inventory .inventory-stock-controls button:focus-visible {
+    outline: 3px solid rgba(22, 163, 74, .25);
+    outline-offset: 3px;
+}
+
+#inventory .inventory-stock-controls button:disabled {
+    cursor: wait;
+    opacity: .72;
+}
+
+@media (max-width: 900px) {
+    #inventory #inventoryChartWrap {
+        height: 250px !important;
+        min-height: 250px !important;
+        max-height: 250px !important;
+    }
+
+    #inventory .inventory-stock-controls {
+        grid-template-columns: minmax(0, 1fr) minmax(0, .65fr) !important;
+        gap: 12px !important;
+    }
+
+    #inventory .inventory-stock-controls > div:nth-child(3) {
+        grid-column: 1 / -1;
+    }
+
+    #inventory .inventory-stock-controls button {
+        grid-column: 1 / -1;
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #inventory {
+        padding: 16px 12px !important;
+        border-radius: 17px !important;
+    }
+
+    #inventory #inventoryChartWrap {
+        height: 220px !important;
+        min-height: 220px !important;
+        max-height: 220px !important;
+        margin: 10px 0 14px !important;
+    }
+
+    #inventory .inventory-stock-controls {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 12px !important;
+        padding: 12px !important;
+    }
+
+    #inventory .inventory-stock-controls > div,
+    #inventory .inventory-stock-controls > div:nth-child(3),
+    #inventory .inventory-stock-controls button {
+        grid-column: 1 / -1 !important;
+        width: 100% !important;
+    }
+
+    #inventory .inventory-stock-controls input,
+    #inventory .inventory-stock-controls select,
+    #inventory .inventory-stock-controls button {
+        min-height: 46px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #inventory .inventory-stock-controls input,
+    #inventory .inventory-stock-controls select,
+    #inventory .inventory-stock-controls button {
+        transition: none !important;
+    }
+
+    #inventory .inventory-stock-controls button:hover:not(:disabled) {
+        transform: none !important;
+    }
+}
+/* END INVENTORY CHART STABLE FRAME V2 */
+
+
+
+/* JHARJEEVAN DONOR EXPERIENCE V1 */
+#donors {
+  position: relative;
+  isolation: isolate;
+}
+
+#donors .donor-management-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+  padding: 18px;
+  border: 1px solid #eee5f8;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff 0%, #fcf8ff 100%);
+}
+
+#donors .donor-toolbar-copy {
+  min-width: 180px;
+}
+
+#donors .donor-toolbar-eyebrow {
+  display: block;
+  color: #c2185b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .13em;
+}
+
+#donors .donor-toolbar-copy p {
+  margin: 6px 0 0;
+  color: #77748e;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#donors .donor-toolbar-controls {
+  display: flex;
+  flex: 1 1 420px;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+}
+
+#donors .donor-search-field,
+#donors .donor-blood-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  height: 46px;
+  padding: 0 13px;
+  border: 1px solid #e5d9f2;
+  border-radius: 12px;
+  background: #fff;
+  color: #77748e;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+#donors .donor-search-field {
+  flex: 1 1 280px;
+}
+
+#donors .donor-blood-field {
+  flex: 0 1 190px;
+}
+
+#donors .donor-search-field:focus-within,
+#donors .donor-blood-field:focus-within {
+  border-color: #d946a0;
+  box-shadow: 0 0 0 3px rgba(217, 70, 160, .11);
+}
+
+#donors .donor-search-field input,
+#donors .donor-blood-field select {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #25243a;
+  font: inherit;
+  font-size: 13px;
+}
+
+#donors .donor-search-field input:focus,
+#donors .donor-blood-field select:focus {
+  outline: none;
+}
+
+#donors .donor-results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 2px 12px;
+  color: #74728a;
+  font-size: 12px;
+}
+
+#donors .donor-results-bar span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+#donors #donorResultCount {
+  padding: 7px 11px;
+  border: 1px solid #f3d7e9;
+  border-radius: 999px;
+  background: #fff5fb;
+  color: #b81759;
+  font-weight: 800;
+}
+
+#donors .table-wrapper {
+  border: 1px solid #ece5f4;
+  border-radius: 14px;
+  background: #fff;
+}
+
+#donors #donorTable {
+  min-width: 680px;
+}
+
+#donors #donorTable thead th {
+  padding: 15px 16px;
+  background: #f8f9fc;
+  color: #737b92;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e8e5f0;
+}
+
+#donors #donorTable tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0edf5;
+  color: #4b5268;
+  font-size: 12px;
+  line-height: 1.6;
+  vertical-align: middle;
+}
+
+#donors #donorTable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#donors #donorTable tbody tr {
+  transition: background .18s ease;
+}
+
+#donors #donorTable tbody tr:hover {
+  background: #fdf8ff;
+}
+
+#donors #donorTable .delete-btn {
+  white-space: nowrap;
+}
+
+#donors .donor-empty-state {
+  padding: 28px 16px !important;
+  color: #77748e !important;
+  text-align: center;
+}
+
+#donors .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 760px) {
+  #donors {
+    padding: 14px;
+    margin-block: 16px;
+    border-radius: 17px;
+  }
+
+  #donors .donor-management-toolbar {
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px;
+  }
+
+  #donors .donor-toolbar-controls {
+    flex: 1 1 100%;
+    flex-direction: column;
+  }
+
+  #donors .donor-search-field,
+  #donors .donor-blood-field {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 46px;
+  }
+
+  #donors .donor-results-bar {
+    align-items: flex-start;
+  }
+
+  #donors .table-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  #donors #donorTable {
+    min-width: 680px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #donors .donor-search-field,
+  #donors .donor-blood-field,
+  #donors #donorTable tbody tr {
+    transition: none;
+  }
+}
+
+
+/* JHARJEEVAN DONOR PREMIUM V2 */
+#donors { min-width: 0; }
+
+#donors .table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid #e9e4f5;
+  border-radius: 16px;
+  background: #fff;
+  scrollbar-width: thin;
+  scrollbar-color: #c8b5f5 #f7f5fc;
+}
+
+#donors #donorTable {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#donors #donorTable thead th {
+  padding: 15px 14px;
+  background: #f7f8fc;
+  color: #64718a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+  border-bottom: 1px solid #e5e7f0;
+  white-space: nowrap;
+}
+
+#donors #donorTable tbody td {
+  padding: 13px 14px;
+  color: #4b556b;
+  font-size: 12px;
+  line-height: 1.5;
+  border-bottom: 1px solid #eeebf5;
+  transition: background-color .18s ease;
+}
+
+#donors #donorTable tbody tr:last-child td { border-bottom: 0; }
+#donors #donorTable tbody tr:hover td { background: #faf8ff; }
+
+#donors .donor-blood-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 26px;
+  padding: 4px 9px;
+  border: 1px solid #e7d9ff;
+  border-radius: 8px;
+  background: #f5efff;
+  color: #6d28d9;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+#donors .donor-blood-ap, #donors .donor-blood-an {
+  background: #fff1f2; color: #be123c; border-color: #fecdd3;
+}
+#donors .donor-blood-bp, #donors .donor-blood-bn {
+  background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe;
+}
+#donors .donor-blood-abp, #donors .donor-blood-abn {
+  background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe;
+}
+#donors .donor-blood-op, #donors .donor-blood-on {
+  background: #ecfdf5; color: #047857; border-color: #a7f3d0;
+}
+
+#donors #donorTable .delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid #fecdd3;
+  border-radius: 9px;
+  background: #fff5f6;
+  color: #be123c;
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease,
+              transform .18s ease, box-shadow .18s ease;
+}
+
+#donors #donorTable .delete-btn:hover {
+  background: #ffe4e8;
+  border-color: #fda4af;
+  box-shadow: 0 4px 12px rgba(190, 24, 93, .10);
+  transform: translateY(-1px);
+}
+
+#donors #donorTable .delete-btn:focus-visible,
+#donors input:focus-visible,
+#donors select:focus-visible {
+  outline: 3px solid rgba(124, 58, 237, .25);
+  outline-offset: 2px;
+}
+
+#donors input, #donors select { max-width: 100%; }
+
+@media (max-width: 768px) {
+  #donors .table-wrapper { border-radius: 12px; }
+  #donors #donorTable { min-width: 680px; }
+  #donors #donorTable thead th { padding: 12px 10px; font-size: 9px; }
+  #donors #donorTable tbody td { padding: 12px 10px; font-size: 11px; }
+  #donors #donorTable .delete-btn { min-height: 36px; }
+  #donors .donor-blood-badge { min-height: 25px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #donors #donorTable tbody td,
+  #donors #donorTable .delete-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+
+/* JHARJEEVAN REQUESTS PREMIUM V1 */
+#requests { min-width: 0; }
+
+#requests .table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border: 1px solid #e8e5f2;
+  border-radius: 16px;
+  background: #fff;
+  scrollbar-width: thin;
+  scrollbar-color: #c8b5f5 #f7f5fc;
+}
+
+#requests #requestTable {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#requests #requestTable thead th {
+  padding: 14px 13px;
+  background: #f7f8fc;
+  color: #65718a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid #e4e7ef;
+}
+
+#requests #requestTable tbody td {
+  padding: 13px;
+  color: #4b556b;
+  font-size: 12px;
+  line-height: 1.5;
+  vertical-align: middle;
+  border-bottom: 1px solid #eeebf5;
+  transition: background-color .18s ease;
+}
+
+#requests #requestTable tbody tr:last-child td { border-bottom: 0; }
+#requests #requestTable tbody tr:hover td { background: #faf8ff; }
+
+#requests .request-blood-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 27px;
+  padding: 4px 9px;
+  border: 1px solid #ddd6fe;
+  border-radius: 8px;
+  background: #f5f3ff;
+  color: #6d28d9;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+#requests #requestTable .status-badge,
+#requests #requestTable .request-priority {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 27px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .025em;
+  white-space: nowrap;
+}
+
+#requests #requestTable .approve-btn,
+#requests #requestTable .ai-match-btn,
+#requests #requestTable .delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 35px;
+  padding: 7px 10px;
+  margin: 2px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease,
+              filter .18s ease;
+}
+
+#requests #requestTable .approve-btn:hover,
+#requests #requestTable .ai-match-btn:hover,
+#requests #requestTable .delete-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 41, 55, .10);
+  filter: brightness(.98);
+}
+
+#requests #requestTable button:focus-visible {
+  outline: 3px solid rgba(124, 58, 237, .25);
+  outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  #requests .table-wrapper { border-radius: 12px; }
+  #requests #requestTable { min-width: 960px; }
+  #requests #requestTable thead th { padding: 12px 10px; font-size: 9px; }
+  #requests #requestTable tbody td { padding: 11px 10px; font-size: 11px; }
+  #requests #requestTable .approve-btn,
+  #requests #requestTable .ai-match-btn,
+  #requests #requestTable .delete-btn { min-height: 36px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #requests #requestTable tbody td,
+  #requests #requestTable button {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* ==========================================================
+   JHARJEEVAN RESPONSIVE POLISH V2
+   Scoped improvements: requests table, action buttons, mobile
+   Preserves existing HTML structure and JavaScript handlers
+   ========================================================== */
+
+#requests {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#requests .table-wrapper {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #b8a1ee #f5f2fb;
+  border: 1px solid #e8e5f2;
+  border-radius: 16px;
+  background: #fff;
+}
+
+#requests #requestTable {
+  width: 100%;
+  min-width: 960px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#requests #requestTable thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 15px 14px;
+  background: #f7f8fc;
+  color: #596780;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border-bottom: 1px solid #e5e7f0;
+}
+
+#requests #requestTable tbody td {
+  padding: 14px;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid #eeebf5;
+  transition: background-color .18s ease;
+}
+
+#requests #requestTable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#requests #requestTable tbody tr:hover td {
+  background: #faf8ff;
+}
+
+#requests #requestTable tbody td:last-child {
+  min-width: 245px;
+  white-space: normal;
+}
+
+#requests #requestTable tbody td:last-child button {
+  margin: 3px;
+  min-height: 38px;
+  padding: 8px 11px;
+  border-radius: 9px;
+  line-height: 1.25;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease;
+}
+
+#requests #requestTable tbody td:last-child button:hover {
+  filter: brightness(.98);
+  box-shadow: 0 4px 12px rgba(31, 41, 55, .10);
+  transform: translateY(-1px);
+}
+
+#requests #requestTable button:focus-visible {
+  outline: 3px solid rgba(124, 58, 237, .30);
+  outline-offset: 3px;
+}
+
+#requests #requestTable .status-badge,
+#requests #requestTable .request-priority,
+#requests #requestTable .request-blood-badge {
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+#requests .table-wrapper:focus-visible {
+  outline: 3px solid rgba(124, 58, 237, .28);
+  outline-offset: 3px;
+}
+
+/* Tablet */
+@media (max-width: 1000px) {
+  #requests .table-wrapper {
+    border-radius: 13px;
+  }
+
+  #requests #requestTable thead th {
+    padding: 13px 11px;
+  }
+
+  #requests #requestTable tbody td {
+    padding: 12px 11px;
+  }
+}
+
+/* Mobile: contained table scrolling; no page-wide overflow */
+@media (max-width: 600px) {
+  #requests {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #requests .table-wrapper {
+    max-width: 100%;
+    border-radius: 12px;
+    scrollbar-width: thin;
+  }
+
+  #requests #requestTable {
+    min-width: 900px;
+  }
+
+  #requests #requestTable thead th {
+    padding: 12px 9px;
+    font-size: 9px;
+  }
+
+  #requests #requestTable tbody td {
+    padding: 12px 9px;
+    font-size: 11px;
+  }
+
+  #requests #requestTable tbody td:last-child {
+    min-width: 230px;
+  }
+
+  #requests #requestTable tbody td:last-child button {
+    min-height: 40px;
+    margin: 3px 2px;
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+}
+
+/* Very narrow phones */
+@media (max-width: 380px) {
+  #requests .table-wrapper {
+    border-radius: 10px;
+  }
+
+  #requests #requestTable {
+    min-width: 880px;
+  }
+}
+
+/* Respect the user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  #requests #requestTable tbody td,
+  #requests #requestTable tbody td:last-child button {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* End JHARJEEVAN RESPONSIVE POLISH V2 */
+
+/* JHARJEEVAN AI COMMAND CENTER RESPONSIVE FIX */
+#ai-center,
+#ai-center * {
+  box-sizing: border-box;
+}
+
+#ai-center {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: clamp(18px, 2vw, 28px);
+  border: 1px solid rgba(196, 181, 253, .34);
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(216, 180, 254, .17), transparent 42%),
+    linear-gradient(145deg, rgba(255,255,255,.99), rgba(250,247,255,.97));
+  box-shadow: 0 16px 44px rgba(43, 31, 75, .075);
+}
+
+#ai-center .ai-command-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  min-width: 0;
+  margin-bottom: 22px;
+}
+
+#ai-center .ai-command-title {
+  display: flex;
+  align-items: center;
+  flex: 1 1 240px;
+  gap: 13px;
+  min-width: 0;
+}
+
+#ai-center .ai-command-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,.65);
+  border-radius: 15px;
+  background: linear-gradient(145deg, #ec4899, #8b5cf6);
+  color: #fff;
+  box-shadow: 0 7px 18px rgba(168, 85, 247, .20);
+}
+
+#ai-center .ai-command-title > div:last-child {
+  min-width: 0;
+}
+
+#ai-center .ai-command-title strong {
+  display: block;
+  color: #20243a;
+  font-size: clamp(16px, 1.3vw, 19px);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -.35px;
+  overflow-wrap: anywhere;
+}
+
+#ai-center .ai-command-title span {
+  display: block;
+  margin-top: 4px;
+  color: #7c809b;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#ai-center .ai-command-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+
+#ai-center .ai-live-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 37px;
+  padding: 8px 12px;
+  border: 1px solid #d5f2e0;
+  border-radius: 999px;
+  background: #f0fdf5;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .45px;
+  white-space: nowrap;
+}
+
+#ai-center .ai-live-badge .status-dot {
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34,197,94,.12);
+}
+
+#ai-center .ai-command-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 100px;
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid #d9d9e8;
+  border-radius: 12px;
+  background: rgba(255,255,255,.95);
+  color: #343750;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 3px 9px rgba(39, 35, 71, .035);
+  transition: border-color .2s ease, background .2s ease,
+    box-shadow .2s ease, transform .2s ease, opacity .2s ease;
+}
+
+#ai-center .ai-command-refresh:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: #c4b5fd;
+  background: #faf7ff;
+  box-shadow: 0 6px 16px rgba(109, 40, 217, .10);
+}
+
+#ai-center .ai-command-refresh:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+#ai-center .ai-command-refresh:focus-visible {
+  outline: 3px solid rgba(139, 92, 246, .38);
+  outline-offset: 3px;
+}
+
+#ai-center .ai-command-refresh:disabled {
+  cursor: wait;
+  opacity: .62;
+}
+
+#ai-center .ai-command-refresh[aria-busy="true"] i {
+  animation: jvAiRefreshSpin .8s linear infinite;
+}
+
+@keyframes jvAiRefreshSpin {
+  to { transform: rotate(360deg); }
+}
+
+#ai-center .ai-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+}
+
+#ai-center .ai-mini {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+  min-height: 128px;
+  padding: 19px 18px;
+  overflow: hidden;
+  border: 1px solid #ebe5f7;
+  border-radius: 18px;
+  background: linear-gradient(155deg, #fff, #fbf9ff);
+  box-shadow: 0 3px 12px rgba(48, 33, 82, .025);
+  transition: transform .2s ease, border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+#ai-center .ai-mini::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: 18px 0 0 18px;
+  background: linear-gradient(180deg, #ec4899, #8b5cf6);
+  content: "";
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+#ai-center .ai-mini:hover {
+  transform: translateY(-2px);
+  border-color: #ddd0f5;
+  box-shadow: 0 9px 24px rgba(67, 42, 107, .07);
+}
+
+#ai-center .ai-mini:hover::before {
+  opacity: 1;
+}
+
+#ai-center .ai-mini-label {
+  color: #777992;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: .65px;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+#ai-center .ai-mini-value {
+  margin-top: 10px;
+  color: #29243f;
+  font-size: clamp(24px, 2vw, 32px);
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+#ai-center .ai-mini-desc {
+  margin-top: 8px;
+  color: #8988a3;
+  font-size: 11px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+#ai-center .ai-recommendation {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  min-width: 0;
+  margin-top: 17px;
+  padding: 16px 18px;
+  border: 1px solid #f3d3e8;
+  border-radius: 16px;
+  background: linear-gradient(110deg, #fff5fb, #f8f3ff);
+  color: #57435f;
+  line-height: 1.7;
+}
+
+#ai-center .ai-recommendation > i {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: #db2777;
+  font-size: 16px;
+}
+
+#ai-center .ai-recommendation > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 9px;
+  min-width: 0;
+}
+
+#ai-center .ai-recommendation strong {
+  color: #a21caf;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+#ai-center #aiRecommendation {
+  min-width: 0;
+  color: #6e5b76;
+  font-size: 11px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 1400px) {
+  #ai-center .ai-grid {
+    gap: 17px;
+  }
+  #ai-center .ai-mini {
+    padding: 22px;
+    min-height: 138px;
+  }
+}
+
+@media (max-width: 1100px) {
+  #ai-center .ai-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  #ai-center .ai-mini {
+    min-height: 120px;
+  }
+  #ai-center .ai-mini-value {
+    font-size: clamp(25px, 3vw, 31px);
+  }
+}
+
+@media (max-width: 600px) {
+  #ai-center {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  #ai-center .ai-command-head {
+    align-items: flex-start;
+    gap: 13px;
+    margin-bottom: 17px;
+  }
+
+  #ai-center .ai-command-title {
+    flex: 1 1 100%;
+    gap: 11px;
+  }
+
+  #ai-center .ai-command-icon {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+  }
+
+  #ai-center .ai-command-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  #ai-center .ai-live-badge {
+    min-height: 36px;
+    padding: 8px 11px;
+  }
+
+  #ai-center .ai-command-refresh {
+    min-height: 40px;
+    min-width: 104px;
+  }
+
+  #ai-center .ai-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  #ai-center .ai-mini {
+    min-height: 116px;
+    padding: 14px 13px;
+    border-radius: 15px;
+  }
+
+  #ai-center .ai-mini-label {
+    font-size: 9px;
+    letter-spacing: .4px;
+  }
+
+  #ai-center .ai-mini-value {
+    margin-top: 9px;
+    font-size: clamp(22px, 6vw, 29px);
+    letter-spacing: -.7px;
+  }
+
+  #ai-center .ai-mini-desc {
+    margin-top: 7px;
+    font-size: 10px;
+  }
+
+  #ai-center .ai-recommendation {
+    gap: 10px;
+    margin-top: 12px;
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  #ai-center .ai-recommendation > div {
+    display: block;
+  }
+
+  #ai-center .ai-recommendation strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  #ai-center #aiRecommendation {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 359px) {
+  #ai-center {
+    padding: 12px;
+  }
+
+  #ai-center .ai-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #ai-center .ai-mini {
+    min-height: 104px;
+  }
+
+  #ai-center .ai-command-title strong {
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #ai-center *,
+  #ai-center *::before,
+  #ai-center *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+
+/* JHARJEEVAN_MOBILE_DASHBOARD_REFINEMENT_V1 */
+@media (max-width: 600px) {
+  /* Keep the launcher compact and clear of dashboard content. */
+  #chatbotToggle {
+    right: 12px !important;
+    bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    min-height: 44px !important;
+    max-width: calc(100vw - 24px) !important;
+    font-size: 12px !important;
+  }
+
+  /* Keep dashboard summary cards in a deliberate two-column grid. */
+  .stats-grid,
+  .dashboard-stats,
+  .stat-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-grid > *,
+  .dashboard-stats > *,
+  .stat-cards > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  #chatbotToggle {
+    right: 8px !important;
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    padding: 9px 12px !important;
+    font-size: 11px !important;
+  }
+}
+/* END JHARJEEVAN_MOBILE_DASHBOARD_REFINEMENT_V1 */

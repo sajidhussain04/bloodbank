@@ -1,12 +1,35 @@
-// AI-powered donor recommendation. Database access is handled by the Supabase route.
+﻿// Preliminary red-cell ABO/Rh compatibility matching.
+// Final donor eligibility and compatibility must be confirmed by the blood bank.
 class DonorRecommender {
-  static getTopDonors(request, donors) {
-    const eligibleDonors = (donors || []).filter(
-      (donor) => donor.bloodGroup === request.bloodGroup && donor.isAvailable === true,
-    );
+  static compatibility = {
+    "O-":  ["O-"],
+    "O+":  ["O-", "O+"],
+    "A-":  ["O-", "A-"],
+    "A+":  ["O-", "O+", "A-", "A+"],
+    "B-":  ["O-", "B-"],
+    "B+":  ["O-", "O+", "B-", "B+"],
+    "AB-": ["O-", "A-", "B-", "AB-"],
+    "AB+": ["O-", "O+", "A-", "A+", "B-", "B+", "AB-", "AB+"]
+  };
 
-    return eligibleDonors
-      .map((donor) => ({ ...donor, score: this.calculateScore(donor, request) }))
+  static getTopDonors(request, donors) {
+    const requestedGroup = String(request?.bloodGroup || "").trim().toUpperCase();
+    const compatibleGroups = this.compatibility[requestedGroup];
+
+    if (!compatibleGroups) return [];
+
+    return (donors || [])
+      .filter((donor) =>
+        donor &&
+        donor.isAvailable === true &&
+        compatibleGroups.includes(
+          String(donor.bloodGroup || "").trim().toUpperCase()
+        )
+      )
+      .map((donor) => ({
+        ...donor,
+        score: this.calculateScore(donor, request)
+      }))
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
   }
@@ -14,28 +37,28 @@ class DonorRecommender {
   static calculateScore(donor, request) {
     let score = 50;
 
-    if (donor.location && request.city) {
-      const donorCity = donor.location.toLowerCase();
-      const requestCity = request.city.toLowerCase();
-      if (donorCity.includes(requestCity) || requestCity.includes(donorCity)) score += 30;
-      else if (donorCity.split(",")[0].trim() === requestCity) score += 25;
-      else score += 10;
+    const donorLocation = String(donor.location || "").trim().toLowerCase();
+    const requestCity = String(request.city || "").trim().toLowerCase();
+
+    if (donorLocation && requestCity) {
+      if (donorLocation === requestCity) {
+        score += 40;
+      } else if (
+        donorLocation.includes(requestCity) ||
+        requestCity.includes(donorLocation)
+      ) {
+        score += 30;
+      } else if (
+        donorLocation.split(",")[0].trim() === requestCity.split(",")[0].trim()
+      ) {
+        score += 20;
+      }
     } else {
-      score += 15;
+      // Missing location is not evidence of a local match.
+      score += 0;
     }
 
-    if (donor.lastDonationDate) {
-      const days = Math.floor((Date.now() - new Date(donor.lastDonationDate).getTime()) / 86400000);
-      if (days < 30) score += 20;
-      else if (days < 90) score += 15;
-      else if (days < 180) score += 10;
-      else score += 5;
-      if (days >= 90) score += 5;
-    } else {
-      score += 10;
-    }
-
-    return Math.min(score, 100);
+    return Math.max(0, Math.min(score, 90));
   }
 }
 

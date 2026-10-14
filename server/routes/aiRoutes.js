@@ -1,4 +1,4 @@
-// AI routes backed by Supabase PostgreSQL.
+﻿// AI routes backed by Supabase PostgreSQL.
 const express = require("express");
 const router = express.Router();
 const DonorRecommender = require("../ai/donorRecommender");
@@ -77,7 +77,7 @@ function initAIRoutes(supabase, verifyAdmin) {
     try {
       const question = req.body.message || req.body.question;
       const sessionId = String(req.body.sessionId || req.ip || "default");
-      if (!question || typeof question !== "string" || question.trim().length < 3 || question.trim().length > 500) {
+      if (!question || typeof question !== "string" || question.trim().length < 1 || question.trim().length > 500) {
         return res.status(400).json({ success: false, message: "Please ask a question", answer: "Please ask something like 'How to donate blood?'" });
       }
       const now = Date.now();
@@ -164,3 +164,4 @@ function initAIRoutes(supabase, verifyAdmin) {
 }
 
 module.exports = { initAIRoutes };
+

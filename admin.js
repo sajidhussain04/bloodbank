@@ -100,72 +100,277 @@ function logout() {
 let inventoryChart = null;
 
 async function loadInventory() {
-  const data = await fetchData("/api/inventory");
-  if (!data) return;
+  const canvas = document.getElementById("inventoryChart");
+  if (!canvas) return;
 
-  const ctx = document.getElementById("inventoryChart");
-  if (!ctx) return;
+  let status = document.getElementById("inventoryChartStatus");
 
-  if (inventoryChart) {
-    inventoryChart.destroy();
+  if (!status) {
+    status = document.createElement("div");
+    status.id = "inventoryChartStatus";
+    status.setAttribute("role", "status");
+    status.style.cssText =
+      "padding:12px 16px;margin:12px 0;border-radius:10px;" +
+      "font-size:13px;line-height:1.6;display:none;";
+    const chartFrame = document.getElementById("inventoryChartWrap") || canvas;
+    chartFrame.parentNode.insertBefore(status, chartFrame);
   }
 
-  const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-  const units = bloodGroups.map((bg) => data[bg] || 0);
+  const showStatus = (message, type) => {
+    const styles = {
+      info: ["#eff6ff", "#1d4ed8"],
+      warning: ["#fff7ed", "#9a3412"],
+      error: ["#fef2f2", "#b91c1c"],
+      success: ["#f0fdf4", "#166534"]
+    };
 
-  inventoryChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: bloodGroups,
-      datasets: [
-        {
+    const selected = styles[type] || styles.info;
+    status.textContent = message;
+    status.style.backgroundColor = selected[0];
+    status.style.color = selected[1];
+    status.style.display = "block";
+  };
+
+  try {
+    const data = await fetchData("/api/inventory");
+
+    if (!data || data.success === false) {
+      if (inventoryChart) {
+        inventoryChart.destroy();
+        inventoryChart = null;
+      }
+
+      canvas.style.display = "none";
+      showStatus(
+        data?.message || "Inventory could not be loaded. Check the server connection and inventory migration.",
+        "error"
+      );
+      return;
+    }
+
+    const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+    const units = bloodGroups.map((group) => {
+      const value = Number(data[group] ?? 0);
+
+      if (!Number.isFinite(value) || value < 0) {
+        throw new Error("Invalid inventory quantity returned for " + group);
+      }
+
+      return value;
+    });
+
+    const totalUnits = units.reduce((sum, value) => sum + value, 0);
+    const highestUnits = Math.max(...units);
+    const chartMaximum = highestUnits > 0
+      ? Math.ceil(highestUnits * 1.15)
+      : 5;
+
+    canvas.style.display = "block";
+
+    if (inventoryChart) {
+      inventoryChart.destroy();
+      inventoryChart = null;
+    }
+
+    inventoryChart = new Chart(canvas, {
+      type: "bar",
+      data: {
+        labels: bloodGroups,
+        datasets: [{
           label: "Available Units",
           data: units,
-          backgroundColor: "#d32f2f",
-          borderRadius: 8,
+          backgroundColor: units.map((value) =>
+            value === 0 ? "#cbd5e1" :
+            value <= 5 ? "#f97316" : "#e11d48"
+          ),
+          borderRadius: 7,
+          borderSkipped: false,
+          maxBarThickness: 42
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          duration: 650,
+          easing: "easeOutQuart"
         },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          position: "top",
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `${context.raw} units available`
+            }
+          }
         },
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              return `${context.raw} units available`;
+        scales: {
+          y: {
+            beginAtZero: true,
+            suggestedMax: chartMaximum,
+            ticks: {
+              precision: 0
             },
+            title: {
+              display: true,
+              text: "Available Units"
+            }
           },
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          title: {
-            display: true,
-            text: "Number of Units",
-          },
-        },
-        x: {
-          title: {
-            display: true,
-            text: "Blood Group",
-          },
-        },
-      },
-    },
-  });
-}
+          x: {
+            title: {
+              display: true,
+              text: "Blood Group"
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
+    });
 
+    if (totalUnits === 0) {
+      showStatus(
+        "No physical blood stock is currently recorded. Add verified received units to update the inventory.",
+        "warning"
+      );
+    } else {
+      showStatus(
+        `Live inventory loaded: ${totalUnits} physical units across ${units.filter(value => value > 0).length} blood groups.`,
+        "success"
+      );
+    }
+  } catch (error) {
+    console.error("Inventory chart error:", error);
+
+    if (inventoryChart) {
+      inventoryChart.destroy();
+      inventoryChart = null;
+    }
+
+    canvas.style.display = "none";
+    showStatus(
+      "Inventory data could not be displayed. Check the API response and try refreshing.",
+      "error"
+    );
+  }
+}
+async function addInventoryStock() {
+  // INVENTORY SUBMISSION UX V2
+  const groupInput = document.getElementById("stockBloodGroup");
+  const unitsInput = document.getElementById("stockUnits");
+  const noteInput = document.getElementById("stockNote");
+  const button = document.querySelector("#inventory .inventory-stock-controls button");
+
+  if (!groupInput || !unitsInput || !button) {
+    showToast("Inventory form is unavailable. Refresh the page and try again.", "error");
+    return;
+  }
+
+  if (button.disabled) return;
+
+  const bloodGroup = groupInput.value;
+  const rawUnits = unitsInput.value.trim();
+  const units = Number(rawUnits);
+  const note = noteInput?.value?.trim() || null;
+
+  if (!["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(bloodGroup)) {
+    groupInput.focus();
+    showToast("Select a valid blood group.", "error");
+    return;
+  }
+
+  if (rawUnits === "" || !Number.isSafeInteger(units) || units < 1 || units > 10000) {
+    unitsInput.focus();
+    showToast("Enter a whole number of units between 1 and 10000.", "error");
+    return;
+  }
+
+  const originalContent = button.innerHTML;
+  button.disabled = true;
+  button.setAttribute("aria-busy", "true");
+  button.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Adding stock…';
+
+  try {
+    const result = await fetchData("/api/inventory/add", "POST", {
+      bloodGroup,
+      units,
+      note
+    });
+
+    if (!result || result.success !== true) {
+      showToast(result?.message || "Stock could not be saved. Please try again.", "error");
+      return;
+    }
+
+    if (unitsInput) unitsInput.value = "1";
+    if (noteInput) noteInput.value = "";
+
+    showToast(
+      result.message || `${units} unit(s) of ${bloodGroup} stock added successfully.`,
+      "success"
+    );
+
+    try {
+      await loadInventory();
+    } catch (refreshError) {
+      console.error("Stock was saved, but inventory refresh failed:", refreshError);
+      showToast("Stock was saved, but the inventory display could not refresh.", "error");
+    }
+  } catch (error) {
+    console.error("Add inventory stock failed:", error);
+    showToast("Could not add stock. Check your connection and try again.", "error");
+  } finally {
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+    button.innerHTML = originalContent;
+  }
+}
+window.addInventoryStock = addInventoryStock;
+async function issueBloodRequest(id) {
+  if (!id) return;
+
+  if (!confirm("Confirm that the requested blood units have actually been issued? This will deduct stock and complete the request.")) {
+    return;
+  }
+
+  try {
+    const result = await fetchData(
+      `/api/requests/${encodeURIComponent(id)}/issue`,
+      "POST"
+    );
+
+    if (result?.success) {
+      await Promise.all([loadRequests(), loadInventory()]);
+      showToast("Blood issuance recorded and request completed", "success");
+    } else {
+      showToast(result?.message || "Blood issuance failed", "error");
+    }
+  } catch (error) {
+    console.error("Issue blood request failed:", error);
+    showToast("Could not record issuance. Please try again.", "error");
+  }
+}
+window.issueBloodRequest = issueBloodRequest;
 async function loadDonors() {
   const donors = await fetchData("/api/donors");
   const tbody = document.querySelector("#donorTable tbody");
   const donorCount = document.getElementById("donorCount");
 
-  if (!donors || !donors.donors || !donors.donors.length) {
+  if (!donors || donors.success === false || !Array.isArray(donors.donors)) {
+    console.error("Donor list could not be loaded:", donors?.message || "Invalid API response");
+    if (donorCount && donorCount.textContent === "Loading…") {
+      donorCount.textContent = "Unavailable";
+      donorCount.title = "Could not load donor count. Retry or check the API.";
+    }
+    if (tbody)
+      tbody.innerHTML = '<tr><td colspan="5">Unable to load donors. Please retry.</td></tr>';
+    return;
+  }
+
+  if (donors.donors.length === 0) {
     if (tbody)
       tbody.innerHTML = '<tr><td colspan="5">No donors registered yet</td></tr>';
     if (donorCount) donorCount.textContent = "0";
@@ -181,11 +386,11 @@ async function loadDonors() {
         (d) => `
       <tr>
         <td>${escapeHtml(d.name)}</td>
-        <td>${d.bloodGroup}</td>
+        <td><span class="donor-blood-badge donor-blood-${String(d.bloodGroup || "").replace(/[^A-Za-z0-9]/g, "").toLowerCase()}">${escapeHtml(d.bloodGroup || "—")}</span></td>
         <td>${d.phone}</td>
         <td>${escapeHtml(d.location)}</td>
         <td>
-          <button class="action-btn delete-btn" onclick="window.deleteDonor('${d._id}')">
+          <button class="action-btn delete-btn" onclick="window.deleteDonor('${d.id}')">
             <i class="fas fa-trash"></i> Delete
           </button>
          </td>
@@ -197,18 +402,32 @@ async function loadDonors() {
 }
 
 async function loadRequests() {
+  // JHARJEEVAN COUNTER REFRESH FIX V1: preserve last successful data during refresh.
   const requests = await fetchData("/api/requests");
   const tbody = document.querySelector("#requestTable tbody");
   const requestCount = document.getElementById("requestCount");
 
-  if (!requests || !requests.requests || !requests.requests.length) {
+  if (!requests || requests.success === false || !Array.isArray(requests.requests)) {
+    console.error("Request list could not be loaded:", requests?.message || "Invalid API response");
+    if (requestCount && requestCount.textContent === "Loading…") {
+      requestCount.textContent = "Unavailable";
+      requestCount.title = "Could not load request count. Retry or check the API.";
+    }
     if (tbody)
-      tbody.innerHTML = '<tr><td colspan="7">No requests yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8">Unable to load requests. Please retry.</td></tr>';
+    return;
+  }
+
+  if (requests.requests.length === 0) {
+    window.jharjeevanRequestsForAI = [];
+    if (tbody)
+      tbody.innerHTML = '<tr><td colspan="8">No requests yet</td></tr>';
     if (requestCount) requestCount.textContent = "0";
     return;
   }
 
   const requestsList = requests.requests;
+  window.jharjeevanRequestsForAI = requestsList;
   if (requestCount) requestCount.textContent = requestsList.length;
 
   if (tbody) {
@@ -217,8 +436,13 @@ async function loadRequests() {
         (r) => `
       <tr>
         <td>${escapeHtml(r.patientName)}</td>
-        <td><strong>${r.bloodGroup}</strong></td>
-        <td>${r.unitsRequired}</td>
+        <td><span class="request-blood-badge">${escapeHtml(r.bloodGroup || "—")}</span></td>
+        <td>${escapeHtml(String(r.unitsRequired ?? ""))}</td>
+        <td>
+          <span class="request-priority ${(String(r.priority || "Normal").toLowerCase() === "urgent") ? "status-pending" : ""}">
+            ${escapeHtml(String(r.priority || "Normal"))}
+          </span>
+        </td>
         <td>${escapeHtml(r.hospitalName)}</td>
         <td>${escapeHtml(r.city)}</td>
         <td>
@@ -229,15 +453,22 @@ async function loadRequests() {
         <td>
           ${
             r.status === "Pending"
-              ? `<button class="action-btn approve-btn" onclick="window.approveRequest('${r._id}')">
+              ? `<button class="action-btn approve-btn" onclick="window.approveRequest('${r.id}')">
             <i class="fas fa-check"></i> Approve
           </button>`
               : ""
           }
-          <button class="action-btn ai-match-btn" onclick="window.showDonorRecommendations('${r._id}')">
+          ${
+            r.status === "Approved"
+              ? `<button class="action-btn approve-btn" onclick="window.issueBloodRequest('${r.id}')">
+                  <i class="fas fa-hand-holding-medical"></i> Issue Blood
+                </button>`
+              : ""
+          }
+          ${!["Completed", "Rejected"].includes(String(r.status || "").trim()) ? `<button class="action-btn ai-match-btn" onclick="window.showDonorRecommendations('${r.id}')">
             <i class="fas fa-robot"></i> AI Match
-          </button>
-          <button class="action-btn delete-btn" onclick="window.deleteRequest('${r._id}')">
+          </button>` : ""}
+          <button class="action-btn delete-btn" onclick="window.deleteRequest('${r.id}')">
             <i class="fas fa-trash"></i> Delete
           </button>
           </td>
@@ -321,22 +552,81 @@ async function loadAIDemandPrediction() {
 
 // Function to show donor recommendations for a request
 async function showDonorRecommendations(requestId) {
-  showToast("ðŸ” AI is finding suitable donors...", "info");
-  
-  const response = await fetchData(`/api/ai/recommend-donors/${requestId}`);
-  
-  if (response && response.success && response.recommendedDonors && response.recommendedDonors.length > 0) {
-    let message = `âœ… AI Found ${response.recommendedDonors.length} Suitable Donors:\n\n`;
-    response.recommendedDonors.forEach((donor, index) => {
-      message += `${index + 1}. ${donor.name} (${donor.bloodGroup})\n`;
-      message += `   ðŸ“ ${donor.location}\n`;
-      message += `   ðŸ“ž ${donor.phone}\n`;
-      message += `   ðŸŽ¯ Match Score: ${Math.round(donor.score)}%\n\n`;
+  const normalizedId = String(requestId || "").trim();
+
+  if (!normalizedId) {
+    showToast("Cannot find the blood request ID. Refresh the requests list.", "error");
+    return;
+  }
+
+  if (showDonorRecommendations.running) {
+    showToast("A donor recommendation request is already running.", "info");
+    return;
+  }
+
+  showDonorRecommendations.running = true;
+  const loadingToast = showToast("AI is checking compatible donor records...", "info");
+
+  try {
+    const response = await fetchData(
+      `/api/ai/recommend-donors/${encodeURIComponent(normalizedId)}`
+    );
+
+    if (!response) {
+      showToast("No response from the server. Check your admin session and connection.", "error");
+      return;
+    }
+
+    if (response.success !== true) {
+      const errorMessage =
+        typeof response.message === "string" && response.message.trim()
+          ? response.message.trim()
+          : "The recommendation service returned an unknown error.";
+
+      showToast(`AI Match failed: ${errorMessage}`, "error");
+      console.error("AI donor recommendation failed:", {
+        requestId: normalizedId,
+        message: errorMessage
+      });
+      return;
+    }
+
+    const donors = Array.isArray(response.recommendedDonors)
+      ? response.recommendedDonors
+      : [];
+
+    if (donors.length === 0) {
+      showToast(
+        response.message || "No preliminarily compatible available donors were found.",
+        "info"
+      );
+      return;
+    }
+
+    const lines = [
+      `AI found ${donors.length} preliminary donor matches:`,
+      "",
+      "Important: These are preliminary matches only. The blood bank must verify donor eligibility, blood type, and compatibility before transfusion."
+    ];
+
+    donors.forEach((donor, index) => {
+      lines.push("");
+      lines.push(`${index + 1}. ${donor.name || "Name unavailable"} (${donor.bloodGroup || "Blood group unavailable"})`);
+      lines.push(`   Location: ${donor.location || "Not provided"}`);
+      lines.push(`   Phone: ${donor.phone || "Not provided"}`);
+
+      if (Number.isFinite(Number(donor.score))) {
+        lines.push(`   Location-based ranking score: ${Math.round(Number(donor.score))}%`);
+      }
     });
-    message += `ðŸ’¡ Tip: Contact donors in order of match score for best results.`;
-    alert(message);
-  } else {
-    showToast("No eligible donors found at this time. Try reaching out to nearby blood banks.", "error");
+
+    alert(lines.join("\n"));
+  } catch (error) {
+    console.error("AI donor recommendation exception:", error);
+    showToast("AI Match could not complete the request. Check the browser console.", "error");
+  } finally {
+    if (loadingToast) loadingToast.remove();
+    showDonorRecommendations.running = false;
   }
 }
 
@@ -344,6 +634,7 @@ async function showDonorRecommendations(requestId) {
 async function askChatbot(question) {
   try {
     const token = getToken();
+
     const response = await fetch(`${API_URL}/api/ai/chat`, {
       method: "POST",
       headers: {
@@ -352,17 +643,37 @@ async function askChatbot(question) {
       },
       body: JSON.stringify({ question })
     });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      return data.answer;
-    } else {
-      return "Sorry, I couldn't process your question. Please try again.";
+
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error(`The AI server returned an invalid response (${response.status}).`);
     }
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message ||
+        (response.status === 429
+          ? "Too many questions. Please wait a moment and try again."
+          : `The AI assistant request failed (${response.status}).`)
+      );
+    }
+
+    return {
+      answer: String(data.answer || data.message || "I couldn't find an answer. Please try asking another way."),
+      suggestedQuestions: Array.isArray(data.suggestedQuestions)
+        ? data.suggestedQuestions.filter((item) => typeof item === "string" && item.trim()).slice(0, 4)
+        : []
+    };
   } catch (error) {
     console.error("Chatbot error:", error);
-    return "Connection error. Please check your internet connection.";
+
+    if (error.name === "TypeError") {
+      return { answer: "Unable to connect to the AI assistant. Please check your connection and try again.", suggestedQuestions: [] };
+    }
+
+    return { answer: error.message || "Something went wrong. Please try again.", suggestedQuestions: [] };
   }
 }
 
@@ -394,6 +705,7 @@ function showToast(message, type = "info") {
       toast.remove();
     }
   }, 3000);
+  return toast;
 }
 
 // scrollToSection function for sidebar navigation
@@ -413,51 +725,197 @@ function initChatbot() {
   const chatInput = document.getElementById("chatInput");
   const chatMessages = document.getElementById("chatMessages");
 
+  if (!chatbotWindow || !chatMessages || !chatInput || !sendChat) {
+    console.warn("AI Assistant could not initialize: required elements are missing.");
+    return;
+  }
+
+  let isSending = false;
+
+  function scrollChatToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function renderAssistantText(container, message) {
+    const lines = String(message ?? "").split(/\r?\n/);
+
+    function appendInline(parent, text) {
+      const parts = text.split(/(\*\*[^*]+\*\*)/g);
+
+      parts.forEach((part) => {
+        if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+          const strong = document.createElement("strong");
+          strong.textContent = part.slice(2, -2);
+          parent.appendChild(strong);
+        } else if (part) {
+          parent.appendChild(document.createTextNode(part));
+        }
+      });
+    }
+
+    lines.forEach((line, index) => {
+      if (index > 0) {
+        container.appendChild(document.createElement("br"));
+      }
+
+      const cleanLine = line.replace(/^\s*[-•]\s+/, "• ");
+
+      if (!cleanLine.trim()) {
+        return;
+      }
+
+      appendInline(container, cleanLine);
+    });
+  }
+
+  function renderChatSuggestions(suggestions) {
+    if (!Array.isArray(suggestions) || !suggestions.length) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "chatbot-suggestions";
+    wrapper.setAttribute("aria-label", "Suggested questions");
+
+    suggestions.forEach((question) => {
+      if (typeof question !== "string" || !question.trim()) return;
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "chatbot-suggestion";
+      button.textContent = question.trim();
+      button.addEventListener("click", () => {
+        if (isSending) return;
+        chatInput.value = question.trim();
+        sendQuestion();
+      });
+
+      wrapper.appendChild(button);
+    });
+
+    if (wrapper.childElementCount) {
+      chatMessages.appendChild(wrapper);
+      scrollChatToBottom();
+    }
+  }
+
+  function appendChatMessage(label, message, type) {
+    const bubble = document.createElement("div");
+    bubble.className = `chatbot-message ${type}-message`;
+
+    const heading = document.createElement("strong");
+    heading.textContent = label;
+
+    const body = document.createElement("span");
+    if (type === "bot") {
+      renderAssistantText(body, message);
+    } else {
+      body.textContent = message;
+    }
+
+    bubble.appendChild(heading);
+    bubble.appendChild(document.createTextNode(" "));
+    bubble.appendChild(body);
+    chatMessages.appendChild(bubble);
+
+    scrollChatToBottom();
+    return bubble;
+  }
+
+  function setSending(busy) {
+    isSending = busy;
+    sendChat.disabled = busy;
+    chatInput.disabled = busy;
+    sendChat.setAttribute("aria-busy", String(busy));
+    chatInput.setAttribute("aria-busy", String(busy));
+
+    sendChat.innerHTML = busy
+      ? '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>'
+      : '<i class="fas fa-paper-plane" aria-hidden="true"></i>';
+
+    sendChat.setAttribute("aria-label", busy ? "Waiting for AI response" : "Send message");
+    sendChat.title = busy ? "Waiting for AI response" : "Send message";
+  }
+
   if (chatbotToggle) {
+    chatbotToggle.setAttribute("aria-controls", "chatbotWindow");
+    chatbotToggle.setAttribute("aria-expanded", "false");
+
     chatbotToggle.addEventListener("click", () => {
-      chatbotWindow.style.display = chatbotWindow.style.display === "none" ? "block" : "none";
+      const isOpen = window.getComputedStyle(chatbotWindow).display !== "none";
+      chatbotWindow.style.display = isOpen ? "none" : "flex";
+      chatbotToggle.setAttribute("aria-expanded", String(!isOpen));
+      chatbotToggle.setAttribute(
+        "aria-label",
+        isOpen ? "Open AI Assistant" : "Close AI Assistant"
+      );
+
+      if (!isOpen) {
+        chatInput.focus();
+        scrollChatToBottom();
+      }
     });
   }
 
   if (closeChatbot) {
+    closeChatbot.setAttribute("aria-label", "Close AI Assistant");
+
     closeChatbot.addEventListener("click", () => {
       chatbotWindow.style.display = "none";
-    });
-  }
-
-  if (sendChat && chatInput) {
-    sendChat.addEventListener("click", async () => {
-      const question = chatInput.value.trim();
-      if (!question) return;
-
-      // Add user message
-      chatMessages.innerHTML += `
-        <div class="chatbot-message user-message" style="margin-left: auto; text-align: right;">
-          <strong>You:</strong> ${escapeHtml(question)}
-        </div>
-      `;
-      chatInput.value = "";
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      // Get bot response
-      showToast("ðŸ¤– Thinking...", "info");
-      const answer = await askChatbot(question);
-      
-      // Add bot message
-      chatMessages.innerHTML += `
-        <div class="chatbot-message bot-message">
-          <strong>ðŸ¤– AI:</strong> ${escapeHtml(answer)}
-        </div>
-      `;
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    });
-
-    chatInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        sendChat.click();
+      if (chatbotToggle) {
+        chatbotToggle.setAttribute("aria-expanded", "false");
+        chatbotToggle.focus();
       }
     });
   }
+
+  async function sendQuestion() {
+    if (isSending) return;
+
+    const question = chatInput.value.trim();
+    if (!question) {
+      chatInput.focus();
+      return;
+    }
+
+    if (question.length > 500) {
+      appendChatMessage("AI:", "Please keep your question to 500 characters or fewer.", "bot");
+      return;
+    }
+
+    appendChatMessage("You:", question, "user");
+    chatInput.value = "";
+    setSending(true);
+
+    const typingBubble = document.createElement("div");
+    typingBubble.className = "chatbot-message bot-message chatbot-typing";
+    typingBubble.setAttribute("role", "status");
+    typingBubble.setAttribute("aria-live", "polite");
+    typingBubble.textContent = "AI is thinking…";
+    chatMessages.appendChild(typingBubble);
+    scrollChatToBottom();
+
+    try {
+      const result = await askChatbot(question);
+      typingBubble.remove();
+      appendChatMessage("AI:", result.answer, "bot");
+      renderChatSuggestions(result.suggestedQuestions);
+    } catch (error) {
+      typingBubble.remove();
+      console.error("AI Assistant send error:", error);
+      appendChatMessage("AI:", "Something went wrong. Please try again.", "bot");
+    } finally {
+      setSending(false);
+      chatInput.focus();
+    }
+  }
+
+  sendChat.addEventListener("click", sendQuestion);
+
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendQuestion();
+    }
+  });
 }
 
 // DOMContentLoaded block
@@ -472,6 +930,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Refresh data every 10 seconds
     setInterval(() => {
+      loadDonors();
       loadRequests();
       loadInventory();
       loadAIDemandPrediction();
@@ -484,6 +943,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     logoutBtn.addEventListener("click", logout);
   }
 
+  // JHARJEEVAN SIDEBAR LOGOUT BINDING START
+  const sidebarLogout = document.getElementById("sidebarLogout");
+  if (sidebarLogout) {
+    sidebarLogout.addEventListener("click", function (event) {
+      event.preventDefault();
+      if (typeof logout === "function") {
+        logout();
+      } else {
+        console.error("Logout function is unavailable.");
+      }
+    });
+  }
+  // JHARJEEVAN SIDEBAR LOGOUT BINDING END
   // Sidebar navigation
   document.querySelectorAll("[data-section]").forEach(link => {
     link.addEventListener("click", function (e) {
@@ -496,3 +968,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize chatbot
   initChatbot();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-// AI Chatbot for Blood Bank FAQs
+﻿// AI Chatbot for Blood Bank FAQs
 class BloodBankChatbot {
   static INTENTS = {
     ELIGIBILITY: "eligibility",
@@ -37,6 +37,16 @@ class BloodBankChatbot {
   }
 
   static detectIntent(question) {
+    const normalized = String(question || "")
+      .toLowerCase()
+      .trim()
+      .replace(/[.!?,]+$/g, "")
+      .replace(/\s+/g, " ");
+
+    if (/^(hi|hello|hey|hiya|greetings|namaste|hola)( there)?$/.test(normalized) ||
+        /^(good morning|good afternoon|good evening)$/.test(normalized)) {
+      return this.INTENTS.GREETING;
+    }
     const intentMap = [
       { intent: this.INTENTS.ELIGIBILITY, keywords: ['eligible', 'eligibility', 'can i donate', 'who can donate', 'am i eligible', 'criteria', 'qualify', 'requirements'] },
       { intent: this.INTENTS.DONATION_PROCESS, keywords: ['how to donate', 'donation process', 'donate blood', 'become donor', 'register donor', 'donor registration', 'where to donate', 'how can i donate', 'process of donation'] },
@@ -46,7 +56,7 @@ class BloodBankChatbot {
       { intent: this.INTENTS.AFTER_CARE, keywords: ['after donation', 'post donation', 'care after', 'what to do after', 'recovery', 'donation care', 'side effects', 'after donating'] },
       { intent: this.INTENTS.BENEFITS, keywords: ['benefits', 'advantage', 'why donate', 'health benefits', 'save life', 'rewards', 'why should i donate'] },
       { intent: this.INTENTS.INVENTORY, keywords: ['inventory', 'stock', 'available blood', 'blood available', 'shortage', 'supply', 'blood stock'] },
-      { intent: this.INTENTS.GREETING, keywords: ['hi', 'hello', 'hey', 'greetings', 'good morning', 'good evening', 'namaste', 'hola'] }
+      { intent: this.INTENTS.GREETING, keywords: ['good morning', 'good afternoon', 'good evening', 'greetings', 'namaste', 'hola'] }
     ];
     
     for (const { intent, keywords } of intentMap) {

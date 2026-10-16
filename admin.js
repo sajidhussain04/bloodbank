@@ -1,5 +1,5 @@
 // Admin Dashboard JavaScript
-const API_URL = (window.JHARJEEVAN_API_BASE || "http://localhost:5000").replace(/\/+$/, "");
+const API_URL = (window.JHARJEEVAN_API_BASE || ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:5000" : window.location.origin)).replace(/\/+$/, "");
 
 // Make functions globally accessible for inline onclick handlers
 window.deleteDonor = deleteDonor;

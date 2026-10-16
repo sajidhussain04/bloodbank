@@ -174,7 +174,7 @@
      * the JharJeevan Express server at localhost:5000.
      */
 
-    window.JHARJEEVAN_API_BASE = "http://localhost:5000";
+    window.JHARJEEVAN_API_BASE = (window.JHARJEEVAN_API_BASE || "http://localhost:5000").replace(/\/+$/, "");
 
     const TOKEN_KEY =
         "jharjeevan_client_token";
@@ -6387,10 +6387,14 @@ const originalInitDashboard =
                 );
             }
 
-            saveClient(result.client);
+            const updatedClient = normalizeClientProfile(
+                result.client
+            );
+
+            saveClient(updatedClient);
 
             updateProfileUI(
-                result.client
+                updatedClient
             );
 
             showMessage(
@@ -9724,6 +9728,7 @@ if (
 })();
 
 /* END JHARJEEVAN_CLEAN_FINAL_NAVIGATION_CONTROLLER */
+
 
 
 

@@ -1,4 +1,4 @@
-const express = require("express");
+﻿const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -90,6 +90,7 @@ const allowedOrigins = new Set([
 ]);
 
 if (process.env.RENDER_EXTERNAL_URL) allowedOrigins.add(process.env.RENDER_EXTERNAL_URL);
+if (process.env.VERCEL_URL) allowedOrigins.add(`https://${process.env.VERCEL_URL}`);
 if (process.env.FRONTEND_URL) allowedOrigins.add(process.env.FRONTEND_URL);
 
 app.use(
@@ -350,7 +351,23 @@ async function sendAdminNotification(subject, html) {
 
 /* -------------------- NEWSLETTER -------------------- */
 
-app.post("/api/newsletter/subscribe", async (req, res) => {
+const newsletterLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 5,
+  message: "Too many newsletter requests. Please try again later."
+});
+
+function escapeHtmlForEmail(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
+}
+
+app.post("/api/newsletter/subscribe", newsletterLimiter, async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
     const name = String(req.body.name || "").trim() || null;
@@ -371,6 +388,13 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
     if (findError) throw findError;
 
     if (existing) {
+      if (existing.is_active) {
+        return res.json({
+          success: true,
+          message: "You are already subscribed to our newsletter."
+        });
+      }
+
       if (!existing.is_active) {
         const { error: reactivateError } = await supabase
           .from("email_subscribers")
@@ -390,7 +414,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px">
             <h2 style="color:#c0392b">Welcome back to JharJeevan Ã¢ÂÂ¤Ã¯Â¸Â</h2>
-            <p>Hello ${name || existing.name || "there"},</p>
+            <p>Hello ${escapeHtmlForEmail(name || existing.name || "there")},</p>
             <p>Your newsletter subscription is active again.</p>
             <p>Thank you for staying connected with JharJeevan Blood Bank.</p>
           </div>
@@ -423,7 +447,7 @@ app.post("/api/newsletter/subscribe", async (req, res) => {
           <div style="text-align:center">
             <h2 style="color:#c0392b">Welcome to JharJeevan Ã¢ÂÂ¤Ã¯Â¸Â</h2>
           </div>
-          <p>Hello ${name || "there"},</p>
+          <p>Hello ${escapeHtmlForEmail(name || "there")},</p>
           <p>Thank you for subscribing to the JharJeevan newsletter.</p>
           <p>You will receive important blood donation updates, awareness messages,
           announcements and other useful information from us.</p>
@@ -636,7 +660,7 @@ async function verifyAdmin(req, res, next) {
 /* -------------------- ADMIN AUTH RATE LIMITING -------------------- */
 // Per-IP limiter for a single Node process. Use a shared store for
 // multi-instance deployments. Ensure trust proxy matches your host.
-function createAdminRateLimiter({ windowMs, maxRequests, message }) {
+function createRateLimiter({ windowMs, maxRequests, message }) {
   const requests = new Map();
 
   return function adminRateLimiter(req, res, next) {
@@ -676,24 +700,65 @@ function createAdminRateLimiter({ windowMs, maxRequests, message }) {
   };
 }
 
-const adminLoginLimiter = createAdminRateLimiter({
+const adminLoginLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   maxRequests: 10,
   message: "Too many login attempts. Please try again later."
 });
 
-const adminForgotLimiter = createAdminRateLimiter({
+const adminForgotLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   maxRequests: 5,
   message: "Too many password reset requests. Please try again later."
 });
 
-const adminResetLimiter = createAdminRateLimiter({
+const adminResetLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
   maxRequests: 10,
   message: "Too many password reset attempts. Please try again later."
 });
 
+const clientLoginLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 10,
+  message: "Too many login attempts. Please try again later."
+});
+
+const clientRegisterLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 5,
+  message: "Too many registration attempts. Please try again later."
+});
+
+const clientForgotLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 5,
+  message: "Too many password reset requests. Please try again later."
+});
+
+const clientResetLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 10,
+  message: "Too many password reset attempts. Please try again later."
+});
+
+const publicDonorLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 10,
+  message: "Too many donor registration attempts. Please try again later."
+});
+
+const publicRequestLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 20,
+  message: "Too many blood requests submitted. Please try again later."
+});
+
+const clientDonorLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 10,
+  message: "Too many donor registration attempts. Please try again later."
+});
 /* -------------------- AUTH ROUTES -------------------- */
 app.post("/api/admin/login", adminLoginLimiter, async (req, res) => {
   try {
@@ -767,7 +832,7 @@ app.post("/api/admin/forgot", adminForgotLimiter, async (req, res) => {
       .eq("id", admin.id);
     if (updateError) throw updateError;
 
-    const baseUrl = process.env.FRONTEND_URL || `${req.protocol}://${req.get("host")}`;
+    const baseUrl = process.env.FRONTEND_URL || process.env.APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : `${req.protocol}://${req.get("host")}`);
     const resetUrl = `${baseUrl.replace(/\/$/, "")}/reset-password.html?token=${encodeURIComponent(resetToken)}`;
 
     if (transporter) {
@@ -1258,7 +1323,8 @@ function getClientPortalBaseUrl() {
   const configured =
     process.env.CLIENT_APP_URL ||
     process.env.FRONTEND_URL ||
-    process.env.APP_URL;
+    process.env.APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
 
   if (!configured) {
     return "http://localhost:5000";
@@ -1480,7 +1546,7 @@ async function sendClientPasswordChangedEmail(client) {
  * - Invalidates previous unused tokens.
  * - Token expires after 30 minutes.
  */
-app.post("/api/client/forgot-password", async (req, res) => {
+app.post("/api/client/forgot-password", clientForgotLimiter, async (req, res) => {
   const genericMessage =
     "If that email address is registered, we will send a password reset link shortly.";
 
@@ -1590,7 +1656,7 @@ app.post("/api/client/forgot-password", async (req, res) => {
 /*
  * CLIENT RESET PASSWORD
  */
-app.post("/api/client/reset-password", async (req, res) => {
+app.post("/api/client/reset-password", clientResetLimiter, async (req, res) => {
   try {
     const token = String(req.body.token || "").trim();
     const newPassword = String(req.body.newPassword || "");
@@ -1735,7 +1801,8 @@ function getJharJeevanEmailBaseUrl() {
 
   const configured =
     process.env.CLIENT_APP_URL ||
-    process.env.APP_URL;
+    process.env.APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
 
   return (
     configured ||
@@ -2125,7 +2192,7 @@ function getEmailInfoCard(rows) {
 
 /* -------------------- CLIENT AUTH ROUTES -------------------- */
 
-app.post("/api/client/register", async (req, res) => {
+app.post("/api/client/register", clientRegisterLimiter, async (req, res) => {
   try {
     const name = String(req.body.name || "").trim();
     const email = normalizeEmail(req.body.email);
@@ -2269,7 +2336,7 @@ app.post("/api/client/register", async (req, res) => {
   }
 });
 
-app.post("/api/client/login", async (req, res) => {
+app.post("/api/client/login", clientLoginLimiter, async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password || "");
@@ -2482,7 +2549,7 @@ app.get("/api/client/donor", verifyClient, async (req, res) => {
   }
 });
 
-app.post("/api/client/donor", verifyClient, async (req, res) => {
+app.post("/api/client/donor", verifyClient, clientDonorLimiter, async (req, res) => {
 
   try {
 
@@ -3752,7 +3819,7 @@ app.get("/api/donors", verifyAdmin, async (req, res) => {
 });
 
 // PUBLIC donor registration.
-app.post("/api/donors", async (req, res) => {
+app.post("/api/donors", publicDonorLimiter, async (req, res) => {
   try {
     const b = req.body || {};
     const donor = {
@@ -3940,7 +4007,7 @@ app.get("/api/requests", verifyAdmin, async (req, res) => {
 });
 
 // PUBLIC blood-request submission.
-app.post("/api/requests", async (req, res) => {
+app.post("/api/requests", publicRequestLimiter, async (req, res) => {
   try {
     const b = req.body || {};
 
@@ -3968,6 +4035,33 @@ app.post("/api/requests", async (req, res) => {
         return res.status(401).json({
           success: false,
           message: "Invalid or expired client session."
+        });
+      }
+    }
+
+    if (clientUserId) {
+      const { data: activeClient, error: activeClientError } = await supabase
+        .from("client_users")
+        .select("id,is_active")
+        .eq("id", clientUserId)
+        .maybeSingle();
+
+      if (activeClientError) {
+        console.error(
+          "Blood request client verification failed:",
+          activeClientError.message
+        );
+
+        return res.status(503).json({
+          success: false,
+          message: "Unable to verify your client account. Please try again."
+        });
+      }
+
+      if (!activeClient || activeClient.is_active !== true) {
+        return res.status(403).json({
+          success: false,
+          message: "Your client account is inactive or no longer available."
         });
       }
     }
@@ -4040,6 +4134,39 @@ app.post("/api/requests", async (req, res) => {
 // APPROVE request — admin only.
 app.patch("/api/requests/:id/approve", verifyAdmin, async (req, res) => {
   try {
+    const requestId = String(req.params.id || "").trim();
+
+    if (!validUUID(requestId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid blood request ID."
+      });
+    }
+
+    const { data: existing, error: lookupError } = await supabase
+      .from("blood_requests")
+      .select("id,status")
+      .eq("id", requestId)
+      .maybeSingle();
+
+    if (lookupError) throw lookupError;
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: "Blood request not found."
+      });
+    }
+
+    if (existing.status !== "Pending") {
+      return res.status(409).json({
+        success: false,
+        message: existing.status === "Completed"
+          ? "Completed requests cannot be approved again."
+          : "Only pending blood requests can be approved."
+      });
+    }
+
     const { data, error } = await supabase
       .from("blood_requests")
       .update({
@@ -4047,15 +4174,17 @@ app.patch("/api/requests/:id/approve", verifyAdmin, async (req, res) => {
         approved_by: req.admin?.email || "Administrator",
         approved_at: new Date().toISOString()
       })
-      .eq("id", req.params.id)
+      .eq("id", requestId)
+      .eq("status", "Pending")
       .select("*")
       .maybeSingle();
 
     if (error) throw error;
+
     if (!data) {
-      return res.status(404).json({
+      return res.status(409).json({
         success: false,
-        message: "Blood request not found."
+        message: "The request status changed. Refresh the request list and try again."
       });
     }
 
@@ -4076,8 +4205,15 @@ app.patch("/api/requests/:id/approve", verifyAdmin, async (req, res) => {
 // UPDATE request status — admin only.
 app.put("/api/requests/:id", verifyAdmin, async (req, res) => {
   try {
-    const b = req.body || {};
-    const status = b.status;
+    const requestId = String(req.params.id || "").trim();
+    const status = (req.body || {}).status;
+
+    if (!validUUID(requestId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid blood request ID."
+      });
+    }
 
     if (!REQUEST_STATUSES.includes(status)) {
       return res.status(400).json({
@@ -4093,7 +4229,30 @@ app.put("/api/requests/:id", verifyAdmin, async (req, res) => {
       });
     }
 
+    const { data: existing, error: lookupError } = await supabase
+      .from("blood_requests")
+      .select("id,status")
+      .eq("id", requestId)
+      .maybeSingle();
+
+    if (lookupError) throw lookupError;
+
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: "Blood request not found."
+      });
+    }
+
+    if (existing.status === "Completed") {
+      return res.status(409).json({
+        success: false,
+        message: "Completed requests cannot be changed."
+      });
+    }
+
     const updates = { status };
+
     if (status === "Approved") {
       updates.approved_by = req.admin?.email || "Administrator";
       updates.approved_at = new Date().toISOString();
@@ -4102,15 +4261,17 @@ app.put("/api/requests/:id", verifyAdmin, async (req, res) => {
     const { data, error } = await supabase
       .from("blood_requests")
       .update(updates)
-      .eq("id", req.params.id)
+      .eq("id", requestId)
+      .eq("status", existing.status)
       .select("*")
       .maybeSingle();
 
     if (error) throw error;
+
     if (!data) {
-      return res.status(404).json({
+      return res.status(409).json({
         success: false,
-        message: "Blood request not found."
+        message: "The request status changed. Refresh the request list and try again."
       });
     }
 
@@ -4126,7 +4287,6 @@ app.put("/api/requests/:id", verifyAdmin, async (req, res) => {
     });
   }
 });
-
 // DELETE request — admin only.
 // Preserve completed requests and issuance/inventory audit history.
 app.delete("/api/requests/:id", verifyAdmin, async (req, res) => {
@@ -4337,3 +4497,6 @@ async function startServer() {
 
 
 if (require.main === module) startServer();
+
+// Export the Express application for Vercel's Node.js function runtime.
+module.exports = app;

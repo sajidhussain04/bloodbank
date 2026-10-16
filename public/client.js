@@ -173,8 +173,7 @@
      * localhost:5500, etc. The API itself always lives on
      * the JharJeevan Express server at localhost:5000.
      */
-
-    window.JHARJEEVAN_API_BASE = (window.JHARJEEVAN_API_BASE || "http://localhost:5000").replace(/\/+$/, "");
+window.JHARJEEVAN_API_BASE = (window.JHARJEEVAN_API_BASE || ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") ? "http://localhost:5000" : window.location.origin)).replace(/\/+$/, "");
 
     const TOKEN_KEY =
         "jharjeevan_client_token";

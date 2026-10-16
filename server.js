@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const { createClient } = require("@supabase/supabase-js");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -278,6 +278,7 @@ app.get("/api/health", async (_req, res) => {
     });
   }
 });
+app.use(express.static(require("path").join(PUBLIC_DIR, "public")));
 app.use(express.static(PUBLIC_DIR));
 app.get("/favicon.ico", (_req, res) => res.status(204).end());
 

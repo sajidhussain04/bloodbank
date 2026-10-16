@@ -1,0 +1,910 @@
+﻿document.addEventListener('DOMContentLoaded', function () {
+  // API Configuration - FIXED: Use absolute URL instead of window.location.origin
+  const API_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : window.location.origin;
+  
+  // DOM Elements
+  const donorForm = document.getElementById('donorRegistration');
+  const bloodRequestForm = document.getElementById('bloodRequest');
+  const newsletterForm = document.getElementById('newsletterForm');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const mainNav = document.getElementById('mainNav');
+  const refreshInventoryBtn = document.getElementById('refreshInventory');
+  const updateTimeElement = document.getElementById('updateTime');
+
+  // Initialize application
+  initApp();
+
+  function initApp() {
+    setupEventListeners();
+    updateInventoryTime();
+    loadInventoryStats();
+    
+    // Update inventory time every hour
+    setInterval(updateInventoryTime, 3600000);
+  }
+
+  function setupEventListeners() {
+    // Mobile menu
+    if (mobileMenuBtn && mainNav) {
+      mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    }
+
+    // Donor form
+    if (donorForm) {
+      setupFormValidation(donorForm);
+      donorForm.addEventListener('submit', handleDonorRegistration);
+    }
+
+    // Blood request form
+    if (bloodRequestForm) {
+      setupFormValidation(bloodRequestForm);
+      bloodRequestForm.addEventListener('submit', handleBloodRequest);
+    }
+
+    // Newsletter form
+    if (newsletterForm) {
+      newsletterForm.addEventListener('submit', handleNewsletterSubscription);
+    }
+
+    // Refresh inventory
+    if (refreshInventoryBtn) {
+      refreshInventoryBtn.addEventListener('click', loadInventoryStats);
+    }
+
+    // Form input validation
+    setupRealTimeValidation();
+  }
+
+  function toggleMobileMenu() {
+    const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+    mobileMenuBtn.setAttribute('aria-expanded', !isExpanded);
+    mainNav.classList.toggle('show');
+  }
+
+  function setupFormValidation(form) {
+    const inputs = form.querySelectorAll('input, select, textarea');
+    
+    inputs.forEach(input => {
+      input.addEventListener('blur', function() {
+        validateField(this);
+      });
+      
+      input.addEventListener('input', function() {
+        clearFieldError(this);
+      });
+    });
+  }
+
+  function setupRealTimeValidation() {
+    // Phone number validation
+    const phoneInputs = document.querySelectorAll('input[type="tel"], input[id$="Phone"]');
+    phoneInputs.forEach(input => {
+      input.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length > 10) {
+          this.value = this.value.slice(0, 10);
+        }
+      });
+    });
+    // ============================================================
+    // AGE VALIDATION
+    // Allow the user to type normally.
+    // Do NOT force 18/65 while typing.
+    // ============================================================
+
+    const ageInput = document.getElementById('donorAge');
+
+    if (ageInput) {
+
+      ageInput.setAttribute('min', '18');
+      ageInput.setAttribute('max', '65');
+      ageInput.setAttribute('step', '1');
+      ageInput.setAttribute('inputmode', 'numeric');
+
+      // Allow normal typing
+      ageInput.addEventListener('input', function () {
+
+        // Keep numbers only
+        this.value = this.value.replace(/\D/g, '');
+
+        // Maximum two digits
+        if (this.value.length > 2) {
+          this.value = this.value.slice(0, 2);
+        }
+
+        // While typing, don't show an error
+        // This allows "2" -> "20" to work normally.
+        clearFieldError(this);
+      });
+
+      // Validate only after the user leaves the field
+      ageInput.addEventListener('blur', function () {
+
+        const value = this.value.trim();
+
+        if (value === '') {
+          showFieldError(this, 'Age is required');
+          return;
+        }
+
+        const age = Number(value);
+
+        if (!Number.isInteger(age) || age < 18 || age > 65) {
+          showFieldError(
+            this,
+            'Age must be between 18 and 65 years'
+          );
+          return;
+        }
+
+        // Valid age
+        clearFieldError(this);
+      });
+    }
+
+
+    // Date validation - cannot select past dates
+    const dateInput = document.getElementById('requiredDate');
+    if (dateInput) {
+      const today = new Date().toISOString().split('T')[0];
+      dateInput.min = today;
+    }
+    
+    // Units validation
+    const unitsInput = document.getElementById('unitsRequired');
+    if (unitsInput) {
+      unitsInput.addEventListener('input', function(e) {
+        let val = parseInt(this.value);
+        if (isNaN(val)) return;
+        if (val < 1) this.value = 1;
+        if (val > 10) this.value = 10;
+      });
+    }
+  }
+
+  function validateField(field) {
+    clearFieldError(field);
+
+    const value = field.value.trim();
+    const formGroup = field.closest('.form-group');
+
+    // Required field validation
+    if (field.hasAttribute('required') && !value) {
+      showFieldError(field, 'This field is required');
+      return false;
+    }
+
+    // Skip further validation if field is empty and not required
+    if (!value && !field.hasAttribute('required')) {
+      return true;
+    }
+
+    // Email validation
+    if (field.type === 'email' && value && !isValidEmail(value)) {
+      showFieldError(field, 'Please enter a valid email address');
+      return false;
+    }
+
+    // Phone validation
+    if ((field.type === 'tel' || field.id === 'donorPhone' || field.id === 'requesterPhone') && value && !isValidPhone(value)) {
+      showFieldError(field, 'Please enter a valid 10-digit phone number');
+      return false;
+    }
+
+    // Age validation
+    if (field.id === 'donorAge' && value) {
+      const age = parseInt(value);
+      if (isNaN(age) || age < 18 || age > 65) {
+        showFieldError(field, 'Age must be between 18 and 65 years');
+        return false;
+      }
+    }
+
+    // Units validation
+    if (field.id === 'unitsRequired' && value) {
+      const units = parseInt(value);
+      if (isNaN(units) || units < 1 || units > 10) {
+        showFieldError(field, 'Units must be between 1 and 10');
+        return false;
+      }
+    }
+    
+    // Blood group validation
+    if (field.id === 'donorBloodGroup' || field.id === 'bloodGroup') {
+      const validGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+      if (!validGroups.includes(value)) {
+        showFieldError(field, 'Please select a valid blood group');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  function isValidPhone(phone) {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  }
+
+  function showFieldError(field, message) {
+    const formGroup = field.closest('.form-group');
+    if (!formGroup) return;
+    
+    let errorElement = formGroup.querySelector('.field-error');
+    
+    if (!errorElement) {
+      errorElement = document.createElement('div');
+      errorElement.className = 'field-error';
+      formGroup.appendChild(errorElement);
+    }
+    
+    errorElement.textContent = message;
+    formGroup.classList.add('error');
+    field.setAttribute('aria-invalid', 'true');
+  }
+
+  function clearFieldError(field) {
+    const formGroup = field.closest('.form-group');
+    if (!formGroup) return;
+    
+    const errorElement = formGroup.querySelector('.field-error');
+    if (errorElement && errorElement.parentNode === formGroup) {
+      errorElement.remove();
+    }
+    formGroup.classList.remove('error');
+    field.removeAttribute('aria-invalid');
+  }
+
+  function validateForm(form) {
+    const inputs = form.querySelectorAll('input, select, textarea');
+    let isValid = true;
+    
+    inputs.forEach(input => {
+      if (!validateField(input)) {
+        isValid = false;
+      }
+    });
+    
+    return isValid;
+  }
+
+  async function handleDonorRegistration(e) {
+    e.preventDefault();
+    
+    if (!donorForm) return;
+    
+    // Validate all fields before submission
+    if (!validateForm(donorForm)) {
+      showMessage('Please correct the errors in the form', 'error');
+      return;
+    }
+    
+    const submitBtn = donorForm.querySelector('button[type="submit"]');
+    
+    // Get optional email field (may not exist)
+    const emailInput = document.getElementById('donorEmail');
+    
+    const donorData = {
+      name: document.getElementById('donorName').value.trim(),
+      age: parseInt(document.getElementById('donorAge').value.trim()),
+      bloodGroup: document.getElementById('donorBloodGroup').value,
+      phone: document.getElementById('donorPhone').value.trim(),
+      email: emailInput ? emailInput.value.trim() : '',
+      location: document.getElementById('donorLocation').value.trim()
+    };
+
+    if (!donorData.name || !donorData.age || !donorData.bloodGroup || !donorData.phone || !donorData.location) {
+      showMessage('Please fill all required fields', 'error');
+      return;
+    }
+
+    setButtonLoading(submitBtn, true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/donors`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(donorData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        showMessage('Donor registered successfully! Thank you for saving lives.', 'success');
+        donorForm.reset();
+        // Reload inventory stats after new donor registration
+        setTimeout(loadInventoryStats, 1000);
+      } else {
+        showMessage(data.message || 'Error registering donor. Please try again.', 'error');
+      }
+    } catch (error) {
+      console.error('Donor registration error:', error);
+      showMessage('Unable to connect to server. Please check your connection.', 'error');
+    } finally {
+      setButtonLoading(submitBtn, false);
+    }
+  }
+
+  async function handleBloodRequest(e) {
+    e.preventDefault();
+    
+    if (!bloodRequestForm) return;
+    
+    // Validate all fields before submission
+    if (!validateForm(bloodRequestForm)) {
+      showMessage('Please correct the errors in the form', 'error');
+      return;
+    }
+    
+    const submitBtn = bloodRequestForm.querySelector('button[type="submit"]');
+
+    // Get optional email field
+    const emailInput = document.getElementById('requesterEmail');
+    
+    const requestData = {
+      patientName: document.getElementById('patientName').value.trim(),
+      bloodGroup: document.getElementById('bloodGroup').value,
+      unitsRequired: parseInt(document.getElementById('unitsRequired').value.trim()),
+      hospitalName: document.getElementById('hospitalName').value.trim(),
+      hospitalAddress: document.getElementById('hospitalAddress').value.trim(),
+      city: document.getElementById('city').value.trim(),
+      requiredDate: document.getElementById('requiredDate').value,
+      requesterName: document.getElementById('requesterName') ? document.getElementById('requesterName').value.trim() : document.getElementById('patientName').value.trim(),
+      requesterPhone: document.getElementById('requesterPhone').value.trim(),
+      requesterEmail: emailInput ? emailInput.value.trim() : ''
+    };
+
+    // Validate required fields
+    const requiredFields = ['patientName', 'bloodGroup', 'unitsRequired', 'hospitalName', 'hospitalAddress', 'city', 'requiredDate', 'requesterPhone', 'requesterEmail'];
+    let missingFields = [];
+    
+    for (const field of requiredFields) {
+      if (!requestData[field]) {
+        missingFields.push(field.replace(/([A-Z])/g, ' $1').toLowerCase());
+      }
+    }
+    
+    if (missingFields.length > 0) {
+      showMessage(`Please fill all required fields: ${missingFields.join(', ')}`, 'error');
+      return;
+    }
+
+    setButtonLoading(submitBtn, true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        const priorityMsg = data.request?.priority === 'Urgent' ? 'Urgent request has been sent to eligible donors.' : '';
+        showMessage(`Blood request submitted successfully!  You will receive status updates from JharJeevan.`, 'success');
+        bloodRequestForm.reset();
+      } else {
+        showMessage(data.message || 'Error submitting request. Please try again.', 'error');
+      }
+    } catch (error) {
+      console.error('Blood request error:', error);
+      showMessage('Unable to connect to server. Please check your connection.', 'error');
+    } finally {
+      setButtonLoading(submitBtn, false);
+    }
+  }
+
+  async function handleNewsletterSubscription(e) {
+    e.preventDefault();
+
+    const emailInput = newsletterForm.querySelector('input[type="email"]');
+    const email = emailInput ? emailInput.value.trim() : '';
+
+    if (!email || !isValidEmail(email)) {
+      showMessage('Please enter a valid email address', 'error');
+      return;
+    }
+
+    const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+
+    try {
+      setButtonLoading(submitBtn, true);
+
+      const response = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        showMessage(
+          data.message || 'Unable to subscribe. Please try again.',
+          'error'
+        );
+        return;
+      }
+
+      showMessage(
+        data.message || 'Thank you for subscribing to our newsletter!',
+        'success'
+      );
+
+      newsletterForm.reset();
+
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+
+      showMessage(
+        'Unable to connect to server. Please try again.',
+        'error'
+      );
+    } finally {
+      setButtonLoading(submitBtn, false);
+    }
+  }
+
+  function setButtonLoading(button, isLoading) {
+    if (!button) return;
+    
+    if (isLoading) {
+      button.disabled = true;
+      button.classList.add('loading');
+      const originalText = button.innerHTML;
+      button.setAttribute('data-original-text', originalText);
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    } else {
+      button.disabled = false;
+      button.classList.remove('loading');
+      const originalText = button.getAttribute('data-original-text');
+      if (originalText) {
+        button.innerHTML = originalText;
+      }
+    }
+  }
+
+  function showMessage(msg, type = 'success') {
+    let toastContainer = document.getElementById('toastContainer');
+
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toastContainer';
+
+        toastContainer.style.cssText = `
+            position: fixed;
+            top: 88px;
+            right: 24px;
+            z-index: 10000;
+            width: min(420px, calc(100vw - 32px));
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        `;
+
+        document.body.appendChild(toastContainer);
+    }
+
+    // Keep important notifications clean instead of stacking endlessly.
+    if (type === 'success' || type === 'error') {
+        toastContainer.querySelectorAll('.toast').forEach(existingToast => {
+            existingToast.remove();
+        });
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const config = {
+        success: {
+            icon: 'check',
+            title: 'Success'
+        },
+        error: {
+            icon: 'exclamation-triangle',
+            title: 'Something went wrong'
+        },
+        warning: {
+            icon: 'exclamation-triangle',
+            title: 'Attention'
+        },
+        info: {
+            icon: 'info',
+            title: 'Information'
+        }
+    };
+
+    const current = config[type] || config.info;
+
+    toast.innerHTML = `
+        <div style="
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            padding: 15px 17px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.98);
+            color: #172033;
+            border: 1px solid rgba(220,38,38,0.12);
+            box-shadow: 0 18px 45px rgba(15,23,42,0.18);
+            overflow: hidden;
+            pointer-events: auto;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            animation: jharjeevanToastIn .45s cubic-bezier(.22,1,.36,1) both;
+        ">
+
+            <div style="
+                flex: 0 0 40px;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: grid;
+                place-items: center;
+                background: ${type === 'success' ? '#eafaf0' : type === 'error' ? '#fff0f0' : type === 'warning' ? '#fff7e6' : '#eef5ff'};
+                color: ${type === 'success' ? '#16a34a' : type === 'error' ? '#dc2626' : type === 'warning' ? '#d97706' : '#2563eb'};
+                font-size: 16px;
+            ">
+                <i class="fas fa-${current.icon}"></i>
+            </div>
+
+            <div style="
+                min-width: 0;
+                flex: 1;
+                padding-right: 22px;
+            ">
+                <div style="
+                    font-size: 13px;
+                    font-weight: 800;
+                    margin-bottom: 4px;
+                    color: #172033;
+                ">
+                    ${current.title}
+                </div>
+
+                <div style="
+                    font-size: 13px;
+                    line-height: 1.55;
+                    color: #64748b;
+                    font-weight: 600;
+                    word-break: break-word;
+                ">
+                    ${msg}
+                </div>
+            </div>
+
+            <button
+                type="button"
+                aria-label="Close notification"
+                class="jharjeevan-toast-close"
+                style="
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    width: 28px;
+                    height: 28px;
+                    border: 0;
+                    border-radius: 50%;
+                    background: #f1f5f9;
+                    color: #64748b;
+                    cursor: pointer;
+                    display: grid;
+                    place-items: center;
+                    transition: all .2s ease;
+                "
+            >
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div style="
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                height: 3px;
+                width: 100%;
+                background: ${type === 'success' ? '#22c55e' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+                transform-origin: left;
+                animation: jharjeevanToastProgress 5s linear forwards;
+            "></div>
+        </div>
+    `;
+
+    toastContainer.appendChild(toast);
+
+    const closeButton = toast.querySelector('.jharjeevan-toast-close');
+
+    closeButton.addEventListener('mouseenter', () => {
+        closeButton.style.background = '#fee2e2';
+        closeButton.style.color = '#dc2626';
+    });
+
+    closeButton.addEventListener('mouseleave', () => {
+        closeButton.style.background = '#f1f5f9';
+        closeButton.style.color = '#64748b';
+    });
+
+    const removeToast = () => {
+        if (!toast.parentNode) return;
+
+        const card = toast.firstElementChild;
+
+        card.style.animation = 'jharjeevanToastOut .3s ease forwards';
+
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 280);
+    };
+
+    closeButton.addEventListener('click', removeToast);
+
+    setTimeout(removeToast, 5000);
+}
+
+  function updateInventoryTime() {
+    const now = new Date();
+    if (updateTimeElement) {
+      updateTimeElement.textContent = now.toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+  }
+
+  async function loadInventoryStats() {
+    if (refreshInventoryBtn) {
+      refreshInventoryBtn.disabled = true;
+      refreshInventoryBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/inventory`);
+      if (response.ok) {
+        const inventory = await response.json();
+        updateInventoryDisplay(inventory);
+        // Inventory loaded successfully.
+      } else {
+        console.error('Failed to load inventory:', response.status);
+      }
+    } catch (error) {
+      console.error('Error loading inventory:', error);
+      // Don't show error message for inventory - it's not critical
+    } finally {
+      if (refreshInventoryBtn) {
+        refreshInventoryBtn.disabled = false;
+        refreshInventoryBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Inventory';
+      }
+      updateInventoryTime();
+    }
+  }
+
+  function updateInventoryDisplay(inventory) {
+    const cards = document.querySelectorAll('#inventory .blood-group');
+
+    cards.forEach(card => {
+      const heading = card.querySelector('h3');
+      const level = card.querySelector('.blood-level');
+      const unitsElement = card.querySelector('.blood-units');
+
+      if (!heading || !level || !unitsElement) return;
+
+      const bloodGroup = heading.textContent.trim();
+
+      if (!Object.prototype.hasOwnProperty.call(inventory, bloodGroup)) {
+        return;
+      }
+
+      const units = Math.max(0, Number(inventory[bloodGroup]) || 0);
+
+      let statusClass;
+      let statusLabel;
+
+      if (units === 0) {
+        statusClass = 'out';
+        statusLabel = 'Out of Stock';
+      } else if (units < 5) {
+        statusClass = 'low';
+        statusLabel = 'Critical';
+      } else if (units < 10) {
+        statusClass = 'medium';
+        statusLabel = 'Limited';
+      } else {
+        statusClass = 'high';
+        statusLabel = 'Available';
+      }
+
+      /*
+       * Keep the existing visual structure but make the
+       * status completely data-driven.
+       */
+      level.className = `blood-level ${statusClass}`;
+      level.textContent = statusLabel;
+
+      unitsElement.textContent =
+        `${units} ${units === 1 ? 'unit' : 'units'}`;
+
+      /*
+       * Make sure the stock meter exists even if the
+       * HTML was not updated manually.
+       */
+      let meter = card.querySelector('.stock-meter');
+
+      if (!meter) {
+        meter = document.createElement('div');
+        meter.className = 'stock-meter';
+        meter.setAttribute('aria-hidden', 'true');
+
+        const fill = document.createElement('span');
+        fill.className = 'stock-fill';
+
+        meter.appendChild(fill);
+
+        unitsElement.insertAdjacentElement('beforebegin', meter);
+      }
+
+      const fill = meter.querySelector('.stock-fill');
+
+      /*
+       * Cap visual scale at 50 units.
+       */
+      const percentage =
+        units === 0
+          ? 0
+          : Math.max(6, Math.min(100, (units / 50) * 100));
+
+      if (fill) {
+        requestAnimationFrame(() => {
+          fill.style.width = `${percentage}%`;
+        });
+      }
+
+      card.dataset.status = statusClass;
+      card.dataset.units = String(units);
+
+      card.classList.remove(
+        'inventory-high',
+        'inventory-medium',
+        'inventory-low',
+        'inventory-out',
+        'inventory-updated'
+      );
+
+      card.classList.add(`inventory-${statusClass}`);
+
+      /*
+       * Small refresh animation.
+       */
+      void card.offsetWidth;
+      card.classList.add('inventory-updated');
+
+      window.setTimeout(() => {
+        card.classList.remove('inventory-updated');
+      }, 650);
+    });
+  }
+  // Health check on load
+  async function checkServerHealth() {
+    try {
+      const response = await fetch(`${API_URL}/api/health`);
+      if (!response.ok) {
+        console.warn('Server health check failed:', response.status);
+        showMessage('Server connection issue detected. Some features may be limited.', 'warning');
+      } else {
+        const healthData = await response.json();
+        console.log('Server health:', healthData);
+      }
+    } catch (error) {
+      console.error('Health check error:', error);
+      showMessage('Unable to connect to server. Please check your connection.', 'error');
+    }
+  }
+
+  // Run health check after a short delay
+  setTimeout(checkServerHealth, 2000);
+
+  // Add animation styles for toasts
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+    
+    .field-error {
+      color: #f44336;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+    }
+    
+    .form-group.error input,
+    .form-group.error select,
+    .form-group.error textarea {
+      border-color: #f44336;
+    }
+    
+    button.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    
+    .toast {
+      animation: slideIn 0.3s ease;
+    }
+    
+    .toast button:hover {
+      opacity: 0.8;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Smooth scrolling for navigation links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const href = this.getAttribute('href');
+      if (href === '#') return;
+      
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+        
+        // Close mobile menu if open
+        if (mainNav && mainNav.classList.contains('show')) {
+          toggleMobileMenu();
+        }
+      }
+    });
+  });
+});
+
+
+
+
+
+
+
+
+
+
